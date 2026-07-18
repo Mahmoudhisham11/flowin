@@ -1,0 +1,155 @@
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 24px 32px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0 24px;
+  gap: 20px;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--success-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.2);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.amountSection {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-direction: row;
+}
+
+.amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.currency {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-gray);
+}
+
+.card {
+  width: 100%;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 0 16px 24px;
+  }
+  .header {
+    padding: 16px 0 0;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .uploadArea {
+    padding: 40px 20px;
+    min-height: 160px;
+  }
+  .uploadIcon {
+    width: 48px;
+    height: 48px;
+  }
+  .field {
+    padding: 12px 0;
+    gap: 4px;
+  }
+  .label {
+    font-size: 11px;
+  }
+  .value {
+    font-size: 13px;
+  }
+  .actions {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: none;
+    margin: 0;
+    padding: 28px 32px 32px;
+  }
+  .main {
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+  }
+}

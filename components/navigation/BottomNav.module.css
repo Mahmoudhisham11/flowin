@@ -1,0 +1,132 @@
+.nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0 16px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--nav-border);
+  border-radius: 28px;
+  padding: 6px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: color 0.2s;
+  flex-shrink: 0;
+  min-width: 44px;
+  justify-content: center;
+}
+
+.tabActive {
+  color: var(--primary);
+}
+
+.tabIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.tabIconActive {
+  color: var(--primary);
+}
+
+.tabLabel {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  animation: labelIn 0.15s ease-out;
+}
+
+@keyframes labelIn {
+  from { opacity: 0; width: 0; }
+  to { opacity: 1; width: auto; }
+}
+
+.pill {
+  position: absolute;
+  inset: 2px;
+  background: var(--badge-bg);
+  border-radius: 22px;
+  z-index: 1;
+  animation: pillIn 0.25s ease-out;
+}
+
+@keyframes pillIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.centerWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+}
+
+.fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.4);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.fab:hover {
+  box-shadow: 0 6px 24px rgba(77, 163, 255, 0.55);
+}
+
+.fabActive {
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.5);
+}
+
+.fabIcon {
+  transition: transform 0.25s ease;
+}
+
+.fabIconRotated {
+  transform: rotate(45deg);
+}
+
+@media (max-width: 767px) {
+  .nav {
+    display: block;
+  }
+}

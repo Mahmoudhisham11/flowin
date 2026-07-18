@@ -1,0 +1,218 @@
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--border);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 32px rgba(77, 163, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.popular {
+  border-color: var(--primary);
+  box-shadow: 0 8px 32px rgba(77, 163, 255, 0.15);
+}
+
+.popular::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(77, 163, 255, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.popularPadding {
+  padding-top: 62px;
+}
+
+.active {
+  border-color: var(--success);
+  opacity: 0.75;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 8px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.iconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.iconFree {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+}
+
+.iconPro {
+  background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+}
+
+.iconWrap svg {
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.price {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.1;
+}
+
+.period {
+  font-size: 15px;
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+.desc {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-dark);
+}
+
+.feature svg {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.selectBtn {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  background: transparent;
+  border: 2px solid var(--primary);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  margin-top: auto;
+}
+
+.selectBtn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+.selectBtnPopular {
+  background: var(--primary-gradient);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.35);
+}
+
+.selectBtnPopular:hover {
+  box-shadow: 0 6px 24px rgba(77, 163, 255, 0.5);
+  transform: scale(1.02);
+}
+
+.selectBtnActive {
+  background: var(--bg-secondary);
+  color: var(--text-gray);
+  border-color: var(--border);
+  cursor: default;
+}
+
+.selectBtnActive:hover {
+  background: var(--bg-secondary);
+  color: var(--text-gray);
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 24px 20px 20px;
+  }
+  .popularPadding {
+    padding-top: 54px;
+  }
+  .price {
+    font-size: 30px;
+  }
+  .iconWrap {
+    width: 46px;
+    height: 46px;
+    margin-bottom: 16px;
+  }
+  .name {
+    font-size: 18px;
+  }
+  .features {
+    gap: 10px;
+  }
+}

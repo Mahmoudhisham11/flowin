@@ -1,0 +1,66 @@
+.card {
+  padding: 20px;
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  margin: 12px 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.percentage {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.amounts {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.spent {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+}
+
+.goal {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.track {
+  height: 8px;
+  background: var(--badge-bg);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #4DA3FF, #2563EB);
+  transition: width 0.5s ease;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.4;
+}

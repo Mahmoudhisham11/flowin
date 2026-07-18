@@ -1,0 +1,352 @@
+.sidebar {
+  width: 264px;
+  flex-shrink: 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 50;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+/* ── Logo ── */
+.logoArea {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--sidebar-border);
+  position: relative;
+}
+
+.logoArea::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0.3;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoMark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 50%, #1D4ED8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.4);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.logoMark::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(77, 163, 255, 0.3), transparent);
+  z-index: -1;
+}
+
+.logoTextWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logoText {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.logoBadge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--badge-bg);
+  padding: 1px 7px;
+  border-radius: 5px;
+  width: fit-content;
+  letter-spacing: 0.3px;
+}
+
+/* ── Nav sections ── */
+.navSection {
+  padding: 0 12px;
+  margin-top: 24px;
+}
+
+.navSection:first-of-type {
+  margin-top: 20px;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Nav items ── */
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-gray);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.navItem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--hover-bg), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.navItem:hover::before {
+  opacity: 1;
+}
+
+.navItem:hover {
+  color: var(--text-dark);
+}
+
+.navItem:active {
+  transform: scale(0.97);
+}
+
+/* Active state */
+.active {
+  background: var(--badge-bg);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 0 var(--primary);
+}
+
+.active::before {
+  display: none;
+}
+
+.active:hover {
+  background: var(--badge-bg);
+  color: var(--primary);
+}
+
+.active .navIcon {
+  color: var(--primary);
+  filter: drop-shadow(0 1px 3px rgba(77, 163, 255, 0.3));
+}
+
+/* Active dot pulse */
+.activeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-left: auto;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(77, 163, 255, 0.5);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Icon hover animation */
+.navItem:hover .navIcon {
+  transform: translateX(2px);
+}
+
+.active .navIcon {
+  transform: none;
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navLabel {
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Footer user card ── */
+.footer {
+  margin-top: auto;
+  padding: 16px 12px 20px;
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: var(--sidebar-border);
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--sidebar-border);
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.userCard:hover {
+  background: var(--hover-bg);
+}
+
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(77, 163, 255, 0.25);
+}
+
+.onlineDot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2.5px solid var(--sidebar-bg);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+}
+
+.userCard:hover .onlineDot {
+  border-color: var(--hover-bg);
+}
+
+.userText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.userName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.userRole {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-gray);
+}
+
+.logoutBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.logoutBtn:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+  transform: scale(1.05);
+}
+
+.logoutBtn:active {
+  transform: scale(0.95);
+}
+
+/* ── Scrollbar ── */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 100px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}

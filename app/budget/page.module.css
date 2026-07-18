@@ -1,0 +1,750 @@
+.page {
+  padding: 28px 32px 32px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.header {
+  margin-bottom: 36px;
+}
+
+.headerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--primary);
+  background: var(--badge-bg);
+  border-radius: 100px;
+  margin-bottom: 12px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+/* === Overview Hero === */
+.overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.overviewCard {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.overviewCard:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.overviewCardAccent {
+  position: relative;
+  overflow: hidden;
+}
+
+.overviewCardAccent::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  border-radius: 20px;
+}
+
+.overviewIncome::before {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+}
+
+.overviewEssentials::before {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+}
+
+.overviewRemaining::before {
+  background: linear-gradient(135deg, #4DA3FF, #2563EB);
+}
+
+.overviewLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.overviewValue {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.overviewSub {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* === Allocation Bar === */
+.allocation {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+}
+
+.allocationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.allocationTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.allocationPct {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-gray);
+}
+
+.barTrack {
+  height: 12px;
+  background: var(--hover-bg);
+  border-radius: 100px;
+  overflow: hidden;
+  display: flex;
+}
+
+.barSegment {
+  height: 100%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+
+.barEssentials {
+  background: linear-gradient(90deg, #EF4444, #F87171);
+  border-radius: 100px 0 0 100px;
+}
+
+.barSavings {
+  background: linear-gradient(90deg, #4DA3FF, #93C5FD);
+  border-radius: 0 100px 100px 0;
+}
+
+.barLegend {
+  display: flex;
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === Income Card === */
+.incomeCard {
+  background: linear-gradient(135deg, var(--card), var(--card-hover));
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s;
+}
+
+.incomeCard:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.incomeLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.incomeDesc {
+  font-size: 12px;
+  color: var(--text-gray);
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.incomeInputWrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.incomeInputWrap:focus-within {
+  border-color: var(--success);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.incomePrefix {
+  padding: 16px 0 16px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-gray);
+  flex-shrink: 0;
+}
+
+.incomeInput {
+  flex: 1;
+  padding: 16px 20px 16px 10px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--success);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  min-width: 0;
+  letter-spacing: -0.5px;
+}
+
+.incomeInput::placeholder {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* === Essentials Card === */
+.essentialsCard {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 28px;
+  border: 1px solid var(--border);
+}
+
+.essentialsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  gap: 12px;
+}
+
+.essentialsTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.essentialsDesc {
+  font-size: 12px;
+  color: var(--text-gray);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--badge-bg);
+  border-radius: 100px;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.addBtn:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: scale(1.03);
+}
+
+.addBtn:active {
+  transform: scale(0.97);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+}
+
+.categoryItem:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.08);
+  transform: translateX(4px);
+}
+
+.categoryItem:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(77, 163, 255, 0.1);
+}
+
+.categoryIndex {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.categoryInput {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-dark);
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-family: inherit;
+}
+
+.catMapWrap {
+  flex-shrink: 0;
+}
+
+.catMapSelect {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-gray);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  max-width: 120px;
+}
+
+.catMapSelect:hover {
+  border-color: var(--primary);
+}
+
+.catMapSelect:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.1);
+}
+
+.categoryAmount {
+  width: 110px;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--hover-bg);
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-family: inherit;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.amountBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.targetDisplay {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--danger);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.targetDisplay:hover {
+  background: var(--hover-bg);
+}
+
+.targetInput {
+  width: 100px;
+  padding: 2px 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  text-align: right;
+}
+
+.spentBadge {
+  font-size: 11px;
+  color: var(--text-gray);
+  white-space: nowrap;
+}
+
+.spentBadge strong {
+  color: var(--text-dark);
+}
+
+.remainingBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--success);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.remainingBadge[data-over] {
+  color: var(--danger);
+}
+
+.catProgressWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.catProgressTrack {
+  width: 60px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.catProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4DA3FF, #93C5FD);
+  border-radius: 100px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.catProgressDanger {
+  background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+.catProgressOver {
+  background: linear-gradient(90deg, #EF4444, #F87171);
+}
+
+.catProgressLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-gray);
+  min-width: 28px;
+  text-align: right;
+}
+
+.removeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+  transform: scale(1.1);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 36px 20px;
+  background: var(--bg);
+  border-radius: 16px;
+  border: 2px dashed var(--border);
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--badge-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin: 0 auto 12px;
+}
+
+.emptyText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* === Save Button === */
+.saveBtn {
+  width: 100%;
+  padding: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(77, 163, 255, 0.35);
+  transition: all 0.25s;
+  letter-spacing: 0.3px;
+}
+
+.saveBtn:hover {
+  box-shadow: 0 8px 32px rgba(77, 163, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.saveBtn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* === Responsive === */
+@media (max-width: 767px) {
+  .page {
+    padding: 20px 16px 32px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .headerBadge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .headerRow {
+    flex-direction: column;
+  }
+
+  .overview {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .overviewCard {
+    padding: 16px 18px;
+    border-radius: 16px;
+  }
+
+  .overviewValue {
+    font-size: 22px;
+  }
+
+  .allocation {
+    padding: 18px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .barTrack {
+    height: 10px;
+  }
+
+  .incomeCard {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .incomeInputWrap {
+    border-radius: 12px;
+  }
+
+  .incomePrefix {
+    padding: 14px 0 14px 16px;
+    font-size: 14px;
+  }
+
+  .incomeInput {
+    padding: 14px 16px 14px 8px;
+    font-size: 22px;
+  }
+
+  .essentialsCard {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .categoryItem {
+    padding: 10px 12px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .categoryInput {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .categoryAmount {
+    width: 85px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .amountBlock {
+    gap: 1px;
+  }
+
+  .targetDisplay {
+    font-size: 12px;
+  }
+
+  .targetInput {
+    width: 75px;
+    font-size: 12px;
+  }
+
+  .spentBadge {
+    font-size: 10px;
+  }
+
+  .remainingBadge {
+    font-size: 11px;
+  }
+
+  .catProgressWrap {
+    min-width: 60px;
+  }
+
+  .catProgressTrack {
+    width: 40px;
+    height: 5px;
+  }
+
+  .catProgressLabel {
+    font-size: 10px;
+    min-width: 22px;
+  }
+
+  .categoryIndex {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .removeBtn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .saveBtn {
+    padding: 16px;
+    font-size: 15px;
+    border-radius: 14px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .overview {
+    gap: 12px;
+  }
+
+  .overviewValue {
+    font-size: 24px;
+  }
+}

@@ -1,0 +1,417 @@
+.page {
+  padding: 28px 32px 32px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.addBtn:hover {
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.45);
+}
+
+.addBtn:active {
+  transform: scale(0.97);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.goalCard {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  transition: box-shadow 0.2s;
+  border-left: 4px solid #8B5CF6;
+}
+
+.goalCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.goalOverdue {
+  border-left-color: #EF4444;
+  background: linear-gradient(135deg, var(--card) 0%, rgba(239, 68, 68, 0.05) 100%);
+}
+
+.deleteBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  background: var(--hover-bg);
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+  z-index: 2;
+}
+
+.goalCard:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.goalName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+  padding-right: 32px;
+}
+
+.goalAmounts {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.goalSaved {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.goalTarget {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.goalProgress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.goalProgressTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--hover-bg);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.goalProgressBar {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  transition: width 0.3s;
+}
+
+.goalBarOverdue {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.goalProgressPct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-gray);
+  white-space: nowrap;
+}
+
+.goalDeadline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-gray);
+  padding: 6px 12px;
+  background: var(--hover-bg);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.deadlineOverdue {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.goalActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.editBtn, .addMoneyBtn, .withdrawBtn {
+  flex: 1;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.editBtn {
+  color: var(--primary);
+  background: var(--badge-bg);
+}
+
+.editBtn:hover {
+  background: var(--hover-bg);
+}
+
+.addMoneyBtn {
+  color: #fff;
+  background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+}
+
+.addMoneyBtn:hover {
+  opacity: 0.9;
+}
+
+.withdrawBtn {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.withdrawBtn:hover {
+  opacity: 0.9;
+}
+
+.moneyInfo {
+  padding: 10px 14px;
+  background: var(--hover-bg);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 20px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--hover-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+  gap: 12px;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.modalClose {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.modalClose:hover {
+  background: var(--hover-bg);
+}
+
+.modalBody {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.fieldInput {
+  padding: 12px 16px;
+  font-size: 15px;
+  color: var(--text-dark);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+}
+
+.fieldInput::placeholder {
+  color: var(--text-light);
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  padding: 0 24px 20px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.cancelBtn:hover {
+  background: var(--border);
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  transition: transform 0.15s;
+}
+
+.saveBtn:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 16px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .subtitle {
+    font-size: 13px;
+  }
+  .header {
+    margin-bottom: 16px;
+  }
+  .addBtn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .goalCard {
+    padding: 16px;
+  }
+  .goalName {
+    font-size: 14px;
+  }
+  .goalSaved {
+    font-size: 17px;
+  }
+  .modal {
+    max-width: 100%;
+    margin: 0 12px;
+  }
+}

@@ -1,0 +1,169 @@
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.brandSide {
+  flex: 1;
+  display: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.formSide {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.brandContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  height: 100%;
+  background: linear-gradient(160deg, #1E3A6E 0%, #2563EB 40%, #4DA3FF 100%);
+  color: #fff;
+}
+
+.brandLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.logoMark {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brandTagline {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.brandDesc {
+  font-size: 15px;
+  line-height: 1.6;
+  opacity: 0.8;
+  max-width: 380px;
+  margin-bottom: 48px;
+}
+
+.decorations {
+  position: relative;
+  height: 220px;
+}
+
+.decoCard {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.decoCard1 {
+  left: 0;
+  top: 0;
+  width: 160px;
+}
+
+.decoCard2 {
+  right: 0;
+  top: 20px;
+  width: 140px;
+}
+
+.decoChart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 60px;
+  margin-bottom: 10px;
+}
+
+.decoBar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 4px 4px 0 0;
+  min-height: 8px;
+  transition: height 0.3s;
+}
+
+.decoLabel {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.decoPie {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.decoBadge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.decoBadge1 {
+  bottom: 40px;
+  left: 20px;
+}
+
+.decoBadge2 {
+  bottom: 60px;
+  right: 40px;
+}
+
+@media (min-width: 1024px) {
+  .brandSide {
+    display: flex;
+  }
+}
+
+@media (min-width: 1440px) {
+  .brandContent {
+    padding: 80px;
+  }
+  .brandTagline {
+    font-size: 40px;
+  }
+}

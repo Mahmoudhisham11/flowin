@@ -1,0 +1,39 @@
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px 0;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.key {
+  height: 56px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, transform 0.1s;
+  cursor: pointer;
+  border: none;
+}
+
+.key:active {
+  background: var(--badge-bg);
+  transform: scale(0.95);
+}
+
+.delete {
+  font-size: 20px;
+  color: var(--text-gray);
+}
+
+.dot {
+  font-size: 28px;
+  font-weight: 700;
+}

@@ -1,0 +1,210 @@
+:root {
+  --primary: #4DA3FF;
+  --primary-light: #7BB8FF;
+  --primary-dark: #2B8BFF;
+  --primary-gradient: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  --bg: #F7FAFF;
+  --bg-secondary: #EEF2F7;
+  --card: #FFFFFF;
+  --card-hover: #F9FAFB;
+  --text-dark: #111827;
+  --text-gray: #6B7280;
+  --text-light: #9CA3AF;
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --border: #E5E7EB;
+  --border-light: #F3F4F6;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --nav-border: rgba(0, 0, 0, 0.06);
+  --overlay: rgba(0, 0, 0, 0.4);
+  --input-bg: #fff;
+  --input-border: #E5E7EB;
+  --sidebar-bg: #fff;
+  --sidebar-border: #F3F4F6;
+  --hover-bg: #F3F4F6;
+  --badge-bg: #EFF6FF;
+  --card-border: transparent;
+  --success-bg: #F0FDF4;
+  --danger-bg: #FEF2F2;
+  --warning-bg: #FFFBEB;
+  --scrollbar-thumb: #E2E8F0;
+}
+
+[data-theme="dark"] {
+  --primary: #93C5FD;
+  --primary-light: #BFDBFE;
+  --primary-dark: #60A5FA;
+  --primary-gradient: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  --bg: #080C16;
+  --bg-secondary: #111827;
+  --card: #111827;
+  --card-hover: #1E293B;
+  --text-dark: #F1F5F9;
+  --text-gray: #94A3B8;
+  --text-light: #64748B;
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --border: #1E293B;
+  --border-light: #111827;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --nav-bg: rgba(8, 12, 22, 0.94);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --overlay: rgba(0, 0, 0, 0.75);
+  --input-bg: #111827;
+  --input-border: #1E293B;
+  --sidebar-bg: #080C16;
+  --sidebar-border: #1E293B;
+  --hover-bg: #1E293B;
+  --badge-bg: rgba(96, 165, 250, 0.1);
+  --card-border: #1E293B;
+  --success-bg: rgba(34, 197, 94, 0.1);
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --scrollbar-thumb: #334155;
+}
+
+html.rtl {
+  --font-primary: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: var(--font-inter), var(--font-tajawal), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.rtl body,
+html.rtl button,
+html.rtl input,
+html.rtl textarea,
+html.rtl select {
+  font-family: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html.rtl .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--sidebar-border);
+}
+
+html.rtl .main-content {
+  animation: pageFadeInRTL 0.6s ease-out;
+}
+
+@keyframes pageFadeInRTL {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body {
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  animation: pageFadeIn 0.6s ease-out;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  .main-content {
+    padding-bottom: 88px;
+  }
+}
+
+/* ===== Global Responsive ===== */
+
+button, a, .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .page, [class*="page_"] {
+    padding: 16px 12px !important;
+  }
+
+  [class*="walletGrid"], [class*="grid_"], [class*="cardGrid"],
+  [class*="statsRow"], [class*="summary"], [class*="stats_"],
+  [class*="chartGrid"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  [class*="walletActions"], [class*="inlineActions"] {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  [class*="header"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+}

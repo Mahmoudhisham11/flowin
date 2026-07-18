@@ -1,0 +1,351 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg);
+  border-radius: 14px;
+}
+
+.totalLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-gray);
+}
+
+.totalValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.expenseItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.itemEmoji {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.itemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.itemCategory {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.itemMerchant {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.itemRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.itemAmount {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.itemActions {
+  display: flex;
+  gap: 8px;
+}
+
+.editItemBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.editItemBtn:hover {
+  background: var(--badge-bg);
+}
+
+.removeItemBtn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.removeItemBtn:hover {
+  background: var(--danger-bg);
+}
+
+.editCard {
+  padding: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--primary);
+  border-radius: 14px;
+}
+
+.editGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editFieldFull {
+  grid-column: 1 / -1;
+}
+
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.editInput {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.editInput:focus {
+  border-color: var(--primary);
+}
+
+.editSelect {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.editSelect:focus {
+  border-color: var(--primary);
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  border-radius: 10px;
+  transition: opacity 0.2s;
+}
+
+.saveBtn:hover {
+  opacity: 0.9;
+}
+
+.cancelEditBtn {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-gray);
+}
+
+.cancelEditBtn:hover {
+  color: var(--text-dark);
+}
+
+.walletSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.walletLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.walletOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.walletOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.walletOption:hover {
+  border-color: var(--primary);
+}
+
+.walletOptionActive {
+  border-color: var(--primary);
+  background: var(--badge-bg);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+}
+
+.walletOptionInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.walletOptionName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.walletOptionBal {
+  font-size: 11px;
+  color: var(--text-gray);
+}
+
+.walletCheck {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.walletPreview {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  text-align: right;
+  padding: 0 4px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.confirmBtn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(77, 163, 255, 0.35);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  box-shadow: 0 6px 28px rgba(77, 163, 255, 0.5);
+}
+
+.confirmBtn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.confirmBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-light);
+  padding: 8px;
+  transition: color 0.2s;
+}
+
+.cancelBtn:hover {
+  color: var(--text-gray);
+}
+

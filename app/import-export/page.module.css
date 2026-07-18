@@ -1,0 +1,229 @@
+.page {
+  padding: 28px 32px 32px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+.dropZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 20px;
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.dropZone:hover {
+  border-color: var(--primary);
+  background: var(--bg);
+  color: var(--primary);
+}
+
+.dropActive {
+  border-color: var(--primary);
+  background: var(--badge-bg);
+  color: var(--primary);
+}
+
+.dropText {
+  font-size: 14px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.dropHint {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.formatInfo {
+  display: flex;
+  gap: 8px;
+}
+
+.formatBadge {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  border-radius: 8px;
+}
+
+.exportList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: 14px;
+  transition: background 0.2s;
+  text-align: left;
+  color: var(--text-dark);
+}
+
+.exportBtn:hover {
+  background: var(--badge-bg);
+}
+
+.exportInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exportName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.exportSize {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+
+.infoCard {
+  border: 1.5px solid var(--border);
+  box-shadow: none;
+}
+
+.backupInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: 12px;
+}
+
+.backupRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backupLabel {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+.backupValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.backupBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.backupBtn:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(77, 163, 255, 0.1);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 16px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .subtitle {
+    font-size: 13px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .card {
+    padding: 16px;
+  }
+  .cardTitle {
+    font-size: 15px;
+  }
+  .cardDesc {
+    font-size: 13px;
+  }
+  .importBtn, .exportBtn, .backupBtn {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

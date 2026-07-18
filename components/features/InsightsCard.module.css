@@ -1,0 +1,271 @@
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerIcon {
+  width: 36px;
+  height: 36px;
+  background: var(--badge-bg);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.weekId {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.refreshBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: background 0.2s;
+}
+
+.refreshBtn:hover {
+  background: var(--hover-bg);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.mainStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--border-light);
+}
+
+.mainLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-gray);
+}
+
+.mainValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.categoryEmoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.categoryBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.categoryBarTrack {
+  height: 6px;
+  background: var(--hover-bg);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.categoryBarFill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #4DA3FF, #2563EB);
+}
+
+.categoryLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-gray);
+}
+
+.insightText {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dark);
+  line-height: 1.6;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 12px;
+  border-left: 3px solid #4DA3FF;
+}
+
+.walletText {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+.walletText svg {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.recommendSection {
+  padding: 14px;
+  background: var(--warning-bg);
+  border-radius: 14px;
+}
+
+.recommendHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.recommendLabel {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--warning);
+}
+
+.riskBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.riskDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.recommendText {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--warning);
+  line-height: 1.5;
+}
+
+.error {
+  font-size: 12px;
+  color: var(--danger);
+  text-align: center;
+}
+
+/* Skeleton */
+.headerSkeleton {
+  height: 20px;
+  width: 60%;
+  background: var(--hover-bg);
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.bodySkeleton {
+  height: 80px;
+  width: 100%;
+  background: var(--hover-bg);
+  border-radius: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  background: var(--badge-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--text-gray);
+  line-height: 1.5;
+  max-width: 260px;
+}
+
+.generateBtn {
+  margin-top: 4px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(77, 163, 255, 0.35);
+  transition: opacity 0.2s;
+}
+
+.generateBtn:disabled {
+  opacity: 0.7;
+}
+
