@@ -126,7 +126,7 @@ function AIPageContent() {
             <div key={i} className={`${styles.msg} ${msg.role === 'user' ? styles.userMsg : styles.aiMsg}`}>
               {msg.role === 'assistant' && (
                 <div className={styles.msgAvatar}>
-                  <AIIcon width="18" height="18" />
+                  <AIIcon width="16" height="16" />
                 </div>
               )}
               <div className={`${styles.msgBubble} ${msg.error ? styles.errorBubble : ''}`} dir="auto">
@@ -151,7 +151,7 @@ function AIPageContent() {
           {loading && (
             <div className={`${styles.msg} ${styles.aiMsg}`}>
               <div className={styles.msgAvatar}>
-                <AIIcon width="18" height="18" />
+                <AIIcon width="16" height="16" />
               </div>
               <div className={styles.msgBubble} dir="auto">
                 <div className={styles.typing}>

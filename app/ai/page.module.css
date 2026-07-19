@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 80px);
+  overflow: hidden;
 }
 
 .header {
@@ -31,22 +32,33 @@
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-right: 4px;
+  gap: 16px;
+  padding: 4px 0;
+  scroll-behavior: smooth;
 }
 
 .msg {
   display: flex;
   gap: 10px;
-  align-items: flex-start;
-  max-width: 85%;
+  align-items: flex-end;
+  max-width: 80%;
+  min-width: 0;
+  animation: msgIn 0.3s ease-out;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .userMsg {
@@ -59,8 +71,8 @@
 }
 
 .msgAvatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
   background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
   display: flex;
@@ -72,28 +84,37 @@
 
 .msgBubble {
   padding: 12px 16px;
-  border-radius: 16px;
-  line-height: 1.5;
+  border-radius: 18px;
+  line-height: 1.6;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .userMsg .msgBubble {
   background: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
   color: #fff;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 6px;
+  box-shadow: 0 2px 12px rgba(77, 163, 255, 0.25);
 }
 
 .aiMsg .msgBubble {
   background: var(--card);
   color: var(--text-dark);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-bottom-left-radius: 6px;
+  border: 1px solid var(--border);
 }
 
 .msgText {
   font-size: 14px;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
   unicode-bidi: plaintext;
   text-align: start;
+  line-height: 1.6;
 }
 
 .msgBubble[dir="rtl"] .msgText {
@@ -108,7 +129,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .suggestions[dir="rtl"] {
@@ -116,42 +141,50 @@
 }
 
 .suggestionBtn {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--primary);
-  padding: 6px 12px;
+  padding: 7px 14px;
   background: var(--badge-bg);
-  border-radius: 16px;
-  transition: background 0.2s;
+  border-radius: 20px;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .suggestionBtn:hover {
   background: var(--hover-bg);
+  border-color: var(--primary);
 }
 
 .confidence {
   font-size: 10px;
   font-weight: 500;
   color: var(--text-light);
-  margin-top: 6px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
 }
 
 .errorBubble {
   background: var(--danger-bg) !important;
   color: var(--danger) !important;
   box-shadow: none !important;
+  border: 1px solid var(--danger) !important;
 }
 
 .typing {
   display: flex;
-  gap: 4px;
+  gap: 5px;
   align-items: center;
-  padding: 4px 0;
+  padding: 4px 2px;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #4DA3FF;
   animation: bounce 1.4s infinite ease-in-out both;
@@ -192,6 +225,7 @@
   justify-content: center;
   color: #fff;
   margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(77, 163, 255, 0.3);
 }
 
 .welcomeTitle {
@@ -224,11 +258,13 @@
   padding: 8px 14px;
   background: var(--badge-bg);
   border-radius: 20px;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  border: 1px solid transparent;
 }
 
 .chip:hover {
   background: var(--hover-bg);
+  border-color: var(--primary);
 }
 
 .inputArea {
@@ -289,6 +325,7 @@
     height: calc(100vh - 100px);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
   .header {
     padding: 12px 16px;
@@ -302,38 +339,60 @@
     flex: 1;
     padding: 12px;
     gap: 12px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .messages {
+    gap: 14px;
+    overflow-x: hidden;
+  }
+  .msg {
+    max-width: 88%;
+    min-width: 0;
   }
   .msgBubble {
-    max-width: 85%;
     padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .userMsg .msgBubble {
+    border-bottom-right-radius: 6px;
+  }
+  .aiMsg .msgBubble {
+    border-bottom-left-radius: 6px;
+  }
+  .msgText {
     font-size: 13px;
+    line-height: 1.55;
+    word-break: break-word;
   }
-  .msgTime {
-    font-size: 10px;
-  }
-  .inputBar {
+  .inputArea {
     padding: 10px 12px;
     gap: 8px;
+    border-radius: 14px;
     border-top: 1px solid var(--border);
   }
   .chatInput {
-    padding: 10px 14px;
     font-size: 14px;
+    min-width: 0;
   }
   .sendBtn {
-    width: 40px;
-    height: 40px;
-  }
-  .emptyState {
-    padding: 40px 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
   }
   .suggestionChips {
     gap: 6px;
     padding: 0 12px;
   }
-  .suggestionChip {
+  .chip {
     padding: 6px 12px;
     font-size: 11px;
+  }
+  .suggestionBtn {
+    font-size: 11px;
+    padding: 5px 10px;
   }
 }
 

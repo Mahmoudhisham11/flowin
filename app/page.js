@@ -4,10 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useSubscription } from '@/hooks/useSubscription'
-import { BellIcon, PlusIcon, TransferIcon } from '@/components/Icons'
+import { PlusIcon, TransferIcon } from '@/components/Icons'
 import { subscribeToTransactions } from '@/services/transactionsService'
 import { subscribeToWallets, WALLET_TYPES } from '@/services/walletService'
-import { subscribeToNotifications, markNotificationRead, markAllNotificationsRead } from '@/services/notificationService'
 import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
 import BalanceCard from '@/components/features/BalanceCard'
@@ -40,15 +39,11 @@ export default function Home() {
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [activeWalletIdx, setActiveWalletIdx] = useState(0)
-  const [notifications, setNotifications] = useState([])
-  const [showNotifDropdown, setShowNotifDropdown] = useState(false)
   const [budgetCategories, setBudgetCategories] = useState([])
   const actionRef = useRef(null)
   const swiperRef = useRef(null)
   const avatarMenuRef = useRef(null)
-  const notifRef = useRef(null)
   const { t } = useTranslation()
-  const unreadCount = notifications.filter((n) => !n.read).length
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -58,23 +53,19 @@ export default function Home() {
       if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) {
         setShowAvatarMenu(false)
       }
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotifDropdown(false)
-      }
     }
-    if (showActions || showAvatarMenu || showNotifDropdown) document.addEventListener('mousedown', handleClick)
+    if (showActions || showAvatarMenu) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [showActions, showAvatarMenu, showNotifDropdown])
+  }, [showActions, showAvatarMenu])
 
   useEffect(() => {
     if (!user) return
     const unsubTx = subscribeToTransactions(user.uid, setTransactions)
     const unsubWallets = subscribeToWallets(user.uid, setWallets)
-    const unsubNotif = subscribeToNotifications(user.uid, setNotifications)
     const unsubBudget = subscribeToBudget(user.uid, (data) => {
       setBudgetCategories(data?.essentialCategories || [])
     })
-    return () => { unsubTx(); unsubWallets(); unsubNotif(); unsubBudget() }
+    return () => { unsubTx(); unsubWallets(); unsubBudget() }
   }, [user])
 
   const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0)
@@ -143,50 +134,6 @@ export default function Home() {
             <span className={styles.userName}>{userData?.name || userData?.email || 'User'}</span>
             <span className={styles.userPlan}>{plan === 'pro' ? 'Pro' : plan === 'admin' ? 'Admin' : 'Free'}</span>
           </div>
-        </div>
-        <div className={styles.notifWrap} ref={notifRef}>
-          <button className={styles.notifBtn} onClick={() => setShowNotifDropdown((prev) => !prev)}>
-            <BellIcon />
-            {unreadCount > 0 && <span className={styles.notifBadge}>{unreadCount > 9 ? '9+' : unreadCount}</span>}
-          </button>
-          {showNotifDropdown && (
-            <div className={styles.notifDropdown}>
-              <div className={styles.notifDropdownHeader}>
-                <span className={styles.notifDropdownTitle}>Notifications</span>
-                {unreadCount > 0 && (
-                  <button className={styles.notifMarkAllBtn} onClick={() => markAllNotificationsRead(user.uid)}>
-                    Mark all read
-                  </button>
-                )}
-              </div>
-              <div className={styles.notifList}>
-                {notifications.length === 0 ? (
-                  <div className={styles.notifEmpty}>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    <p>No notifications yet</p>
-                  </div>
-                ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      className={`${styles.notifItem} ${n.read ? styles.notifItemRead : ''}`}
-                      onClick={() => { if (!n.read) markNotificationRead(user.uid, n.id) }}
-                    >
-                      <div className={styles.notifDot} data-read={n.read ? '' : undefined} />
-                      <div className={styles.notifContent}>
-                        <div className={styles.notifTitle}>{n.title}</div>
-                        <div className={styles.notifMessage}>{n.message}</div>
-                        <div className={styles.notifTime}>{new Date(n.createdAt).toLocaleDateString()}</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </header>
 
@@ -298,6 +245,9 @@ export default function Home() {
           <div className={styles.walletsEmpty}>
             <p className={styles.walletsEmptyText}>No wallets yet</p>
             <p className={styles.walletsEmptyHint}>Create your first wallet to start tracking your money</p>
+            <button className={styles.emptyAddWalletBtn} onClick={() => setShowAddWallet(true)}>
+              <PlusIcon /> {t('dashboard.addWallet')}
+            </button>
           </div>
         )}
       </div>
