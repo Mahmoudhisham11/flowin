@@ -8,9 +8,11 @@ Rules:
 - If the question is outside the scope of the provided data, politely say you can only answer based on their financial data
 - Use numbers and percentages from the context when relevant
 - Suggest actionable advice when appropriate
-- You can analyze goals progress, daily task completion rates, and project status
+- You can analyze goals progress, daily task completion rates, overdue tasks, and project status
 - You can compare progress over time and provide insights on productivity and financial health
 - You can provide a holistic view of the user's life including finances, tasks, and projects
+- Tasks are persistent (they don't reset daily) and are scheduled for specific dates
+- You can help users plan their tasks across the week and prioritize effectively
 
 Return ONLY valid JSON in this exact format:
 {
@@ -74,9 +76,14 @@ SAVINGS GOALS:
 ${(context.goals?.items || []).length > 0 ? context.goals.items.map((g) => `  - ${g.name}: EGP ${fmt(g.saved)} / ${fmt(g.target)} (${g.progress}%)${g.overdue ? ' [OVERDUE]' : ''}${g.deadline ? ` - deadline: ${g.deadline}` : ''}`).join('\n') : '  (no goals)'}
 ${context.goals?.overdue > 0 ? `  - WARNING: ${context.goals.overdue} goal(s) overdue!` : ''}
 
-DAILY TASKS (${context.dailyTasks?.total || 0} total, ${context.dailyTasks?.completed || 0} completed, ${context.dailyTasks?.completionRate || 0}% completion rate):
-${(context.dailyTasks?.items || []).length > 0 ? context.dailyTasks.items.map((t) => `  - [${t.completed ? 'x' : ' '}] ${t.title} (${t.priority}${t.time ? ', ' + t.time : ''})`).join('\n') : '  (no tasks today)'}
-${context.dailyTasks?.urgent > 0 ? `  - WARNING: ${context.dailyTasks.urgent} urgent task(s) incomplete!` : ''}
+DAILY TASKS (${context.dailyTasks?.total || 0} total, ${context.dailyTasks?.completed || 0} completed):
+Today (${context.dailyTasks?.todayTotal || 0} tasks, ${context.dailyTasks?.todayCompletionRate || 0}% complete):
+${(context.dailyTasks?.todayItems || []).length > 0 ? context.dailyTasks.todayItems.map((t) => `  - [${t.completed ? 'x' : ' '}] ${t.title} (${t.priority}${t.time ? ', ' + t.time : ''})`).join('\n') : '  (no tasks today)'}
+${context.dailyTasks?.urgent > 0 ? `  - WARNING: ${context.dailyTasks.urgent} urgent task(s) incomplete today!` : ''}
+${context.dailyTasks?.overdue > 0 ? `OVERDUE TASKS (${context.dailyTasks.overdue}):
+${(context.dailyTasks?.overdueItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}`).join('\n')}` : ''}
+${context.dailyTasks?.upcoming > 0 ? `UPCOMING TASKS (${context.dailyTasks.upcoming}):
+${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}${t.time ? ', ' + t.time : ''}`).join('\n')}` : ''}
 
 PROJECTS (${context.projects?.total || 0} total, ${context.projects?.completed || 0} completed):
 ${(context.projects?.items || []).length > 0 ? context.projects.items.map((p) => `  - ${p.name}: ${p.progress}% [${p.status}]${p.deadline ? ` - deadline: ${p.deadline}` : ''}`).join('\n') : '  (no projects)'}

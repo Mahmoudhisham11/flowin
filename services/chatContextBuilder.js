@@ -35,9 +35,12 @@ export async function buildChatContext(uid, userName) {
   const goals = goalsSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
 
   const today = getTodayDate()
-  const tasksQ = query(collection(db, `users/${uid}/dailyTasks`), where('date', '==', today))
-  const tasksSnap = await getDocs(tasksQ)
+  const tasksSnap = await getDocs(collection(db, `users/${uid}/dailyTasks`))
   const dailyTasks = tasksSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+
+  const todayTasks = dailyTasks.filter((t) => t.date === today)
+  const overdueTasks = dailyTasks.filter((t) => !t.completed && t.date < today)
+  const upcomingTasks = dailyTasks.filter((t) => !t.completed && t.date > today).slice(0, 10)
 
   const projectsSnap = await getDocs(collection(db, `users/${uid}/projects`))
   const projects = projectsSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
@@ -63,6 +66,7 @@ export async function buildChatContext(uid, userName) {
 
   const overdueGoals = goals.filter((g) => g.deadline && new Date(g.deadline) < new Date() && (g.saved || 0) < g.targetAmount)
   const completedTasks = dailyTasks.filter((t) => t.completed).length
+  const completedTodayTasks = todayTasks.filter((t) => t.completed).length
   const completedProjects = projects.filter((p) => p.status === 'completed').length
   const overdueProjects = projects.filter((p) => p.deadline && new Date(p.deadline) < new Date() && p.status !== 'completed')
 
@@ -101,12 +105,27 @@ export async function buildChatContext(uid, userName) {
     dailyTasks: {
       total: dailyTasks.length,
       completed: completedTasks,
-      completionRate: dailyTasks.length > 0 ? Math.round((completedTasks / dailyTasks.length) * 100) : 0,
-      urgent: dailyTasks.filter((t) => t.priority === 'urgent' && !t.completed).length,
-      items: dailyTasks.map((t) => ({
+      todayTotal: todayTasks.length,
+      todayCompleted: completedTodayTasks,
+      todayCompletionRate: todayTasks.length > 0 ? Math.round((completedTodayTasks / todayTasks.length) * 100) : 0,
+      overdue: overdueTasks.length,
+      upcoming: upcomingTasks.length,
+      urgent: todayTasks.filter((t) => t.priority === 'urgent' && !t.completed).length,
+      todayItems: todayTasks.map((t) => ({
         title: t.title,
         priority: t.priority,
         completed: t.completed,
+        time: t.time,
+      })),
+      overdueItems: overdueTasks.map((t) => ({
+        title: t.title,
+        priority: t.priority,
+        date: t.date,
+      })),
+      upcomingItems: upcomingTasks.map((t) => ({
+        title: t.title,
+        priority: t.priority,
+        date: t.date,
         time: t.time,
       })),
     },

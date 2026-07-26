@@ -368,6 +368,313 @@
   transform: scale(0.97);
 }
 
+.dateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.dateNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dateNavBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  transition: background 0.2s, color 0.2s;
+}
+
+.dateNavBtn:hover {
+  background: var(--border);
+  color: var(--text-dark);
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.dateMonth {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.todayBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--badge-bg);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.viewToggle {
+  display: flex;
+  background: var(--hover-bg);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.viewBtn {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.viewBtnActive {
+  background: var(--card);
+  color: var(--text-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.dateStrip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+  scrollbar-width: none;
+}
+
+.dateStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.stripDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  min-width: 56px;
+  background: var(--hover-bg);
+  transition: all 0.2s;
+  position: relative;
+}
+
+.stripDay:hover {
+  background: var(--border);
+}
+
+.stripDaySelected {
+  background: var(--primary);
+}
+
+.stripDaySelected .stripDayName,
+.stripDaySelected .stripDayNum {
+  color: #fff;
+}
+
+.stripDayToday {
+  border: 2px solid var(--primary);
+}
+
+.stripDayName {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-gray);
+  text-transform: uppercase;
+}
+
+.stripDayNum {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.stripDayDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--primary);
+  position: absolute;
+  bottom: 4px;
+}
+
+.stripDayDotDone {
+  background: var(--success);
+}
+
+.taskOverdue {
+  border-left: 3px solid var(--danger);
+}
+
+.taskMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overdueBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-bg);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+
+.fieldRow .field {
+  flex: 1;
+}
+
+.quickDates {
+  display: flex;
+  gap: 8px;
+}
+
+.quickDateBtn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.quickDateBtn:hover {
+  background: var(--border);
+}
+
+.quickDateActive {
+  background: var(--badge-bg);
+  color: var(--primary);
+}
+
+.weekView {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weekDay {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: background 0.2s;
+}
+
+.weekDaySelected {
+  border: 1.5px solid var(--primary);
+}
+
+.weekDayHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.weekDayName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.weekDayDate {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.weekDayDateToday {
+  background: var(--primary);
+  color: #fff;
+}
+
+.weekDayCount {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.weekDayTasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weekTaskItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.weekTaskDone {
+  opacity: 0.5;
+}
+
+.weekTaskDone .weekTaskTitle {
+  text-decoration: line-through;
+}
+
+.weekTaskDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.weekTaskTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dark);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weekTaskTime {
+  font-size: 11px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.weekMore {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  padding: 2px 0;
+}
+
+.weekDayEmpty {
+  font-size: 13px;
+  color: var(--text-light);
+  padding: 4px 0;
+}
+
 @media (max-width: 767px) {
   .page {
     padding: 16px;
@@ -390,6 +697,33 @@
   }
   .taskActions {
     opacity: 1;
+  }
+  .dateHeader {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .dateInfo {
+    min-width: 100px;
+  }
+  .dateMonth {
+    font-size: 14px;
+  }
+  .stripDay {
+    min-width: 48px;
+    padding: 8px 10px;
+  }
+  .stripDayNum {
+    font-size: 14px;
+  }
+  .fieldRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .quickDates {
+    flex-wrap: wrap;
+  }
+  .weekDay {
+    padding: 10px 12px;
   }
   .modal {
     max-width: 100%;
