@@ -102,6 +102,7 @@ export default function useVoiceExpense() {
           currency: exp.currency || 'EGP',
           category: exp.category || 'Other',
           merchant: exp.merchant || '',
+          reason: exp.reason || '',
           type: 'expense',
           source: 'voice',
           walletId: walletId || '',

@@ -667,6 +667,11 @@
   color: var(--primary);
 }
 
+.txReason {
+  color: var(--accent, #F59E0B);
+  font-weight: 500;
+}
+
 .txRight {
   flex-shrink: 0;
 }

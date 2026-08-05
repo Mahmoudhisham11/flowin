@@ -3,7 +3,7 @@
 import { useTranslation } from '@/hooks/useTranslation'
 import styles from './TransactionList.module.css'
 
-function TransactionItem({ name, category, amount, status, color }) {
+function TransactionItem({ name, category, amount, status, color, reason }) {
   const { t } = useTranslation()
   const initials = name
     .split(' ')
@@ -21,7 +21,7 @@ function TransactionItem({ name, category, amount, status, color }) {
       </div>
       <div className={styles.details}>
         <span className={styles.name}>{name}</span>
-        <span className={styles.category}>{category}</span>
+        <span className={styles.category}>{category}{reason ? ` · ${reason}` : ''}</span>
       </div>
       <div className={styles.right}>
         <span className={`${styles.amount} ${isPositive ? styles.positive : styles.negative}`}>

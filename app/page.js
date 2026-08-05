@@ -327,6 +327,7 @@ export default function Home() {
                     <span className={styles.txName}>{t.merchant || t.category || 'Transaction'}</span>
                     <span className={styles.txMeta}>
                       {category.emoji} {t.category}
+                      {t.reason && <span className={styles.txReason}> · {t.reason}</span>}
                       {t.walletName && <span className={styles.txWallet}> · {t.walletName}</span>}
                     </span>
                   </div>

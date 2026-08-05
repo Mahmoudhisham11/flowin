@@ -16,6 +16,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
   const [amount, setAmount] = useState(String(transaction.amount || ''))
   const [category, setCategory] = useState(transaction.category || 'Other')
   const [walletId, setWalletId] = useState(transaction.walletId || (wallets.length > 0 ? wallets[0].id : ''))
+  const [reason, setReason] = useState(transaction.reason || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -45,6 +46,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
         category,
         type: txType,
         walletId,
+        reason: reason.trim(),
       })
 
       if (oldWalletId || walletId) {
@@ -149,6 +151,17 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
               />
             </div>
           )}
+
+          <div className={styles.field}>
+            <label className={styles.label}>{t('expense.reason')}</label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder={t('expense.reasonPlaceholder')}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          </div>
 
           {error && <p className={styles.error}>{error}</p>}
 

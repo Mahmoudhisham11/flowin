@@ -6,6 +6,7 @@ Return a JSON object with an "expenses" array. Each expense object:
   "currency": "EGP",
   "category": string,
   "merchant": string (or "" if unknown),
+  "reason": string (the specific reason/cause of this expense, e.g. "أكل", "اخويا", "إيجار"),
   "type": "expense" | "income",
   "confidence": number 0-1
 }
@@ -13,7 +14,7 @@ Return a JSON object with an "expenses" array. Each expense object:
 IMPORTANT: Return ONLY valid JSON. No markdown, no code fences, no extra text before or after.
 
 Example for "صرفت 200 جنيه اكل و 100 سجاير و 50 مواصلات":
-{"expenses": [{"amount":200,"currency":"EGP","category":"Food","merchant":"","type":"expense","confidence":0.9},{"amount":100,"currency":"EGP","category":"Smoking","merchant":"","type":"expense","confidence":0.9},{"amount":50,"currency":"EGP","category":"Transport","merchant":"","type":"expense","confidence":0.9}]}
+{"expenses": [{"amount":200,"currency":"EGP","category":"Food","merchant":"","reason":"أكل","type":"expense","confidence":0.9},{"amount":100,"currency":"EGP","category":"Smoking","merchant":"","reason":"سجاير","type":"expense","confidence":0.9},{"amount":50,"currency":"EGP","category":"Transport","merchant":"","reason":"مواصلات","type":"expense","confidence":0.9}]}
 
 If you cannot parse anything, return: {"expenses": [], "error": "Could not parse any expense"}`
 

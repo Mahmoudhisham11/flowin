@@ -117,6 +117,10 @@ export default function VoiceResultPreview({ expenses, wallets = [], onConfirm, 
                     />
                   </div>
                 </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>{t('expense.reason')}</label>
+                  <input className={styles.editInput} type="text" placeholder={t('expense.reasonPlaceholder')} value={draft.reason || ''} onChange={(e) => setDraft({ ...draft, reason: e.target.value })} />
+                </div>
                 <div className={styles.editActions}>
                   <button className={styles.saveBtn} onClick={saveEdit}>{t('save')}</button>
                   <button className={styles.cancelEditBtn} onClick={() => setEditingIndex(null)}>{t('cancel')}</button>
@@ -133,6 +137,7 @@ export default function VoiceResultPreview({ expenses, wallets = [], onConfirm, 
                 </div>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemCategory}>{exp.category || category.labelEn}</span>
+                  {exp.reason && <span className={styles.itemMerchant}>{exp.reason}</span>}
                   {exp.merchant && <span className={styles.itemMerchant}>{exp.merchant}</span>}
                 </div>
               </div>

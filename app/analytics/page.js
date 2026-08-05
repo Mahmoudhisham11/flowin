@@ -231,10 +231,10 @@ export default function AnalyticsPage() {
 
   const renderSummaryCards = (s, colorMap) => {
     const cards = [
-      { label: t('analytics.totalSpent'), value: `EGP ${s.expenses}`, color: '#EF4444', icon: '💸', trend: null },
-      { label: t('analytics.totalIncome'), value: `EGP ${s.income}`, color: '#22C55E', icon: '💰', trend: null },
-      { label: 'Net', value: `${s.net >= 0 ? '+' : '-'}EGP ${Math.abs(s.net)}`, color: s.net >= 0 ? '#22C55E' : '#EF4444', icon: s.net >= 0 ? '📈' : '📉', trend: null },
-      { label: 'Transactions', value: String(s.count), color: '#F59E0B', icon: '📋', trend: null },
+      { label: t('analytics.totalSpent'), numValue: s.expenses, color: '#EF4444', icon: '💸', trend: null },
+      { label: t('analytics.totalIncome'), numValue: s.income, color: '#22C55E', icon: '💰', trend: null },
+      { label: 'Net', numValue: Math.abs(s.net), prefix: s.net >= 0 ? '+' : '-', color: s.net >= 0 ? '#22C55E' : '#EF4444', icon: s.net >= 0 ? '📈' : '📉', trend: null },
+      { label: 'Transactions', numValue: s.count, color: '#F59E0B', icon: '📋', trend: null },
     ]
     return cards.map((card, i) => (
       <div key={i} className={styles.summaryCard} style={{ '--accent': card.color }}>
@@ -243,8 +243,7 @@ export default function AnalyticsPage() {
           <div className={styles.cardIcon} style={{ background: `${card.color}18`, color: card.color }}>{card.icon}</div>
         </div>
         <span className={styles.summaryValue} style={{ color: card.color === '#EF4444' ? 'var(--danger)' : card.color === '#22C55E' ? 'var(--success)' : undefined }}>
-          <AnimatedNumber value={s.count === card.value ? s.count : undefined} decimals={0} />
-          {s.count === card.value ? '' : card.value.replace(/EGP /, '')}
+          {card.prefix || ''}<AnimatedNumber value={card.numValue} decimals={0} />
         </span>
         {card.trend !== null && (
           <span className={`${styles.summaryTrend} ${card.trend >= 0 ? '' : ''}`}>{card.trend}</span>
@@ -521,7 +520,9 @@ export default function AnalyticsPage() {
                     <div className={styles.txInfo}>
                       <span className={styles.txName}>{tx.merchant || tx.category || 'Transaction'}</span>
                       <span className={styles.txMeta}>
-                        {cat.emoji} {tx.category} · {new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {cat.emoji} {tx.category}
+                        {tx.reason && <span className={styles.txReason}> · {tx.reason}</span>}
+                        · {new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         {tx.walletName ? ` · ${tx.walletName}` : ''}
                       </span>
                     </div>

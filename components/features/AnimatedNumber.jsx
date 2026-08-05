@@ -27,6 +27,7 @@ export default function AnimatedNumber({ value, duration = 800, prefix = '', suf
   useEffect(() => {
     valRef.current = value
     started.current = false
+    setDisplay(0)
     const el = ref.current
     if (!el) return
 
@@ -45,9 +46,11 @@ export default function AnimatedNumber({ value, duration = 800, prefix = '', suf
     return () => observer.disconnect()
   }, [value, animate])
 
+  const formatted = Number(display) || 0
+
   return (
     <span ref={ref}>
-      {prefix}{display.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
+      {prefix}{formatted.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
     </span>
   )
 }

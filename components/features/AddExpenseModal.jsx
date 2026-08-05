@@ -14,6 +14,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('Food')
   const [merchant, setMerchant] = useState('')
+  const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -33,6 +34,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
         currency: 'EGP',
         category,
         merchant: merchant.trim(),
+        reason: reason.trim(),
         type: 'expense',
         source: 'manual',
         walletId,
@@ -128,6 +130,17 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               placeholder="e.g. Restaurant, Store..."
               value={merchant}
               onChange={(e) => setMerchant(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>{t('expense.reason')}</label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder={t('expense.reasonPlaceholder')}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             />
           </div>
 

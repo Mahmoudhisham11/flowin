@@ -621,6 +621,11 @@
   color: var(--text-light);
 }
 
+.txReason {
+  color: var(--accent, #F59E0B);
+  font-weight: 500;
+}
+
 .txAmount {
   font-size: 14px;
   font-weight: 700;
