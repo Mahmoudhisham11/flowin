@@ -8,11 +8,12 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  gap: 16px;
 }
 
 .title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 4px;
@@ -26,8 +27,8 @@
 .addBtn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
+  gap: 8px;
+  padding: 11px 20px;
   font-size: 14px;
   font-weight: 600;
   color: #fff;
@@ -35,6 +36,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
   transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
 }
 
 .addBtn:hover {
@@ -45,6 +47,309 @@
   transform: scale(0.97);
 }
 
+/* Stats Overview Cards */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.statIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.statIconTotal {
+  background: rgba(77, 163, 255, 0.12);
+  color: var(--primary);
+}
+
+.statIconToday {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.statIconCompleted {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--success);
+}
+
+.statIconOverdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search and Filters Section */
+.controlsSection {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  inset-inline-start: 14px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  padding-inline-start: 40px;
+  padding-inline-end: 36px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--hover-bg);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.searchInput:focus {
+  background: var(--card);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+}
+
+.clearSearchBtn {
+  position: absolute;
+  inset-inline-end: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: background 0.2s;
+}
+
+.clearSearchBtn:hover {
+  background: var(--text-light);
+  color: #fff;
+}
+
+.viewModeToggle {
+  display: flex;
+  background: var(--hover-bg);
+  border-radius: 10px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.viewBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-gray);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.viewBtnActive {
+  background: var(--card);
+  color: var(--text-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter Row: Date Pills, Status, Priority */
+.filterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.datePillsGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pillBtn {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-gray);
+  background: var(--hover-bg);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pillBtn:hover {
+  background: var(--border);
+  color: var(--text-dark);
+}
+
+.pillBtnActive {
+  background: var(--primary);
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(77, 163, 255, 0.3);
+}
+
+.pillBadge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: 700;
+}
+
+.pillBtnActive .pillBadge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.customDateInputWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--hover-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.customDateInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.secondaryFilters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.selectFilter {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: var(--hover-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.selectFilter:focus {
+  border-color: var(--primary);
+}
+
+.activeFilterBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(77, 163, 255, 0.1);
+  color: var(--primary);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.resetFilterBtn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Progress bar */
 .progressBar {
   margin-bottom: 20px;
   display: flex;
@@ -54,7 +359,7 @@
 
 .progressTrack {
   flex: 1;
-  height: 10px;
+  height: 8px;
   background: var(--hover-bg);
   border-radius: 20px;
   overflow: hidden;
@@ -68,16 +373,43 @@
 }
 
 .progressText {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-gray);
   white-space: nowrap;
 }
 
+/* Task List */
 .taskList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.taskGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.taskGroupTitle {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-gray);
+}
+
+.taskGroupCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--hover-bg);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 .taskItem {
@@ -86,13 +418,35 @@
   gap: 12px;
   padding: 14px 16px;
   background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: opacity 0.2s, background 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.taskItem:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(77, 163, 255, 0.3);
+}
+
+.taskPriorityStrip {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
 }
 
 .taskCompleted {
-  opacity: 0.5;
+  opacity: 0.55;
+  background: var(--hover-bg);
+}
+
+.taskOverdue {
+  border-inline-start: 4px solid var(--danger);
 }
 
 .taskCheck {
@@ -104,10 +458,15 @@
   justify-content: center;
   flex-shrink: 0;
   color: var(--text-light);
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .taskCheck:hover {
+  color: var(--success);
+  transform: scale(1.1);
+}
+
+.taskCheckDone {
   color: var(--success);
 }
 
@@ -116,18 +475,21 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .taskTitleRow {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .taskTitle {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--text-dark);
+  word-break: break-word;
 }
 
 .taskTitleDone {
@@ -143,15 +505,61 @@
   white-space: nowrap;
 }
 
-.taskTime {
-  font-size: 12px;
+.taskMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.taskDateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--hover-bg);
   color: var(--text-gray);
+}
+
+.taskDateBadgeToday {
+  background: rgba(77, 163, 255, 0.12);
+  color: var(--primary);
+}
+
+.taskDateBadgeTomorrow {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.taskDateBadgeOverdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.taskTime {
+  font-size: 11.5px;
+  color: var(--text-gray);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.overdueBadge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-bg);
+  padding: 2px 8px;
+  border-radius: 8px;
 }
 
 .taskActions {
   display: flex;
   gap: 4px;
-  opacity: 0;
+  opacity: 0.7;
   transition: opacity 0.2s;
 }
 
@@ -160,8 +568,8 @@
 }
 
 .taskEditBtn, .taskDeleteBtn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -180,194 +588,7 @@
   color: var(--danger);
 }
 
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 80px 20px;
-}
-
-.emptyIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--hover-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-light);
-  margin-bottom: 16px;
-}
-
-.emptyText {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 4px;
-}
-
-.emptyHint {
-  font-size: 13px;
-  color: var(--text-gray);
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  width: 100%;
-  max-width: 420px;
-  background: var(--card);
-  border-radius: 24px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.modalHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 20px 24px 0;
-  gap: 12px;
-}
-
-.modalTitle {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.modalClose {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-gray);
-  transition: background 0.2s;
-  flex-shrink: 0;
-}
-
-.modalClose:hover {
-  background: var(--hover-bg);
-}
-
-.modalBody {
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.fieldLabel {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-.fieldInput {
-  padding: 12px 16px;
-  font-size: 15px;
-  color: var(--text-dark);
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-
-.fieldInput:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
-}
-
-.fieldInput::placeholder {
-  color: var(--text-light);
-}
-
-.priorityGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.priorityBtn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 8px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  transition: all 0.2s;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-dark);
-}
-
-.priorityBtn:hover {
-  border-color: var(--primary);
-}
-
-.priorityActive {
-  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
-}
-
-.modalActions {
-  display: flex;
-  gap: 10px;
-  padding: 0 24px 20px;
-}
-
-.cancelBtn {
-  flex: 1;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-gray);
-  background: var(--hover-bg);
-  border-radius: 12px;
-  transition: background 0.2s;
-}
-
-.cancelBtn:hover {
-  background: var(--border);
-}
-
-.saveBtn {
-  flex: 1;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
-  transition: transform 0.15s;
-}
-
-.saveBtn:active {
-  transform: scale(0.97);
-}
-
+/* Day Strip View */
 .dateHeader {
   display: flex;
   align-items: center;
@@ -420,28 +641,6 @@
   background: var(--badge-bg);
   padding: 2px 8px;
   border-radius: 8px;
-}
-
-.viewToggle {
-  display: flex;
-  background: var(--hover-bg);
-  border-radius: 10px;
-  padding: 3px;
-}
-
-.viewBtn {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-gray);
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.viewBtnActive {
-  background: var(--card);
-  color: var(--text-dark);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .dateStrip {
@@ -513,23 +712,149 @@
   background: var(--success);
 }
 
-.taskOverdue {
-  border-left: 3px solid var(--danger);
+/* Empty State */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  background: var(--card);
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  text-align: center;
 }
 
-.taskMeta {
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--hover-bg);
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  color: var(--text-light);
+  margin-bottom: 16px;
 }
 
-.overdueBadge {
-  font-size: 10px;
+.emptyText {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: var(--text-gray);
+  max-width: 360px;
+  margin-bottom: 16px;
+}
+
+.emptyResetBtn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--badge-bg);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.emptyResetBtn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card);
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+  gap: 12px;
+}
+
+.modalTitle {
+  font-size: 18px;
   font-weight: 700;
-  color: var(--danger);
-  background: var(--danger-bg);
-  padding: 2px 8px;
-  border-radius: 8px;
+  color: var(--text-dark);
+}
+
+.modalClose {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.modalClose:hover {
+  background: var(--hover-bg);
+}
+
+.modalBody {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.fieldInput {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+}
+
+.fieldInput::placeholder {
+  color: var(--text-light);
 }
 
 .fieldRow {
@@ -565,132 +890,137 @@
   color: var(--primary);
 }
 
-.weekView {
+.priorityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.priorityBtn {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.weekDay {
-  background: var(--card);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: background 0.2s;
-}
-
-.weekDaySelected {
-  border: 1.5px solid var(--primary);
-}
-
-.weekDayHeader {
-  display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.weekDayName {
-  font-size: 13px;
-  font-weight: 700;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-dark);
 }
 
-.weekDayDate {
-  font-size: 12px;
+.priorityBtn:hover {
+  border-color: var(--primary);
+}
+
+.priorityActive {
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+}
+
+.modalActions {
+  display: flex;
+  gap: 10px;
+  padding: 0 24px 20px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-gray);
   background: var(--hover-bg);
-  padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: 12px;
+  transition: background 0.2s;
 }
 
-.weekDayDateToday {
-  background: var(--primary);
-  color: #fff;
+.cancelBtn:hover {
+  background: var(--border);
 }
 
-.weekDayCount {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-light);
-}
-
-.weekDayTasks {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.weekTaskItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-}
-
-.weekTaskDone {
-  opacity: 0.5;
-}
-
-.weekTaskDone .weekTaskTitle {
-  text-decoration: line-through;
-}
-
-.weekTaskDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.weekTaskTitle {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-dark);
+.saveBtn {
   flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.weekTaskTime {
-  font-size: 11px;
-  color: var(--text-light);
-  flex-shrink: 0;
-}
-
-.weekMore {
-  font-size: 11px;
+  padding: 12px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-light);
-  padding: 2px 0;
+  color: #fff;
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  transition: transform 0.15s;
 }
 
-.weekDayEmpty {
-  font-size: 13px;
-  color: var(--text-light);
-  padding: 4px 0;
+.saveBtn:active {
+  transform: scale(0.97);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 767px) {
   .page {
     padding: 16px;
   }
-  .title {
-    font-size: 18px;
-  }
-  .subtitle {
-    font-size: 13px;
-  }
   .header {
     margin-bottom: 16px;
   }
-  .addBtn {
-    padding: 8px 14px;
-    font-size: 13px;
+  .title {
+    font-size: 20px;
+  }
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .statCard {
+    padding: 12px;
+  }
+  .statIcon {
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+  .statValue {
+    font-size: 17px;
+  }
+  .statLabel {
+    font-size: 11px;
+  }
+  .controlsSection {
+    padding: 12px 14px;
+  }
+  .searchRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .viewModeToggle {
+    width: 100%;
+  }
+  .viewBtn {
+    flex: 1;
+    justify-content: center;
+  }
+  .filterRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .datePillsGroup {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .secondaryFilters {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .selectFilter {
+    flex: 1;
   }
   .taskItem {
     padding: 12px;
@@ -698,35 +1028,17 @@
   .taskActions {
     opacity: 1;
   }
-  .dateHeader {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .dateInfo {
-    min-width: 100px;
-  }
-  .dateMonth {
-    font-size: 14px;
-  }
-  .stripDay {
-    min-width: 48px;
-    padding: 8px 10px;
-  }
-  .stripDayNum {
-    font-size: 14px;
-  }
   .fieldRow {
     flex-direction: column;
     gap: 12px;
   }
-  .quickDates {
-    flex-wrap: wrap;
-  }
-  .weekDay {
-    padding: 10px 12px;
-  }
   .modal {
-    max-width: 100%;
     margin: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
   }
 }

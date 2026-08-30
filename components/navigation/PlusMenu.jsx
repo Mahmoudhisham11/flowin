@@ -3,21 +3,18 @@
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useUser } from '@/contexts/UserContext'
-import { BudgetIcon, DebtIcon, AIIcon, SettingsIcon, AdminIcon, GoalIcon, TaskIcon, ProjectIcon } from '@/components/Icons'
+import { BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon } from '@/components/Icons'
 import styles from './PlusMenu.module.css'
 
 const getItems = (isAdmin) => {
   const items = [
     { id: 'budget', key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
-    { id: 'goals', key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
-    { id: 'dailyTasks', key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/daily-tasks' },
-    { id: 'projects', key: 'nav.projects', icon: <ProjectIcon />, route: '/projects' },
-    { id: 'debts', key: 'nav.debts', icon: <DebtIcon />, route: '/debts' },
+    { id: 'tasks', key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
     { id: 'ai', key: 'nav.aiAssistant', icon: <AIIcon />, route: '/ai' },
     { id: 'settings', key: 'nav.settings', icon: <SettingsIcon />, route: '/settings' },
   ]
   if (isAdmin) {
-    items.splice(1, 0, { id: 'admin', key: 'nav.admin', icon: <AdminIcon />, route: '/admin' })
+    items.unshift({ id: 'admin', key: 'nav.admin', icon: <AdminIcon />, route: '/admin' })
   }
   return items
 }

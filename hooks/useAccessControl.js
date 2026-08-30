@@ -20,8 +20,6 @@ export function useAccessControl() {
       canManageWallets: !featureBlocked,
       canAccessAnalytics: adminBypass || (!sub.expired && sub.plan !== 'free'),
       canAccessReports: adminBypass || (!sub.expired && sub.plan !== 'free'),
-      canUseGoals: !featureBlocked,
-      canUseDebts: !featureBlocked,
       blockAll: featureBlocked,
       ...sub,
     }

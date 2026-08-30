@@ -31,9 +31,6 @@ export async function buildChatContext(uid, userName) {
   const budgetSnap = await getDoc(budgetRef)
   const budget = budgetSnap.exists() ? budgetSnap.data() : null
 
-  const goalsSnap = await getDocs(collection(db, `users/${uid}/goals`))
-  const goals = goalsSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
-
   const today = getTodayDate()
   const tasksSnap = await getDocs(collection(db, `users/${uid}/dailyTasks`))
   const dailyTasks = tasksSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
@@ -41,9 +38,6 @@ export async function buildChatContext(uid, userName) {
   const todayTasks = dailyTasks.filter((t) => t.date === today)
   const overdueTasks = dailyTasks.filter((t) => !t.completed && t.date < today)
   const upcomingTasks = dailyTasks.filter((t) => !t.completed && t.date > today).slice(0, 10)
-
-  const projectsSnap = await getDocs(collection(db, `users/${uid}/projects`))
-  const projects = projectsSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
 
   const totalSpent = transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + Number(t.amount || 0), 0)
   const totalIncome = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + Number(t.amount || 0), 0)
@@ -64,11 +58,8 @@ export async function buildChatContext(uid, userName) {
     }
   })
 
-  const overdueGoals = goals.filter((g) => g.deadline && new Date(g.deadline) < new Date() && (g.saved || 0) < g.targetAmount)
   const completedTasks = dailyTasks.filter((t) => t.completed).length
   const completedTodayTasks = todayTasks.filter((t) => t.completed).length
-  const completedProjects = projects.filter((p) => p.status === 'completed').length
-  const overdueProjects = projects.filter((p) => p.deadline && new Date(p.deadline) < new Date() && p.status !== 'completed')
 
   return {
     userName: userName || 'User',
@@ -90,18 +81,6 @@ export async function buildChatContext(uid, userName) {
       essentialCategories: (budget.essentialCategories || []).map((c) => ({ name: c.name, amount: c.amount })),
       totalEssentials: (budget.essentialCategories || []).reduce((s, c) => s + Number(c.amount || 0), 0),
     } : null,
-    goals: {
-      total: goals.length,
-      overdue: overdueGoals.length,
-      items: goals.map((g) => ({
-        name: g.name,
-        target: g.targetAmount,
-        saved: g.saved || 0,
-        progress: g.targetAmount > 0 ? Math.round(((g.saved || 0) / g.targetAmount) * 100) : 0,
-        deadline: g.deadline,
-        overdue: g.deadline && new Date(g.deadline) < new Date() && (g.saved || 0) < g.targetAmount,
-      })),
-    },
     dailyTasks: {
       total: dailyTasks.length,
       completed: completedTasks,
@@ -127,17 +106,6 @@ export async function buildChatContext(uid, userName) {
         priority: t.priority,
         date: t.date,
         time: t.time,
-      })),
-    },
-    projects: {
-      total: projects.length,
-      completed: completedProjects,
-      overdue: overdueProjects.length,
-      items: projects.map((p) => ({
-        name: p.name,
-        progress: p.progress || 0,
-        deadline: p.deadline,
-        status: p.status,
       })),
     },
   }

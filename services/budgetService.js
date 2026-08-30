@@ -26,6 +26,51 @@ export async function saveBudget(uid, data) {
   }
 }
 
+export async function generateAIDailyBudget(uid, budgetData, lang = 'ar') {
+  const res = await fetch('/api/ai/daily-budget', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      monthlyIncome: budgetData.monthlyIncome,
+      essentialCategories: budgetData.essentialCategories,
+      totalEssentials: budgetData.totalEssentials,
+      remaining: budgetData.remaining,
+      lang,
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.error || 'Failed to generate AI daily budget')
+  }
+
+  const result = await res.json()
+
+  if (uid) {
+    const ref = doc(db, DOC_PATH(uid))
+    await updateDoc(ref, {
+      aiDailyBudget: {
+        ...result,
+        generatedAt: new Date().toISOString(),
+      },
+      updatedAt: new Date().toISOString(),
+    }).catch(async () => {
+      await setDoc(ref, {
+        monthlyIncome: budgetData.monthlyIncome || 0,
+        essentialCategories: budgetData.essentialCategories || [],
+        aiDailyBudget: {
+          ...result,
+          generatedAt: new Date().toISOString(),
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }, { merge: true })
+    })
+  }
+
+  return result
+}
+
 export function subscribeToBudget(uid, callback) {
   const ref = doc(db, DOC_PATH(uid))
   return onSnapshot(ref, (snap) => {

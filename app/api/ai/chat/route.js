@@ -1,4 +1,4 @@
-const SYSTEM_PROMPT = `You are a professional financial advisor AI. You have access to the user's real financial data as context, including their transactions, wallets, budget, savings goals, daily tasks, and projects. The user's name is provided in the context - use it to personalize your responses and greet them by name.
+const SYSTEM_PROMPT = `You are a professional financial advisor AI. You have access to the user's real financial data as context, including their transactions, wallets, budget, and tasks. The user's name is provided in the context - use it to personalize your responses and greet them by name.
 
 Rules:
 - Answer ONLY based on the provided financial context
@@ -8,9 +8,7 @@ Rules:
 - If the question is outside the scope of the provided data, politely say you can only answer based on their financial data
 - Use numbers and percentages from the context when relevant
 - Suggest actionable advice when appropriate
-- You can analyze goals progress, daily task completion rates, overdue tasks, and project status
-- You can compare progress over time and provide insights on productivity and financial health
-- You can provide a holistic view of the user's life including finances, tasks, and projects
+- You can analyze daily task completion rates and overdue tasks
 - Tasks are persistent (they don't reset daily) and are scheduled for specific dates
 - You can help users plan their tasks across the week and prioritize effectively
 
@@ -72,10 +70,6 @@ ${context.budget ? `MONTHLY BUDGET PLAN:
 - Essential Categories:
 ${(context.budget.essentialCategories || []).map((c) => `  - ${c.name}: EGP ${fmt(c.amount)}`).join('\n') || '  (none set)'}` : ''}
 
-SAVINGS GOALS:
-${(context.goals?.items || []).length > 0 ? context.goals.items.map((g) => `  - ${g.name}: EGP ${fmt(g.saved)} / ${fmt(g.target)} (${g.progress}%)${g.overdue ? ' [OVERDUE]' : ''}${g.deadline ? ` - deadline: ${g.deadline}` : ''}`).join('\n') : '  (no goals)'}
-${context.goals?.overdue > 0 ? `  - WARNING: ${context.goals.overdue} goal(s) overdue!` : ''}
-
 DAILY TASKS (${context.dailyTasks?.total || 0} total, ${context.dailyTasks?.completed || 0} completed):
 Today (${context.dailyTasks?.todayTotal || 0} tasks, ${context.dailyTasks?.todayCompletionRate || 0}% complete):
 ${(context.dailyTasks?.todayItems || []).length > 0 ? context.dailyTasks.todayItems.map((t) => `  - [${t.completed ? 'x' : ' '}] ${t.title} (${t.priority}${t.time ? ', ' + t.time : ''})`).join('\n') : '  (no tasks today)'}
@@ -83,11 +77,7 @@ ${context.dailyTasks?.urgent > 0 ? `  - WARNING: ${context.dailyTasks.urgent} ur
 ${context.dailyTasks?.overdue > 0 ? `OVERDUE TASKS (${context.dailyTasks.overdue}):
 ${(context.dailyTasks?.overdueItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}`).join('\n')}` : ''}
 ${context.dailyTasks?.upcoming > 0 ? `UPCOMING TASKS (${context.dailyTasks.upcoming}):
-${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}${t.time ? ', ' + t.time : ''}`).join('\n')}` : ''}
-
-PROJECTS (${context.projects?.total || 0} total, ${context.projects?.completed || 0} completed):
-${(context.projects?.items || []).length > 0 ? context.projects.items.map((p) => `  - ${p.name}: ${p.progress}% [${p.status}]${p.deadline ? ` - deadline: ${p.deadline}` : ''}`).join('\n') : '  (no projects)'}
-${context.projects?.overdue > 0 ? `  - WARNING: ${context.projects.overdue} project(s) overdue!` : ''}`
+${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}${t.time ? ', ' + t.time : ''}`).join('\n')}` : ''}`
 
     const messages = [
       { role: 'system', content: SYSTEM_PROMPT },

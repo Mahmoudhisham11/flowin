@@ -5,27 +5,24 @@ import { useUser } from '@/contexts/UserContext'
 import { useTranslation } from '@/hooks/useTranslation'
 import {
   DashboardIcon, ReportIcon,
-  BudgetIcon, AIIcon, SettingsIcon, DebtIcon, AdminIcon, GoalIcon, TaskIcon, ProjectIcon
+  BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon
 } from '@/components/Icons'
 import styles from './Sidebar.module.css'
 
 const mainNav = [
   { key: 'nav.dashboard', icon: <DashboardIcon />, route: '/' },
   { key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
+  { key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
   { key: 'nav.reports', icon: <ReportIcon />, route: '/analytics' },
 ]
 
 const getSecondaryNav = (isAdmin) => {
   const items = [
-    { key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
-    { key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/daily-tasks' },
-    { key: 'nav.projects', icon: <ProjectIcon />, route: '/projects' },
-    { key: 'nav.debts', icon: <DebtIcon />, route: '/debts' },
     { key: 'nav.aiAssistant', icon: <AIIcon />, route: '/ai' },
     { key: 'nav.settings', icon: <SettingsIcon />, route: '/settings' },
   ]
   if (isAdmin) {
-    items.splice(1, 0, { key: 'nav.admin', icon: <AdminIcon />, route: '/admin' })
+    items.unshift({ key: 'nav.admin', icon: <AdminIcon />, route: '/admin' })
   }
   return items
 }
@@ -80,7 +77,7 @@ export default function Sidebar() {
         <span className={styles.sectionLabel}>{t('nav.workspace')}</span>
         <nav className={styles.nav}>
           {secondaryNav.map((item) => {
-            const isActive = item.route === pathname
+            const isActive = item.route === pathname || (item.route === '/daily-tasks' && pathname === '/tasks')
             return (
               <button
                 key={item.key}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { DashboardIcon, BudgetIcon, ReportIcon, GoalIcon } from '@/components/Icons'
+import { DashboardIcon, BudgetIcon, ReportIcon, TaskIcon } from '@/components/Icons'
 import { useTranslation } from '@/hooks/useTranslation'
 import PlusMenu from './PlusMenu'
 import styles from './BottomNav.module.css'
@@ -10,7 +10,7 @@ import styles from './BottomNav.module.css'
 const navItems = [
   { key: 'nav.dashboard', icon: <DashboardIcon />, route: '/' },
   { key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
-  { key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
+  { key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
   { key: 'nav.reports', icon: <ReportIcon />, route: '/analytics' },
 ]
 
