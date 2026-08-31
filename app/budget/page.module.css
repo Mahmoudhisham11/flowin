@@ -325,8 +325,9 @@
 .categoryItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
   background: var(--bg);
   border: 1.5px solid var(--border);
   border-radius: 16px;
@@ -342,6 +343,21 @@
 .categoryItem:focus-within {
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(77, 163, 255, 0.1);
+}
+
+.catMainRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.catDetailsRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .categoryIndex {
@@ -360,16 +376,27 @@
 
 .categoryInput {
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
   padding: 8px 12px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-dark);
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 10px;
   outline: none;
   font-family: inherit;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.categoryInput:hover {
+  background: var(--hover-bg);
+  border-color: var(--border);
+}
+
+.categoryInput:focus {
+  background: var(--card);
+  border-color: var(--primary);
 }
 
 .catMapWrap {
@@ -960,55 +987,22 @@
   }
 
   .categoryItem {
-    padding: 10px 12px;
-    gap: 8px;
-    border-radius: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 14px;
   }
 
-  .categoryInput {
-    padding: 6px 8px;
-    font-size: 13px;
+  .categoryItem:hover {
+    transform: none;
   }
 
-  .categoryAmount {
-    width: 85px;
-    padding: 6px 10px;
-    font-size: 13px;
-  }
-
-  .amountBlock {
-    gap: 1px;
-  }
-
-  .targetDisplay {
-    font-size: 12px;
-  }
-
-  .targetInput {
-    width: 75px;
-    font-size: 12px;
-  }
-
-  .spentBadge {
-    font-size: 10px;
-  }
-
-  .remainingBadge {
-    font-size: 11px;
-  }
-
-  .catProgressWrap {
-    min-width: 60px;
-  }
-
-  .catProgressTrack {
-    width: 40px;
-    height: 5px;
-  }
-
-  .catProgressLabel {
-    font-size: 10px;
-    min-width: 22px;
+  .catMainRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .categoryIndex {
@@ -1016,11 +1010,80 @@
     height: 28px;
     font-size: 11px;
     border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .categoryInput {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .categoryInput:focus {
+    border-color: var(--primary);
   }
 
   .removeBtn {
     width: 28px;
     height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .catDetailsRow {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .amountBlock {
+    align-items: flex-start;
+    gap: 1px;
+  }
+
+  .targetDisplay {
+    font-size: 13px;
+    padding: 0;
+  }
+
+  .targetInput {
+    width: 80px;
+    font-size: 13px;
+  }
+
+  .spentBadge {
+    font-size: 10.5px;
+  }
+
+  .catProgressWrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 70px;
+  }
+
+  .catProgressTrack {
+    width: 50px;
+    height: 5px;
+  }
+
+  .catProgressLabel {
+    font-size: 10.5px;
+    min-width: 24px;
+  }
+
+  .remainingBadge {
+    font-size: 11.5px;
   }
 
   .saveBtn {

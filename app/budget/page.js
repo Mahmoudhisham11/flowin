@@ -362,54 +362,58 @@ export default function BudgetPage() {
               const isOver = spent > target && target > 0
               return (
                 <div key={i} className={`${styles.categoryItem} ${isOver ? styles.categoryOver : ''}`}>
-                  <span className={styles.categoryIndex}>{i + 1}</span>
-                  <input
-                    className={styles.categoryInput}
-                    type="text"
-                    value={cat.name}
-                    onChange={(e) => updateCategory(i, 'name', e.target.value)}
-                    placeholder={t('budget.categoryPlaceholder')}
-                  />
-                  <div className={styles.amountBlock}>
-                    {editingAmount === i ? (
-                      <input
-                        className={styles.targetInput}
-                        type="number"
-                        value={cat.amount || ''}
-                        onChange={(e) => updateCategory(i, 'amount', e.target.value)}
-                        onBlur={() => setEditingAmount(null)}
-                        autoFocus
-                        placeholder="0"
-                      />
-                    ) : (
-                      <button className={styles.targetDisplay} onClick={() => setEditingAmount(i)}>
-                        <span>EGP {fmt(target)}</span>
-                        <EditIcon width="12" height="12" />
-                      </button>
-                    )}
-                    <span className={styles.spentBadge}>
-                      صرفت <strong>EGP {fmt(spent)}</strong>
-                    </span>
+                  <div className={styles.catMainRow}>
+                    <span className={styles.categoryIndex}>{i + 1}</span>
+                    <input
+                      className={styles.categoryInput}
+                      type="text"
+                      value={cat.name}
+                      onChange={(e) => updateCategory(i, 'name', e.target.value)}
+                      placeholder={t('budget.categoryPlaceholder')}
+                    />
+                    <button className={styles.removeBtn} onClick={() => removeCategory(i)} aria-label={t('delete')}>
+                      <CloseIcon width="14" height="14" />
+                    </button>
                   </div>
-                  {target > 0 && (
-                    <div className={styles.remainingBadge} data-over={isOver ? '' : undefined}>
-                      {isOver ? `+${fmt(spent - target)}` : `EGP ${fmt(remainingCat)}`}
-                    </div>
-                  )}
-                  {target > 0 && (
-                    <div className={styles.catProgressWrap}>
-                      <div className={styles.catProgressTrack}>
-                        <div
-                          className={`${styles.catProgressFill} ${isOver ? styles.catProgressOver : spentPct >= 90 ? styles.catProgressDanger : ''}`}
-                          style={{ width: `${spentPct}%` }}
+                  <div className={styles.catDetailsRow}>
+                    <div className={styles.amountBlock}>
+                      {editingAmount === i ? (
+                        <input
+                          className={styles.targetInput}
+                          type="number"
+                          value={cat.amount || ''}
+                          onChange={(e) => updateCategory(i, 'amount', e.target.value)}
+                          onBlur={() => setEditingAmount(null)}
+                          autoFocus
+                          placeholder="0"
                         />
-                      </div>
-                      <span className={styles.catProgressLabel}>{spentPct.toFixed(0)}%</span>
+                      ) : (
+                        <button className={styles.targetDisplay} onClick={() => setEditingAmount(i)}>
+                          <span>EGP {fmt(target)}</span>
+                          <EditIcon width="12" height="12" />
+                        </button>
+                      )}
+                      <span className={styles.spentBadge}>
+                        {language === 'ar' ? 'صرفت' : 'Spent'} <strong>EGP {fmt(spent)}</strong>
+                      </span>
                     </div>
-                  )}
-                  <button className={styles.removeBtn} onClick={() => removeCategory(i)}>
-                    <CloseIcon width="14" height="14" />
-                  </button>
+                    {target > 0 && (
+                      <div className={styles.catProgressWrap}>
+                        <div className={styles.catProgressTrack}>
+                          <div
+                            className={`${styles.catProgressFill} ${isOver ? styles.catProgressOver : spentPct >= 90 ? styles.catProgressDanger : ''}`}
+                            style={{ width: `${spentPct}%` }}
+                          />
+                        </div>
+                        <span className={styles.catProgressLabel}>{spentPct.toFixed(0)}%</span>
+                      </div>
+                    )}
+                    {target > 0 && (
+                      <div className={styles.remainingBadge} data-over={isOver ? '' : undefined}>
+                        {isOver ? `+${fmt(spent - target)}` : `EGP ${fmt(remainingCat)}`}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}
