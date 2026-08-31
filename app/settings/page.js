@@ -86,6 +86,8 @@ export default function SettingsPage() {
 
   const showBanner = userData?.role === 'free'
 
+  const { isClosing: isPwdClosing, handleClose: handleClosePwd } = useSmoothClose(() => setShowPwdModal(false))
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -243,11 +245,11 @@ export default function SettingsPage() {
       </div>
 
       {showPwdModal && (
-        <div className={styles.overlay} onClick={() => { if (!pwdLoading) setShowPwdModal(false) }}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={`${styles.overlay} ${isPwdClosing ? styles.overlayClosing : ''}`} onClick={() => { if (!pwdLoading) handleClosePwd() }}>
+          <div className={`${styles.modal} ${isPwdClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>{t('auth.changePassword')}</h2>
-              <button className={styles.modalClose} onClick={() => { if (!pwdLoading) setShowPwdModal(false) }}>
+              <button className={styles.modalClose} onClick={() => { if (!pwdLoading) handleClosePwd() }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>

@@ -7,12 +7,14 @@ import { refundFromBudget } from '@/services/budgetService'
 import { CATEGORIES } from '@/lib/categories'
 import { WALLET_TYPES } from '@/services/walletService'
 import { useTranslation } from '@/hooks/useTranslation'
+import useSmoothClose from '@/hooks/useSmoothClose'
 import Select from '@/components/ui/Select'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import styles from './AddIncomeModal.module.css'
 
 export default function EditTransactionModal({ uid, transaction, wallets, onClose, budgetCategories = [] }) {
   const { t } = useTranslation()
+  const { isClosing, handleClose } = useSmoothClose(onClose)
   const [amount, setAmount] = useState(String(transaction.amount || ''))
   const [category, setCategory] = useState(transaction.category || 'Other')
 
@@ -78,7 +80,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
         }
       }
 
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -106,7 +108,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
         await adjustWallet(uid, txWalletId, reverse)
       }
 
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -122,8 +124,8 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={`${styles.overlay} ${isClosing ? styles.overlayClosing : ''}`} onClick={handleClose}>
+      <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('transactions.editTransaction')}</h2>
           <p className={styles.subtitle}>Update transaction details</p>
@@ -181,7 +183,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
             <button type="button" className={styles.deleteBtn} onClick={() => setShowDeleteConfirm(true)} disabled={loading}>
                 {t('transactions.deleteTransaction')}
               </button>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>{t('cancel')}</button>
+            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
           </div>
         </form>
       </div>

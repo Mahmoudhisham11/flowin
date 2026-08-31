@@ -793,35 +793,48 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 1000;
   padding: 20px;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: overlayIn 0.25s ease-out forwards;
+}
+
+.overlayClosing {
+  animation: overlayOut 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  pointer-events: none;
 }
 
 .modal {
   width: 100%;
-  max-width: 440px;
-  background: var(--card);
-  border-radius: 24px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  max-width: 460px;
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.modalClosing {
+  animation: modalOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards !important;
 }
 
 .modalHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 20px 24px 0;
+  padding: 24px 24px 0;
   gap: 12px;
 }
 
 .modalTitle {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
   color: var(--text-dark);
 }
 
@@ -861,20 +874,20 @@
 }
 
 .fieldInput {
-  padding: 12px 16px;
+  padding: 14px 16px;
   font-size: 14px;
   color: var(--text-dark);
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   outline: none;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .fieldInput:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.16);
 }
 
 .fieldInput::placeholder {
@@ -898,20 +911,24 @@
 .quickDateBtn {
   padding: 8px 16px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-gray);
-  background: var(--hover-bg);
-  border-radius: 10px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .quickDateBtn:hover {
-  background: var(--border);
+  background: var(--hover-bg);
+  border-color: var(--primary);
 }
 
 .quickDateActive {
   background: var(--badge-bg);
   color: var(--primary);
+  border-color: var(--primary);
 }
 
 .priorityGrid {
@@ -926,21 +943,24 @@
   align-items: center;
   gap: 4px;
   padding: 12px 8px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  transition: all 0.2s;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-dark);
+  cursor: pointer;
 }
 
 .priorityBtn:hover {
   border-color: var(--primary);
+  background: var(--hover-bg);
 }
 
 .priorityActive {
-  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.12);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.16);
 }
 
 .modalActions {

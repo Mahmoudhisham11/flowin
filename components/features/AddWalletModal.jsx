@@ -5,10 +5,12 @@ import { createWallet, updateWallet, deleteWallet, WALLET_TYPES, WALLET_COLORS }
 import { saveTransaction } from '@/services/transactionsService'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/hooks/useTranslation'
+import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddWalletModal.module.css'
 
 export default function AddWalletModal({ uid, wallet, onClose }) {
   const { t } = useTranslation()
+  const { isClosing, handleClose } = useSmoothClose(onClose)
   const isEdit = !!wallet
   const [name, setName] = useState(wallet?.name || '')
   const [type, setType] = useState(wallet?.type || 'cash')
@@ -51,7 +53,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
           })
         }
       }
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -64,7 +66,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
     setLoading(true)
     try {
       await deleteWallet(uid, wallet.id)
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -75,8 +77,8 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
   const activeType = WALLET_TYPES.find((t) => t.id === type)
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={`${styles.overlay} ${isClosing ? styles.overlayClosing : ''}`} onClick={handleClose}>
+      <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{isEdit ? t('dashboard.editWallet') : t('dashboard.addWallet')}</h2>
           <p className={styles.subtitle}>{isEdit ? 'Update wallet details' : 'Create a new wallet or account'}</p>
@@ -128,7 +130,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
                 {t('dashboard.deleteWallet')}
               </button>
             )}
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>{t('cancel')}</button>
+            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
           </div>
         </form>
       </div>

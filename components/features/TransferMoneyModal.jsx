@@ -5,11 +5,13 @@ import { doc, collection, runTransaction } from 'firebase/firestore'
 import { db } from '@/lib/firestore'
 import { WALLET_TYPES } from '@/services/walletService'
 import { useTranslation } from '@/hooks/useTranslation'
+import useSmoothClose from '@/hooks/useSmoothClose'
 import Select from '@/components/ui/Select'
 import styles from './AddIncomeModal.module.css'
 
 export default function TransferMoneyModal({ uid, wallets, onClose }) {
   const { t } = useTranslation()
+  const { isClosing, handleClose } = useSmoothClose(onClose)
   const [fromId, setFromId] = useState(wallets.length > 1 ? wallets[0].id : '')
   const [toId, setToId] = useState(wallets.length > 1 ? wallets[1].id : '')
   const [amount, setAmount] = useState('')
@@ -61,7 +63,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
         })
       })
 
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -70,8 +72,8 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={`${styles.overlay} ${isClosing ? styles.overlayClosing : ''}`} onClick={handleClose}>
+      <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('transfer.title')}</h2>
           <p className={styles.subtitle}>Move money between your wallets</p>
@@ -125,7 +127,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
             <button type="submit" className={styles.saveBtn} disabled={loading || !fromId || !toId || fromId === toId}>
               {loading ? t('saving') : t('transfer.transferNow')}
             </button>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>{t('cancel')}</button>
+            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
           </div>
         </form>
       </div>

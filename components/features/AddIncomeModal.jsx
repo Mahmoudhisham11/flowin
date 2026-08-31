@@ -5,10 +5,12 @@ import { saveTransaction } from '@/services/transactionsService'
 import { updateWallet } from '@/services/walletService'
 import { WALLET_TYPES } from '@/services/walletService'
 import { useTranslation } from '@/hooks/useTranslation'
+import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddIncomeModal.module.css'
 
 export default function AddIncomeModal({ uid, wallets, onClose }) {
   const { t } = useTranslation()
+  const { isClosing, handleClose } = useSmoothClose(onClose)
   const [walletId, setWalletId] = useState(wallets.length > 0 ? wallets[0].id : '')
   const [amount, setAmount] = useState('')
   const [source, setSource] = useState('')
@@ -43,7 +45,7 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
         balance: (selectedWallet?.balance || 0) + num,
       })
 
-      onClose()
+      handleClose()
     } catch (err) {
       setError(err.message)
     } finally {
@@ -52,8 +54,8 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
   }
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+    <div className={`${styles.overlay} ${isClosing ? styles.overlayClosing : ''}`} onClick={handleClose}>
+      <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('income.title')}</h2>
           <p className={styles.subtitle}>Add money to your wallet</p>
@@ -125,7 +127,7 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
             <button type="submit" className={styles.saveBtn} disabled={loading}>
               {loading ? t('saving') : t('income.add')}
             </button>
-            <button type="button" className={styles.cancelBtn} onClick={onClose}>{t('cancel')}</button>
+            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
           </div>
         </form>
       </div>
