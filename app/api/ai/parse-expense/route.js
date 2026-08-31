@@ -5,7 +5,7 @@ Return a JSON object with an "expenses" array:
 {
   "expenses": [
     {
-      "amount": number (positive, convert spoken words like "ميتين" to 200, "خمسمية" to 500, "ألف/باكو" to 1000, "ربع مية" to 400, "تلت مية" to 300, "خمسين" to 50, "تلاتين" to 30, etc.),
+      "amount": number (positive, convert spoken numbers like "ميتين" to 200, "خمسمية" to 500, "ألف/باكو" to 1000, "ربع مية" to 400, "تلت مية" to 300, "خمسين" to 50, "تلاتين" to 30, etc.),
       "currency": "EGP",
       "category": string (e.g. Food, Transport, Shopping, Bills, Smoking, Entertainment, Health, Other, or a custom budget category name),
       "merchant": string (store or person name, e.g. "سوبرماركت زهران", "أوبر", "فودافون", or "" if none),
@@ -55,10 +55,14 @@ function extractJSON(raw) {
   return JSON.parse(cleaned)
 }
 
-const CANDIDATE_MODELS = [
-  'google/gemini-2.0-flash-001',
-  'meta-llama/llama-3.3-70b-instruct',
+// 100% Free models on OpenRouter that never require credits (no 402 errors)
+const FREE_MODELS = [
   'openrouter/free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'google/gemini-2.0-flash-exp:free',
+  'google/gemini-2.0-flash-lite-preview-02-05:free',
+  'qwen/qwen-2.5-72b-instruct:free',
+  'meta-llama/llama-3.1-8b-instruct:free',
 ]
 
 export async function POST(req) {
@@ -78,7 +82,7 @@ export async function POST(req) {
     let parsed = null
     let lastError = null
 
-    for (const model of CANDIDATE_MODELS) {
+    for (const model of FREE_MODELS) {
       try {
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
@@ -99,7 +103,8 @@ export async function POST(req) {
         })
 
         if (!res.ok) {
-          lastError = `Model ${model} returned ${res.status}`
+          const errBody = await res.text().catch(() => '')
+          lastError = `Model ${model} (${res.status}): ${errBody}`
           continue
         }
 
