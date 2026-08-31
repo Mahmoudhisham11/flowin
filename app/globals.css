@@ -1,81 +1,112 @@
 :root {
-  --primary: #4DA3FF;
-  --primary-light: #7BB8FF;
-  --primary-dark: #2B8BFF;
-  --primary-gradient: linear-gradient(135deg, #4DA3FF 0%, #2563EB 100%);
-  --bg: #F7FAFF;
-  --bg-secondary: #EEF2F7;
-  --card: #FFFFFF;
-  --card-hover: #F9FAFB;
-  --text-dark: #111827;
-  --text-gray: #6B7280;
-  --text-light: #9CA3AF;
-  --success: #22C55E;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-  --border: #E5E7EB;
-  --border-light: #F3F4F6;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 28px;
-  --nav-bg: rgba(255, 255, 255, 0.9);
+  /* ===== Apple iOS Glassmorphism (Light Mode) ===== */
+  --primary: #007AFF;
+  --primary-light: #47A1FF;
+  --primary-dark: #0056B3;
+  --primary-gradient: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  --bg: #F2F2F7;
+  --bg-secondary: #E5E5EA;
+  --card: rgba(255, 255, 255, 0.82);
+  --card-hover: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-highlight: rgba(255, 255, 255, 0.9);
+  --text-dark: #000000;
+  --text-gray: #636366;
+  --text-light: #8E8E93;
+  --success: #34C759;
+  --danger: #FF3B30;
+  --warning: #FF9500;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1);
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 36px;
+  --nav-bg: rgba(255, 255, 255, 0.78);
   --nav-border: rgba(0, 0, 0, 0.06);
-  --overlay: rgba(0, 0, 0, 0.4);
-  --input-bg: #fff;
-  --input-border: #E5E7EB;
-  --sidebar-bg: #fff;
-  --sidebar-border: #F3F4F6;
-  --hover-bg: #F3F4F6;
-  --badge-bg: #EFF6FF;
-  --card-border: transparent;
-  --success-bg: #F0FDF4;
-  --danger-bg: #FEF2F2;
-  --warning-bg: #FFFBEB;
-  --scrollbar-thumb: #E2E8F0;
+  --overlay: rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-border: rgba(0, 0, 0, 0.1);
+  --sidebar-bg: rgba(255, 255, 255, 0.75);
+  --sidebar-border: rgba(0, 0, 0, 0.06);
+  --hover-bg: rgba(0, 0, 0, 0.05);
+  --badge-bg: rgba(0, 122, 255, 0.1);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --success-bg: rgba(52, 199, 89, 0.12);
+  --danger-bg: rgba(255, 59, 48, 0.12);
+  --warning-bg: rgba(255, 149, 0, 0.12);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+
+  /* Active Pill Styles */
+  --pill-active-bg: #000000;
+  --pill-active-text: #FFFFFF;
+  --pill-active-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  --pill-inactive-bg: rgba(0, 0, 0, 0.05);
+  --pill-inactive-border: rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="dark"] {
-  --primary: #93C5FD;
-  --primary-light: #BFDBFE;
-  --primary-dark: #60A5FA;
-  --primary-gradient: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
-  --bg: #080C16;
-  --bg-secondary: #111827;
-  --card: #111827;
-  --card-hover: #1E293B;
-  --text-dark: #F1F5F9;
-  --text-gray: #94A3B8;
-  --text-light: #64748B;
-  --success: #22C55E;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-  --border: #1E293B;
-  --border-light: #111827;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-  --nav-bg: rgba(8, 12, 22, 0.94);
-  --nav-border: rgba(255, 255, 255, 0.08);
-  --overlay: rgba(0, 0, 0, 0.75);
-  --input-bg: #111827;
-  --input-border: #1E293B;
-  --sidebar-bg: #080C16;
-  --sidebar-border: #1E293B;
-  --hover-bg: #1E293B;
-  --badge-bg: rgba(96, 165, 250, 0.1);
-  --card-border: #1E293B;
-  --success-bg: rgba(34, 197, 94, 0.1);
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --scrollbar-thumb: #334155;
+  /* ===== Futuristic Apple iOS 26 Glassmorphism (Dark Mode) ===== */
+  --primary: #0A84FF;
+  --primary-light: #5AC8FA;
+  --primary-dark: #0064D2;
+  --primary-gradient: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  
+  /* Pure Pitch OLED Glass Background */
+  --bg: #000000;
+  --bg-secondary: #08080A;
+  
+  /* Frosted Dark Glass Surface */
+  --card: rgba(255, 255, 255, 0.055);
+  --card-hover: rgba(255, 255, 255, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border-highlight: rgba(255, 255, 255, 0.22);
+  
+  /* Apple Crisp High-Contrast Typography */
+  --text-dark: #FFFFFF;
+  --text-gray: rgba(255, 255, 255, 0.68);
+  --text-light: rgba(255, 255, 255, 0.42);
+  
+  /* Apple Dynamic System Accents */
+  --success: #30D158;
+  --danger: #FF453A;
+  --warning: #FF9F0A;
+  --border: rgba(255, 255, 255, 0.11);
+  --border-light: rgba(255, 255, 255, 0.06);
+  
+  /* Soft Ambient Glows & Glass Shadows */
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 2px 1px rgba(255, 255, 255, 0.15);
+  
+  --nav-bg: rgba(12, 12, 16, 0.82);
+  --nav-border: rgba(255, 255, 255, 0.12);
+  --overlay: rgba(0, 0, 0, 0.82);
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --sidebar-bg: rgba(8, 8, 12, 0.85);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --badge-bg: rgba(10, 132, 255, 0.16);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --success-bg: rgba(48, 209, 88, 0.15);
+  --danger-bg: rgba(255, 69, 58, 0.15);
+  --warning-bg: rgba(255, 159, 10, 0.15);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+
+  /* Reference Image: Brilliant White Capsule for Active Items */
+  --pill-active-bg: #FFFFFF;
+  --pill-active-text: #000000;
+  --pill-active-shadow: 0 4px 24px rgba(255, 255, 255, 0.28), 0 0 12px rgba(255, 255, 255, 0.15);
+  --pill-inactive-bg: rgba(255, 255, 255, 0.07);
+  --pill-inactive-border: rgba(255, 255, 255, 0.1);
 }
 
 html.rtl {
-  --font-primary: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-primary: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
 }
 
 * {
@@ -87,12 +118,12 @@ html.rtl {
 html,
 body {
   height: 100%;
-  font-family: var(--font-inter), var(--font-tajawal), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', var(--font-inter), var(--font-tajawal), 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.rtl body,
@@ -100,46 +131,70 @@ html.rtl button,
 html.rtl input,
 html.rtl textarea,
 html.rtl select {
-  font-family: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 }
 
-html.rtl .sidebar {
-  border-right: none;
-  border-left: 1px solid var(--sidebar-border);
+/* Ambient Radial Glow on Dark Background */
+[data-theme="dark"] body {
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(10, 132, 255, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(94, 92, 230, 0.05), transparent 60%);
+  background-attachment: fixed;
 }
 
-html.rtl .main-content {
-  animation: pageFadeInRTL 0.6s ease-out;
+/* Glassmorphism Surface Defaults */
+.glass-panel,
+[class*="Card_"],
+[class*="card_"],
+[class*="overviewCard"],
+[class*="widget_"] {
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
-@keyframes pageFadeInRTL {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-body {
-  overflow-x: hidden;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
+/* Tactile Spring Micro-Interactions (Apple Physics) */
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
   cursor: pointer;
   font-family: inherit;
   border: none;
   background: none;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              opacity 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-input {
+button:active,
+a:active,
+[role="button"]:active {
+  transform: scale(0.96) !important;
+}
+
+input, textarea, select {
   font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 100px;
 }
 
 .app-layout {
@@ -152,12 +207,12 @@ input {
   flex: 1;
   min-width: 0;
   overflow-x: hidden;
-  animation: pageFadeIn 0.6s ease-out;
+  animation: pageFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(16px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media (min-width: 768px) {
@@ -171,40 +226,12 @@ input {
     flex-direction: column;
   }
   .main-content {
-    padding-bottom: 88px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
-}
-
-/* ===== Global Responsive ===== */
-
-button, a, .btn {
-  white-space: nowrap;
 }
 
 @media (max-width: 480px) {
-  html {
-    font-size: 14px;
-  }
-
   .page, [class*="page_"] {
-    padding: 16px 12px !important;
-  }
-
-  [class*="walletGrid"], [class*="grid_"], [class*="cardGrid"],
-  [class*="statsRow"], [class*="summary"], [class*="stats_"],
-  [class*="chartGrid"] {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  [class*="walletActions"], [class*="inlineActions"] {
-    flex-direction: column !important;
-    gap: 6px !important;
-  }
-
-  [class*="header"] {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 10px !important;
+    padding: 16px 14px !important;
   }
 }

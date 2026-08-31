@@ -100,7 +100,7 @@ ${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.
         'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
       },
       body: JSON.stringify({
-        model: 'openrouter/free',
+        model: 'minimax/minimax-m3:free',
         messages,
         temperature: 0.3,
         max_tokens: 800,

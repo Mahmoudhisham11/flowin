@@ -55,14 +55,9 @@ function extractJSON(raw) {
   return JSON.parse(cleaned)
 }
 
-// 100% Free models on OpenRouter that never require credits (no 402 errors)
 const FREE_MODELS = [
+  'minimax/minimax-m3:free',
   'openrouter/free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'google/gemini-2.0-flash-exp:free',
-  'google/gemini-2.0-flash-lite-preview-02-05:free',
-  'qwen/qwen-2.5-72b-instruct:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
 ]
 
 export async function POST(req) {

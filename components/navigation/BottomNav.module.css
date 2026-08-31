@@ -14,14 +14,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   background: var(--nav-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid var(--nav-border);
-  border-radius: 28px;
-  padding: 6px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 36px;
+  padding: 6px 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(255, 255, 255, 0.08);
   max-width: 480px;
   margin: 0 auto;
 }
@@ -31,19 +31,19 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 14px;
-  border-radius: 22px;
+  padding: 10px 16px;
+  border-radius: 26px;
   background: transparent;
   color: var(--text-gray);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
   min-width: 44px;
   justify-content: center;
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--pill-active-text);
 }
 
 .tabIcon {
@@ -56,17 +56,17 @@
 }
 
 .tabIconActive {
-  color: var(--primary);
+  color: var(--pill-active-text);
 }
 
 .tabLabel {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   position: relative;
   z-index: 2;
   overflow: hidden;
-  animation: labelIn 0.15s ease-out;
+  animation: labelIn 0.2s ease-out;
 }
 
 @keyframes labelIn {
@@ -77,10 +77,11 @@
 .pill {
   position: absolute;
   inset: 2px;
-  background: var(--badge-bg);
-  border-radius: 22px;
+  background: var(--pill-active-bg);
+  border-radius: 24px;
   z-index: 1;
-  animation: pillIn 0.25s ease-out;
+  box-shadow: var(--pill-active-shadow);
+  animation: pillIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes pillIn {
