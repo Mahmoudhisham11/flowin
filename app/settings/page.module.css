@@ -93,13 +93,6 @@
   flex-direction: column;
   gap: 14px;
 }
-
-.section {
-}
-
-.sectionFull {
-}
-
 .sectionCard {
   background: var(--card);
   border-radius: 16px;

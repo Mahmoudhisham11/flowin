@@ -542,62 +542,54 @@ export default function TasksPage() {
               <div
                 key={task.id}
                 className={`${styles.taskItem} ${task.completed ? styles.taskCompleted : ''} ${isOverdue ? styles.taskOverdue : ''}`}
+                onClick={() => handleToggle(task)}
               >
-                <div
-                  className={styles.taskPriorityStrip}
-                  style={{ background: priority?.color || '#22C55E' }}
-                />
-
-                <button
-                  className={`${styles.taskCheck} ${task.completed ? styles.taskCheckDone : ''}`}
-                  onClick={() => handleToggle(task)}
-                >
-                  {task.completed ? (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                      <polyline points="22 4 12 14.01 9 11.01" />
-                    </svg>
-                  ) : (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                    </svg>
-                  )}
-                </button>
-
-                <div className={styles.taskContent}>
-                  <div className={styles.taskTitleRow}>
+                <div className={styles.taskLeftSection}>
+                  <div className={`${styles.taskIconBadge} ${task.completed ? styles.taskIconBadgeDone : ''}`}>
+                    <span>{priority?.emoji || '📋'}</span>
+                  </div>
+                  <div className={styles.taskContent}>
                     <span className={`${styles.taskTitle} ${task.completed ? styles.taskTitleDone : ''}`}>
                       {task.title}
                     </span>
-                    <span
-                      className={styles.priorityBadge}
-                      style={{ color: priority?.color, background: (priority?.color || '#22C55E') + '15' }}
-                    >
-                      {priority?.emoji} {isAr ? priority?.labelAr : priority?.labelEn}
-                    </span>
-                  </div>
-
-                  <div className={styles.taskMeta}>
-                    {renderDateBadge(task)}
-                    {task.time && (
-                      <span className={styles.taskTime}>
-                        🕐 {formatTime12(task.time)}
-                      </span>
+                    {(task.time || isOverdue) && (
+                      <div className={styles.taskMeta}>
+                        {task.time && (
+                          <span className={styles.taskTime}>
+                            🕐 {formatTime12(task.time)}
+                          </span>
+                        )}
+                        {isOverdue && <span className={styles.overdueBadge}>{t('dailyTasks.overdue')}</span>}
+                      </div>
                     )}
-                    {isOverdue && <span className={styles.overdueBadge}>{t('dailyTasks.overdue')}</span>}
                   </div>
                 </div>
 
-                <div className={styles.taskActions}>
-                  <button className={styles.taskEditBtn} onClick={() => openEdit(task)} title={t('edit')}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                  </button>
-                  <button className={styles.taskDeleteBtn} onClick={() => setShowDeleteConfirm(task.id)} title={t('delete')}>
-                    <CloseIcon width="15" height="15" />
-                  </button>
+                <div className={styles.taskRightSection}>
+                  <div
+                    className={`${styles.taskCheck} ${task.completed ? styles.taskCheckDone : ''}`}
+                    title={task.completed ? 'مكتمل' : 'غير مكتمل'}
+                  >
+                    {task.completed ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <div className={styles.emptyCircle} />
+                    )}
+                  </div>
+
+                  <div className={styles.taskActions} onClick={(e) => e.stopPropagation()}>
+                    <button className={styles.taskEditBtn} onClick={() => openEdit(task)} title={t('edit')}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                    <button className={styles.taskDeleteBtn} onClick={() => setShowDeleteConfirm(task.id)} title={t('delete')}>
+                      <CloseIcon width="14" height="14" />
+                    </button>
+                  </div>
                 </div>
               </div>
             )
