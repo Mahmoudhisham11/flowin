@@ -209,7 +209,11 @@ export default function AnalyticsPage() {
     setDeleteLoading(true)
     try {
       const amt = Number(deletingTx.amount || 0)
-      const txWalletId = deletingTx.walletId
+      const txWalletId = deletingTx.walletId || wallets.find((x) => {
+        if (deletingTx.walletName && x.name?.toLowerCase() === deletingTx.walletName?.toLowerCase()) return true
+        if (deletingTx.merchant && deletingTx.merchant.toLowerCase() === `initial balance - ${x.name?.toLowerCase()}`) return true
+        return false
+      })?.id || null
       const txType = deletingTx.type
       const txCategory = deletingTx.category
       await deleteTransaction(user.uid, deletingTx.id)

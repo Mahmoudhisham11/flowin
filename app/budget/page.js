@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { PlusIcon, CloseIcon, EditIcon } from '@/components/Icons'
-import { subscribeToBudget, saveBudget, generateAIDailyBudget } from '@/services/budgetService'
+import { subscribeToBudget, saveBudget } from '@/services/budgetService'
 import { useTranslation } from '@/hooks/useTranslation'
 import styles from './page.module.css'
 
@@ -16,9 +16,6 @@ export default function BudgetPage() {
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editingAmount, setEditingAmount] = useState(null)
-  const [aiDailyBudget, setAiDailyBudget] = useState(null)
-  const [generatingAI, setGeneratingAI] = useState(false)
-  const [aiError, setAiError] = useState('')
 
   useEffect(() => {
     if (!user) return
@@ -27,14 +24,10 @@ export default function BudgetPage() {
         setBudget(data)
         setMonthlyIncome(data.monthlyIncome || 0)
         setCategories(data.essentialCategories || [])
-        if (data.aiDailyBudget) {
-          setAiDailyBudget(data.aiDailyBudget)
-        }
       } else {
         setBudget(null)
         setMonthlyIncome(0)
         setCategories([])
-        setAiDailyBudget(null)
       }
     })
     return unsub
@@ -81,36 +74,6 @@ export default function BudgetPage() {
       console.error('Failed to save budget', err)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleGenerateAI = async () => {
-    if (incomeNum <= 0) {
-      setAiError(t('budget.needIncomeFirst'))
-      setTimeout(() => setAiError(''), 4000)
-      return
-    }
-
-    setGeneratingAI(true)
-    setAiError('')
-    try {
-      const result = await generateAIDailyBudget(
-        user?.uid,
-        {
-          monthlyIncome: incomeNum,
-          essentialCategories: categories,
-          totalEssentials,
-          remaining,
-        },
-        language || 'ar'
-      )
-      setAiDailyBudget(result)
-    } catch (err) {
-      console.error('Failed to generate AI daily budget:', err)
-      setAiError(err.message || 'Error generating AI daily budget')
-      setTimeout(() => setAiError(''), 4000)
-    } finally {
-      setGeneratingAI(false)
     }
   }
 
@@ -180,149 +143,6 @@ export default function BudgetPage() {
             </div>
           </div>
         </>
-      )}
-
-      {/* === AI Daily Budget Card === */}
-      {(incomeNum > 0 || aiDailyBudget) && (
-        <div className={styles.aiBudgetCard}>
-          <div className={styles.aiCardHeader}>
-            <div>
-              <div className={styles.aiBadge}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                {t('budget.aiDailyBudgetTitle')}
-              </div>
-              <h2 className={styles.aiCardTitle}>{t('budget.dailyBudgetAmount')}</h2>
-              <p className={styles.aiCardDesc}>{t('budget.aiDailyBudgetDesc')}</p>
-            </div>
-
-            <button
-              className={styles.aiGenerateBtn}
-              onClick={handleGenerateAI}
-              disabled={generatingAI}
-            >
-              {generatingAI ? (
-                <>
-                  <div className={styles.spinner} />
-                  {t('budget.generating')}
-                </>
-              ) : aiDailyBudget ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="23 4 23 10 17 10" />
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                  </svg>
-                  {t('budget.regenerateAiBudget')}
-                </>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                  {t('budget.generateAiBudget')}
-                </>
-              )}
-            </button>
-          </div>
-
-          {aiError && (
-            <div style={{ color: 'var(--danger)', fontSize: '13px', fontWeight: '600', marginBottom: '16px' }}>
-              {aiError}
-            </div>
-          )}
-
-          {aiDailyBudget && (
-            <>
-              <div className={styles.dailyHero}>
-                <span className={styles.dailyAmount}>EGP {fmt(aiDailyBudget.dailyBudget)}</span>
-                <span className={styles.dailyPeriod}>{t('budget.perDay')}</span>
-              </div>
-
-              <div className={styles.aiMetricsGrid}>
-                <div className={styles.aiMetricCard}>
-                  <span className={styles.aiMetricLabel}>{t('budget.safeDailyLimit')}</span>
-                  <div className={styles.aiMetricValue} style={{ color: '#22C55E' }}>
-                    EGP {fmt(aiDailyBudget.safeDailyLimit || Math.round(aiDailyBudget.dailyBudget * 0.85))}
-                  </div>
-                </div>
-
-                <div className={styles.aiMetricCard}>
-                  <span className={styles.aiMetricLabel}>{t('budget.weekendBuffer')}</span>
-                  <div className={styles.aiMetricValue} style={{ color: '#3B82F6' }}>
-                    +{fmt(aiDailyBudget.weekendBuffer || 0)}
-                  </div>
-                </div>
-
-                <div className={styles.aiMetricCard}>
-                  <span className={styles.aiMetricLabel}>{t('budget.monthlySavingsBuffer')}</span>
-                  <div className={styles.aiMetricValue} style={{ color: '#8B5CF6' }}>
-                    EGP {fmt(aiDailyBudget.monthlySavingsBuffer || 0)}
-                  </div>
-                </div>
-              </div>
-
-              {aiDailyBudget.reasoning && (
-                <div className={styles.reasoningSection}>
-                  <div className={styles.sectionHeader}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="16" x2="12" y2="12" />
-                      <line x1="12" y1="8" x2="12.01" y2="8" />
-                    </svg>
-                    {t('budget.whyThisNumber')}
-                  </div>
-                  <p className={styles.reasoningText}>{aiDailyBudget.reasoning}</p>
-                </div>
-              )}
-
-              {Array.isArray(aiDailyBudget.formulaSteps) && aiDailyBudget.formulaSteps.length > 0 && (
-                <div className={styles.breakdownSection}>
-                  <div className={styles.sectionHeader}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <line x1="3" y1="9" x2="21" y2="9" />
-                      <line x1="9" y1="21" x2="9" y2="9" />
-                    </svg>
-                    {t('budget.formulaBreakdown')}
-                  </div>
-                  <div className={styles.stepsList}>
-                    {aiDailyBudget.formulaSteps.map((step, idx) => (
-                      <div key={idx} className={styles.stepRow}>
-                        <div className={styles.stepInfo}>
-                          <span className={styles.stepName}>{step.step}</span>
-                          {step.note && <span className={styles.stepNote}>{step.note}</span>}
-                        </div>
-                        <span className={`${styles.stepAmount} ${step.amount < 0 ? styles.stepAmountNegative : styles.stepAmountPositive}`}>
-                          {step.amount < 0 ? `-EGP ${fmt(Math.abs(step.amount))}` : `EGP ${fmt(step.amount)}`}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {Array.isArray(aiDailyBudget.tips) && aiDailyBudget.tips.length > 0 && (
-                <div className={styles.tipsSection}>
-                  <div className={styles.sectionHeader}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
-                    {t('budget.financialTips')}
-                  </div>
-                  <ul className={styles.tipsList}>
-                    {aiDailyBudget.tips.map((tip, idx) => (
-                      <li key={idx} className={styles.tipItem}>
-                        <span className={styles.tipBullet} />
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </>
-          )}
-        </div>
       )}
 
       <div className={styles.incomeCard}>

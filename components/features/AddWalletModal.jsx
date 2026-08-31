@@ -32,7 +32,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
         })
       } else {
         const initBalance = parseFloat(balance) || 0
-        await createWallet(uid, {
+        const newWalletId = await createWallet(uid, {
           name: name.trim(),
           type,
           balance: initBalance,
@@ -45,7 +45,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
             amount: initBalance,
             category: 'Other',
             merchant: `Initial balance - ${name.trim()}`,
-            walletId: null,
+            walletId: newWalletId,
             walletName: name.trim(),
             currency: 'EGP',
           })

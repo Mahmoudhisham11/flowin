@@ -15,7 +15,14 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
   const { t } = useTranslation()
   const [amount, setAmount] = useState(String(transaction.amount || ''))
   const [category, setCategory] = useState(transaction.category || 'Other')
-  const [walletId, setWalletId] = useState(transaction.walletId || (wallets.length > 0 ? wallets[0].id : ''))
+
+  const matchedWalletId = transaction.walletId || wallets.find((w) => {
+    if (transaction.walletName && w.name?.toLowerCase() === transaction.walletName?.toLowerCase()) return true
+    if (transaction.merchant && transaction.merchant.toLowerCase() === `initial balance - ${w.name?.toLowerCase()}`) return true
+    return false
+  })?.id || ''
+
+  const [walletId, setWalletId] = useState(matchedWalletId || (wallets.length > 0 ? wallets[0].id : ''))
   const [reason, setReason] = useState(transaction.reason || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -36,7 +43,8 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
     setError('')
     try {
       const oldAmount = Number(transaction.amount || 0)
-      const oldWalletId = transaction.walletId
+      const oldWalletId = transaction.walletId || matchedWalletId || null
+      const selectedWallet = wallets.find((w) => w.id === walletId)
 
       const txType = transaction.type || 'expense'
 
@@ -46,6 +54,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
         category,
         type: txType,
         walletId,
+        walletName: selectedWallet?.name || transaction.walletName || '',
         reason: reason.trim(),
       })
 
@@ -82,7 +91,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
     setLoading(true)
     try {
       const amt = Number(transaction.amount || 0)
-      const txWalletId = transaction.walletId
+      const txWalletId = transaction.walletId || matchedWalletId || null
       const txType = transaction.type
       const txCategory = transaction.category
 
