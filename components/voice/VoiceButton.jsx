@@ -96,23 +96,9 @@ export default function VoiceButton() {
         </button>
       )}
 
-      {/* 2. Recording State: Smooth In-Place Floating Soundbar (No Popup) */}
+      {/* 2. Recording State: Smooth In-Place Floating Soundbar (No Live Transcript) */}
       {voice.step === STEPS.RECORDING && (
         <div className={styles.recordingBar}>
-          {/* Live Floating Speech Preview */}
-          {voice.transcript ? (
-            <div className={styles.floatingTranscript}>
-              <p className={styles.floatingTranscriptText} dir={recLang.startsWith('ar') ? 'rtl' : 'ltr'}>
-                {voice.transcript}
-              </p>
-            </div>
-          ) : (
-            <div className={styles.floatingHint}>
-              <span className={styles.pulseDot} />
-              <span>{recLang.startsWith('ar') ? 'تحدث الآن... (مثال: صرفت 50 جنيه قهوة)' : 'Speak now... (e.g. Spent 50 on coffee)'}</span>
-            </div>
-          )}
-
           <div className={styles.recordingContent}>
             {/* Language Switch */}
             <button
@@ -179,9 +165,6 @@ export default function VoiceButton() {
           <div className={styles.processingSpinner} />
           <div className={styles.processingInfo}>
             <span className={styles.processingLabel}>{t('voice.processing') || 'جاري استخراج المعاملات...'}</span>
-            {voice.transcript && (
-              <span className={styles.processingSnippet}>&ldquo;{voice.transcript}&rdquo;</span>
-            )}
           </div>
         </div>
       )}
