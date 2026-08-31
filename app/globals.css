@@ -25,12 +25,13 @@
   --radius-md: 20px;
   --radius-lg: 28px;
   --radius-xl: 36px;
-  --nav-bg: rgba(255, 255, 255, 0.78);
-  --nav-border: rgba(0, 0, 0, 0.06);
-  --overlay: rgba(0, 0, 0, 0.35);
-  --input-bg: rgba(255, 255, 255, 0.9);
+  --modal-bg: #FFFFFF;
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: rgba(0, 0, 0, 0.08);
+  --overlay: rgba(0, 0, 0, 0.45);
+  --input-bg: rgba(0, 0, 0, 0.04);
   --input-border: rgba(0, 0, 0, 0.1);
-  --sidebar-bg: rgba(255, 255, 255, 0.75);
+  --sidebar-bg: rgba(255, 255, 255, 0.85);
   --sidebar-border: rgba(0, 0, 0, 0.06);
   --hover-bg: rgba(0, 0, 0, 0.05);
   --badge-bg: rgba(0, 122, 255, 0.1);
@@ -82,12 +83,14 @@
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.1);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 2px 1px rgba(255, 255, 255, 0.15);
   
-  --nav-bg: rgba(12, 12, 16, 0.82);
-  --nav-border: rgba(255, 255, 255, 0.12);
-  --overlay: rgba(0, 0, 0, 0.82);
+  /* Opaque rich surfaces for Modals and Sheets */
+  --modal-bg: #12131A;
+  --nav-bg: rgba(18, 18, 24, 0.94);
+  --nav-border: rgba(255, 255, 255, 0.14);
+  --overlay: rgba(0, 0, 0, 0.75);
   --input-bg: rgba(255, 255, 255, 0.06);
   --input-border: rgba(255, 255, 255, 0.15);
-  --sidebar-bg: rgba(8, 8, 12, 0.85);
+  --sidebar-bg: rgba(12, 12, 16, 0.9);
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --hover-bg: rgba(255, 255, 255, 0.08);
   --badge-bg: rgba(10, 132, 255, 0.16);
@@ -226,7 +229,7 @@ input, textarea, select {
     flex-direction: column;
   }
   .main-content {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(115px + env(safe-area-inset-bottom, 16px));
   }
 }
 

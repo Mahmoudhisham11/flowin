@@ -25,8 +25,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 18px;
-  background: var(--bg);
-  border-radius: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
 }
 
 .totalLabel {
@@ -44,7 +45,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -53,10 +54,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: var(--bg);
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
+  padding: 14px 16px;
+  background: var(--input-bg);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .itemLeft {
@@ -254,17 +256,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-size: 14px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
   text-align: left;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .walletOption:hover {
   border-color: var(--primary);
+  background: var(--hover-bg);
 }
 
 .walletOptionActive {

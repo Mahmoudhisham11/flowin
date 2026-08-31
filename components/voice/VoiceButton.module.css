@@ -396,12 +396,14 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: flex-end;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
@@ -412,11 +414,13 @@
 .modal {
   width: 100%;
   max-width: 540px;
-  background: var(--card);
-  border-radius: 28px 28px 0 0;
-  padding: 28px 24px calc(24px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
-  animation: sheetUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 32px 32px 0 0;
+  padding: 28px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -12px 60px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+  animation: sheetUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -429,11 +433,12 @@
 .modalSmall {
   width: 100%;
   max-width: 380px;
-  background: var(--card);
-  border-radius: 24px;
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 28px;
   padding: 32px 24px;
   margin: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.1);
   animation: modalPop 0.25s ease-out;
 }
 
