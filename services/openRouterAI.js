@@ -1,8 +1,8 @@
-export async function parseExpenseFromText(text, budgetCategories = []) {
+export async function parseExpenseFromText(text, budgetCategories = [], wallets = []) {
   const res = await fetch('/api/ai/parse-expense', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, budgetCategories }),
+    body: JSON.stringify({ text, budgetCategories, wallets }),
   })
 
   if (!res.ok) {
@@ -12,4 +12,3 @@ export async function parseExpenseFromText(text, budgetCategories = []) {
 
   return res.json()
 }
-

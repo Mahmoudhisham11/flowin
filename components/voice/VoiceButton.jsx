@@ -42,7 +42,7 @@ export default function VoiceButton() {
   const handleOpen = () => {
     setOpen(true)
     setRecLang('ar-EG')
-    voice.startRecording('ar-EG', budgetRef.current)
+    voice.startRecording('ar-EG', budgetRef.current, wallets)
   }
 
   const handleClose = () => {
@@ -51,7 +51,7 @@ export default function VoiceButton() {
   }
 
   const handleDone = async (walletId) => {
-    await voice.confirmExpenses(walletId)
+    await voice.confirmExpenses(walletId, wallets)
   }
 
   const handleDoneAndClose = () => {
@@ -79,7 +79,7 @@ export default function VoiceButton() {
                 onCancel={handleClose}
                 onRestart={(lang) => {
                   setRecLang(lang)
-                  voice.startRecording(lang)
+                  voice.startRecording(lang, budgetRef.current, wallets)
                 }}
               />
             )}
@@ -139,7 +139,7 @@ export default function VoiceButton() {
                 </div>
                 <p className={styles.errorText}>{voice.error}</p>
                 <button className={styles.retryBtn} onClick={() => {
-                  voice.startRecording(recLang)
+                  voice.startRecording(recLang, budgetRef.current, wallets)
                 }}>
                   {t('retry')}
                 </button>

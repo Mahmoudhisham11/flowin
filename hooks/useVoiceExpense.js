@@ -26,24 +26,15 @@ export default function useVoiceExpense() {
   const [error, setError] = useState('')
   const sttRef = useRef(null)
   const budgetRef = useRef([])
+  const walletsRef = useRef([])
 
-  const startRecording = useCallback(async (lang = 'ar-EG', budgetCategories = []) => {
+  const startRecording = useCallback(async (lang = 'ar-EG', budgetCategories = [], wallets = []) => {
     setError('')
     setTranscript('')
     setExpenses([])
     setStep(STEPS.RECORDING)
-    budgetRef.current = budgetCategories
-
-    try {
-      if (navigator.mediaDevices?.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        stream.getTracks().forEach((t) => t.stop())
-      }
-    } catch (err) {
-      setError(err.name === 'NotAllowedError' ? 'Microphone permission denied. Please allow microphone access in your browser settings.' : err.message)
-      setStep(STEPS.IDLE)
-      return
-    }
+    budgetRef.current = budgetCategories || []
+    walletsRef.current = wallets || []
 
     const stt = new SpeechToTextService()
     sttRef.current = stt
@@ -58,7 +49,7 @@ export default function useVoiceExpense() {
         setStep(STEPS.IDLE)
       },
       onEnd: async (finalText) => {
-        if (!finalText) {
+        if (!finalText || !finalText.trim()) {
           setError('لم يتم التعرف على كلام - No speech recognized')
           setStep(STEPS.IDLE)
           return
@@ -66,7 +57,7 @@ export default function useVoiceExpense() {
         setTranscript(finalText)
         setStep(STEPS.PROCESSING)
         try {
-          const result = await parseExpenseFromText(finalText, budgetRef.current)
+          const result = await parseExpenseFromText(finalText, budgetRef.current, walletsRef.current)
           if (result.error) {
             setError(result.error)
             setStep(STEPS.IDLE)
@@ -74,7 +65,7 @@ export default function useVoiceExpense() {
             setExpenses(result.expenses)
             setStep(STEPS.PREVIEW)
           } else {
-            setError('Could not parse any expense')
+            setError('Could not parse any transaction from speech')
             setStep(STEPS.IDLE)
           }
         } catch (e) {
@@ -92,32 +83,48 @@ export default function useVoiceExpense() {
     }
   }, [])
 
-  const confirmExpenses = useCallback(async (walletId) => {
+  const confirmExpenses = useCallback(async (defaultWalletId, userWallets = []) => {
     if (!user || expenses.length === 0) return
     setStep(STEPS.SAVING)
     try {
-      const promises = expenses.map((exp) =>
-        saveTransaction(user.uid, {
-          amount: Number(exp.amount),
+      const walletDeltas = {}
+
+      const promises = expenses.map((exp) => {
+        const wid = exp.walletId || defaultWalletId || ''
+        const amt = Number(exp.amount) || 0
+        const isIncome = exp.type === 'income'
+
+        if (wid) {
+          walletDeltas[wid] = (walletDeltas[wid] || 0) + (isIncome ? amt : -amt)
+        }
+
+        const matchedWallet = userWallets.find((w) => w.id === wid)
+
+        return saveTransaction(user.uid, {
+          amount: amt,
           currency: exp.currency || 'EGP',
-          category: exp.category || 'Other',
+          category: exp.category || (isIncome ? 'Other' : 'Food'),
           merchant: exp.merchant || '',
           reason: exp.reason || '',
-          type: 'expense',
+          type: isIncome ? 'income' : 'expense',
           source: 'voice',
-          walletId: walletId || '',
+          walletId: wid,
+          walletName: matchedWallet?.name || '',
         })
-      )
+      })
+
       await Promise.all(promises)
 
-      if (walletId) {
-        const total = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
-        const walletRef = doc(db, 'users', user.uid, 'wallets', walletId)
+      const walletUpdates = Object.entries(walletDeltas).map(async ([wid, delta]) => {
+        const walletRef = doc(db, 'users', user.uid, 'wallets', wid)
         const snap = await getDoc(walletRef)
         if (snap.exists()) {
-          await updateWallet(user.uid, walletId, { balance: (snap.data().balance || 0) - total })
+          const currentBal = Number(snap.data().balance || 0)
+          await updateWallet(user.uid, wid, { balance: currentBal + delta })
         }
-      }
+      })
+
+      await Promise.all(walletUpdates)
 
       setStep(STEPS.DONE)
     } catch (e) {
@@ -168,4 +175,3 @@ export default function useVoiceExpense() {
     STEPS,
   }
 }
-
