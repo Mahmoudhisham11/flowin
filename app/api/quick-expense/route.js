@@ -1,9 +1,7 @@
 import { verifyQuickToken } from '@/services/quickTokenService'
 import { saveTransaction } from '@/services/transactionsService'
-import { updateWallet } from '@/services/walletService'
-import { CATEGORIES } from '@/lib/categories'
-import { db } from '@/lib/firestore'
-import { doc, getDoc } from 'firebase/firestore'
+import { fetchWallets, updateWallet } from '@/services/walletService'
+import { classifyExpenseCategory } from '@/services/aiClassifier'
 
 export async function POST(req) {
   try {
@@ -39,7 +37,7 @@ export async function POST(req) {
       )
     }
 
-    const { walletId, amount, category, reason, merchant, date } = body
+    const { amount, reason } = body
 
     // 3. Validate Amount
     const numAmount = parseFloat(amount)
@@ -50,62 +48,48 @@ export async function POST(req) {
       )
     }
 
-    // 4. Validate Wallet ID
-    if (!walletId || typeof walletId !== 'string') {
+    // 4. Validate Reason
+    const normalizedReason = String(reason || '').trim()
+    if (!normalizedReason) {
       return Response.json(
-        { success: false, error: 'walletId is required' },
+        { success: false, error: 'Reason is required' },
         { status: 400 }
       )
     }
 
-    // Verify wallet belongs to this user
-    const walletRef = doc(db, 'users', uid, 'wallets', walletId)
-    const walletSnap = await getDoc(walletRef)
-
-    if (!walletSnap.exists()) {
+    // 5. Fetch user's wallets and pick the first one automatically
+    const wallets = await fetchWallets(uid)
+    if (!wallets || wallets.length === 0) {
       return Response.json(
-        { success: false, error: 'Selected wallet does not exist or does not belong to this account' },
-        { status: 404 }
+        { success: false, error: 'No wallet is available for this account' },
+        { status: 400 }
       )
     }
 
-    const walletData = walletSnap.data()
-    const walletName = walletData.name || 'Main Wallet'
-    const currentBalance = Number(walletData.balance || 0)
+    const firstWallet = wallets[0]
+    const walletId = firstWallet.id
+    const walletName = firstWallet.name || 'Main Wallet'
+    const currentBalance = Number(firstWallet.balance || 0)
 
-    // 5. Validate / Normalize Category
-    let selectedCategory = 'Other'
-    if (category && typeof category === 'string') {
-      const match = CATEGORIES.find(
-        (c) =>
-          c.id.toLowerCase() === category.toLowerCase() ||
-          c.labelAr.toLowerCase() === category.toLowerCase() ||
-          c.labelEn.toLowerCase() === category.toLowerCase()
-      )
-      if (match) {
-        selectedCategory = match.id
-      } else {
-        selectedCategory = category.trim()
-      }
-    }
+    // 6. AI Category Classification
+    const detectedCategory = await classifyExpenseCategory(normalizedReason)
 
-    // 6. Save Transaction to Firestore
+    // 7. Save Transaction to Firestore
     const transactionData = {
       amount: numAmount,
       currency: 'EGP',
-      category: selectedCategory,
-      merchant: String(merchant || '').trim(),
-      reason: String(reason || '').trim(),
+      category: detectedCategory,
+      merchant: '',
+      reason: normalizedReason,
       type: 'expense',
       source: 'shortcut',
       walletId,
       walletName,
-      ...(date ? { createdAt: new Date(date).toISOString() } : {}),
     }
 
     const expenseId = await saveTransaction(uid, transactionData)
 
-    // 7. Deduct from wallet balance
+    // 8. Deduct from first wallet balance
     const newBalance = currentBalance - numAmount
     await updateWallet(uid, walletId, {
       balance: newBalance,
@@ -113,14 +97,11 @@ export async function POST(req) {
 
     return Response.json({
       success: true,
-      message: 'Expense created successfully',
       expenseId,
       expense: {
-        id: expenseId,
         amount: numAmount,
-        currency: 'EGP',
-        category: selectedCategory,
-        reason: transactionData.reason,
+        reason: normalizedReason,
+        category: detectedCategory,
         walletName,
         remainingBalance: newBalance,
       },

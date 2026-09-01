@@ -514,61 +514,52 @@ export default function SettingsPage() {
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>1</div>
                   <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'جلب الخيارات المتاحة (Wallets & Categories)' : 'Fetch Options (Wallets & Categories)'}</strong>
-                    <p>{isAr ? 'أضف أكشن Get Contents of URL:' : 'Add "Get Contents of URL" action:'}</p>
-                    <code className={styles.guideCodeBlock}>GET /api/quick-expense/options</code>
-                    <p>{isAr ? 'مع Header:' : 'With Header:'}</p>
-                    <code className={styles.guideCodeBlock}>Authorization: Bearer &lt;Your_Token&gt;</code>
+                    <strong>{isAr ? 'إدخال المبلغ (Amount)' : 'Ask for Amount'}</strong>
+                    <p>{isAr ? 'أضف Ask for Input بنوع Number (كام دفعت؟).' : 'Add "Ask for Input" with type Number (Prompt: "How much?").'}</p>
                   </div>
                 </div>
 
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>2</div>
                   <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'اختيار المحفظة (Wallet)' : 'Select Wallet'}</strong>
-                    <p>{isAr ? 'استخرج Wallets من الـ Dictionary ثم استخدم Choose from List.' : 'Get "wallets" from Dictionary and use "Choose from List".'}</p>
+                    <strong>{isAr ? 'إدخال سبب الصرف (Reason)' : 'Ask for Reason'}</strong>
+                    <p>{isAr ? 'أضف Ask for Input بنوع Text (سبب الصرف؟ مثال: غداء مع صحابي، بنزين).' : 'Add "Ask for Input" with type Text (Prompt: "Reason?").'}</p>
                   </div>
                 </div>
 
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>3</div>
                   <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'إدخال المبلغ (Amount)' : 'Ask for Amount'}</strong>
-                    <p>{isAr ? 'أضف Ask for Input بنوع Number (كام دفعت؟).' : 'Add "Ask for Input" with type Number.'}</p>
+                    <strong>{isAr ? 'تجهيز البيانات (Dictionary)' : 'Build Dictionary'}</strong>
+                    <p>{isAr ? 'أضف أكشن Dictionary وضع بداخله الحقلين:' : 'Add "Dictionary" action with two keys:'}</p>
+                    <code className={styles.guideCodeBlock}>
+                      {`amount: Provided Input (Number)\nreason: Provided Input (Text)`}
+                    </code>
                   </div>
                 </div>
 
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>4</div>
                   <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'إدخال سبب الصرف (Reason)' : 'Ask for Reason'}</strong>
-                    <p>{isAr ? 'أضف Ask for Input بنوع Text (سبب الصرف؟).' : 'Add "Ask for Input" with type Text.'}</p>
+                    <strong>{isAr ? 'إرسال الطلب (POST Request)' : 'Send Request'}</strong>
+                    <p>{isAr ? 'أضف Get Contents of URL مع POST إلى:' : 'Add "Get Contents of URL" with POST to:'}</p>
+                    <code className={styles.guideCodeBlock}>POST /api/quick-expense</code>
+                    <p>{isAr ? 'مع Header:' : 'With Header:'}</p>
+                    <code className={styles.guideCodeBlock}>Authorization: Bearer &lt;Your_Token&gt;</code>
+                    <p>{isAr ? 'و Request Body بنوع JSON يربط الـ Dictionary من الخطوة 3.' : 'And Request Body JSON linked to the Dictionary.'}</p>
                   </div>
                 </div>
 
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>5</div>
                   <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'اختيار القسم (Category)' : 'Select Category'}</strong>
-                    <p>{isAr ? 'استخرج Categories ثم استخدم Choose from List.' : 'Get "categories" from Dictionary and use "Choose from List".'}</p>
+                    <strong>{isAr ? 'إشعار النجاح (Notification)' : 'Show Notification'}</strong>
+                    <p>{isAr ? 'أضف Show Notification: "✅ تم تسجيل المصروف وخصمه بنجاح".' : 'Add "Show Notification": "✅ Expense recorded successfully".'}</p>
                   </div>
                 </div>
 
                 <div className={styles.guideStep}>
                   <div className={styles.guideStepNum}>6</div>
-                  <div className={styles.guideStepContent}>
-                    <strong>{isAr ? 'إرسال المصروف (POST Request)' : 'Send Expense (POST Request)'}</strong>
-                    <p>{isAr ? 'أضف Get Contents of URL بطريقة POST إلى:' : 'Add "Get Contents of URL" with POST to:'}</p>
-                    <code className={styles.guideCodeBlock}>POST /api/quick-expense</code>
-                    <p>{isAr ? 'JSON Body يحتوي على:' : 'JSON Body containing:'}</p>
-                    <code className={styles.guideCodeBlock}>
-                      {`{\n  "walletId": SelectedWallet.id,\n  "amount": Amount,\n  "reason": Reason,\n  "category": SelectedCategory.id\n}`}
-                    </code>
-                  </div>
-                </div>
-
-                <div className={styles.guideStep}>
-                  <div className={styles.guideStepNum}>7</div>
                   <div className={styles.guideStepContent}>
                     <strong>{isAr ? 'تفعيل ميزة Back Tap' : 'Enable Back Tap'}</strong>
                     <p>{isAr ? 'من إعدادات الآيفون: Settings ➔ Accessibility ➔ Touch ➔ Back Tap ➔ Double Tap ➔ اختر الـ Shortcut' : 'On iPhone: Settings ➔ Accessibility ➔ Touch ➔ Back Tap ➔ Double Tap ➔ Choose your Shortcut.'}</p>
