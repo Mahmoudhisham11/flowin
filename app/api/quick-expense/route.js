@@ -2,6 +2,8 @@ import { verifyQuickToken } from '@/services/quickTokenService'
 import { saveTransaction } from '@/services/transactionsService'
 import { fetchWallets, updateWallet } from '@/services/walletService'
 import { classifyExpenseCategory } from '@/services/aiClassifier'
+import { sendPushNotificationToUser } from '@/services/serverFcm'
+import { CATEGORIES } from '@/lib/categories'
 
 export async function POST(req) {
   try {
@@ -94,6 +96,30 @@ export async function POST(req) {
     await updateWallet(uid, walletId, {
       balance: newBalance,
     })
+
+    // 9. Send Push Notification asynchronously (Non-blocking)
+    try {
+      const catItem = CATEGORIES.find((c) => c.id === detectedCategory) || { labelAr: detectedCategory, emoji: '💸' }
+      const catLabel = catItem.labelAr || detectedCategory
+      const catEmoji = catItem.emoji || '💸'
+
+      sendPushNotificationToUser(uid, {
+        title: 'Flowin ✅',
+        body: `تم تسجيل ${numAmount} جنيه — ${catLabel} ${catEmoji}`,
+        data: {
+          type: 'expense_created',
+          expenseId,
+          amount: String(numAmount),
+          category: detectedCategory,
+          walletName,
+          url: '/',
+        },
+      }).catch((notifErr) => {
+        console.warn('[QuickExpense] FCM push error (non-fatal):', notifErr.message)
+      })
+    } catch (pushErr) {
+      console.warn('[QuickExpense] Error dispatching push notification:', pushErr)
+    }
 
     return Response.json({
       success: true,

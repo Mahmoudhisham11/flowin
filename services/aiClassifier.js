@@ -119,8 +119,12 @@ export async function classifyExpenseCategory(reason) {
   if (apiKey) {
     for (const model of FREE_MODELS) {
       try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 3000)
+
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
+          signal: controller.signal,
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${apiKey}`,
@@ -135,7 +139,7 @@ export async function classifyExpenseCategory(reason) {
             temperature: 0.1,
             max_tokens: 20,
           }),
-        })
+        }).finally(() => clearTimeout(timeoutId))
 
         if (res.ok) {
           const data = await res.json()
