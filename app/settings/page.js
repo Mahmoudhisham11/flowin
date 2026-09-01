@@ -7,6 +7,7 @@ import { useLocale } from '@/contexts/LocaleContext'
 import { changePassword } from '@/services/firebaseAuth'
 import { createQuickExpenseToken, revokeQuickExpenseToken } from '@/services/quickTokenService'
 import { t } from '@/lib/translations'
+import useSmoothClose from '@/hooks/useSmoothClose'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import PricingModal from '@/components/subscription/PricingModal'
 import styles from './page.module.css'
@@ -97,7 +98,7 @@ export default function SettingsPage() {
 
   const showBanner = userData?.role === 'free'
 
-    const handleGenerateToken = async () => {
+  const handleGenerateToken = async () => {
     if (!user?.uid) return
     setTokenLoading(true)
     setTokenError('')
@@ -135,6 +136,7 @@ export default function SettingsPage() {
     setTimeout(() => setTokenCopied(false), 2000)
   }
 
+  const { isClosing: isPwdClosing, handleClose: handleClosePwd } = useSmoothClose(() => setShowPwdModal(false))
   const { isClosing: isTokenClosing, handleClose: handleCloseToken } = useSmoothClose(() => setShowTokenModal(false))
   const { isClosing: isGuideClosing, handleClose: handleCloseGuide } = useSmoothClose(() => setShowGuideModal(false))
 
