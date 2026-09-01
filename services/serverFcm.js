@@ -1,15 +1,17 @@
-import admin from 'firebase-admin'
+import { initializeApp, cert, getApps } from 'firebase-admin/app'
+import { getMessaging } from 'firebase-admin/messaging'
 import { db } from '@/lib/firestore'
-import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
 
 let adminApp = null
 
 /**
- * Initializes and returns the Firebase Admin SDK singleton.
+ * Initializes and returns the Firebase Admin SDK singleton with explicit environment validation.
  */
 export function getFirebaseAdmin() {
-  if (admin.apps && admin.apps.length > 0) {
-    return admin.apps[0]
+  const existingApps = getApps()
+  if (existingApps.length > 0) {
+    return existingApps[0]
   }
 
   if (adminApp) return adminApp
@@ -18,15 +20,21 @@ export function getFirebaseAdmin() {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_ADMIN_CLIENT_EMAIL
   let privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_ADMIN_PRIVATE_KEY
 
+  if (!clientEmail || !privateKey) {
+    console.warn(
+      '[FCM Server] Warning: FIREBASE_CLIENT_EMAIL or FIREBASE_PRIVATE_KEY is missing in environment variables. Web Push sending might fail.'
+    )
+  }
+
   if (privateKey) {
-    // Handle escaped newlines in environment variables
-    privateKey = privateKey.replace(/\\n/g, '\n')
+    // Handle escaped newlines in environment variables or surrounding quotes
+    privateKey = privateKey.replace(/\\n/g, '\n').replace(/^"|"$/g, '')
   }
 
   if (clientEmail && privateKey) {
     try {
-      adminApp = admin.initializeApp({
-        credential: admin.credential.cert({
+      adminApp = initializeApp({
+        credential: cert({
           projectId,
           clientEmail,
           privateKey,
@@ -34,18 +42,18 @@ export function getFirebaseAdmin() {
       })
       return adminApp
     } catch (err) {
-      console.error('Error initializing Firebase Admin with certificate:', err)
+      console.error('[FCM Server] Error initializing Firebase Admin certificate:', err)
     }
   }
 
-  // Fallback: try initializeApp without explicit cert (for environments with GOOGLE_APPLICATION_CREDENTIALS)
+  // Fallback: initializeApp without explicit cert
   try {
-    adminApp = admin.initializeApp({
+    adminApp = initializeApp({
       projectId,
     })
     return adminApp
   } catch (err) {
-    console.warn('Firebase Admin initialized without credentials (FCM send might require service account credentials):', err.message)
+    console.warn('[FCM Server] Firebase Admin fallback initialization error:', err.message)
     return null
   }
 }
@@ -66,7 +74,7 @@ export async function sendPushNotificationToUser(uid, payload) {
     const snap = await getDocs(devicesRef)
 
     if (snap.empty) {
-      console.log(`[serverFcm] No registered devices found for user ${uid}`)
+      console.log(`[FCM Server] No registered devices found for user ${uid}`)
       return { success: true, sentCount: 0, message: 'No registered devices' }
     }
 
@@ -82,12 +90,17 @@ export async function sendPushNotificationToUser(uid, payload) {
     })
 
     if (tokens.length === 0) {
-      console.log(`[serverFcm] No active FCM tokens for user ${uid}`)
+      console.log(`[FCM Server] No active FCM tokens for user ${uid}`)
       return { success: true, sentCount: 0, message: 'No active tokens' }
     }
 
-    // 2. Initialize Firebase Admin
-    getFirebaseAdmin()
+    // 2. Initialize Firebase Admin and get Messaging instance
+    const app = getFirebaseAdmin()
+    if (!app) {
+      throw new Error('Firebase Admin could not be initialized. Please check FIREBASE_PRIVATE_KEY and FIREBASE_CLIENT_EMAIL.')
+    }
+
+    const messaging = getMessaging(app)
 
     // 3. Prepare Multicast Message
     const title = payload.title || 'Flowin ✅'
@@ -123,8 +136,8 @@ export async function sendPushNotificationToUser(uid, payload) {
     }
 
     // 4. Send via Firebase Admin Messaging
-    const response = await admin.messaging().sendEachForMulticast(message)
-    console.log(`[serverFcm] FCM Send result for ${uid}: ${response.successCount} success, ${response.failureCount} failed`)
+    const response = await messaging.sendEachForMulticast(message)
+    console.log(`[FCM Server] Push send result for user ${uid}: ${response.successCount} success, ${response.failureCount} failed`)
 
     // 5. Clean up expired / invalid tokens
     if (response.failureCount > 0) {
@@ -132,7 +145,7 @@ export async function sendPushNotificationToUser(uid, payload) {
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
           const errorCode = resp.error?.code
-          console.warn(`[serverFcm] Token send error (${errorCode}):`, resp.error?.message)
+          console.warn(`[FCM Server] Token send error (${errorCode}):`, resp.error?.message)
           
           if (
             errorCode === 'messaging/registration-token-not-registered' ||
@@ -157,7 +170,7 @@ export async function sendPushNotificationToUser(uid, payload) {
       failureCount: response.failureCount,
     }
   } catch (err) {
-    console.error(`[serverFcm] Failed to send push notification to user ${uid}:`, err)
+    console.error(`[FCM Server] Failed to send push notification to user ${uid}:`, err)
     return {
       success: false,
       error: err.message || 'Failed to send notification',

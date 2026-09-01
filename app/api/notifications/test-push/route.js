@@ -1,5 +1,5 @@
-import admin from 'firebase-admin'
 import { getFirebaseAdmin, sendPushNotificationToUser } from '@/services/serverFcm'
+import { getAuth } from 'firebase-admin/auth'
 
 export async function POST(req) {
   try {
@@ -14,15 +14,16 @@ export async function POST(req) {
     const idToken = authHeader.replace('Bearer ', '').trim()
     let uid = null
 
-    getFirebaseAdmin()
+    const adminApp = getFirebaseAdmin()
 
-    try {
-      if (admin.apps && admin.apps.length > 0) {
-        const decoded = await admin.auth().verifyIdToken(idToken)
+    if (adminApp) {
+      try {
+        const auth = getAuth(adminApp)
+        const decoded = await auth.verifyIdToken(idToken)
         uid = decoded.uid
+      } catch (authErr) {
+        console.warn('[TestPush] verifyIdToken error in test-push:', authErr.message)
       }
-    } catch (authErr) {
-      console.warn('verifyIdToken error in test-push:', authErr.message)
     }
 
     if (!uid) {
@@ -33,7 +34,7 @@ export async function POST(req) {
           uid = payload.user_id || payload.sub
         }
       } catch (decodeErr) {
-        console.error('Failed to parse token in test-push:', decodeErr)
+        console.error('[TestPush] Failed to parse token in test-push:', decodeErr)
       }
     }
 
@@ -58,7 +59,7 @@ export async function POST(req) {
       result,
     })
   } catch (err) {
-    console.error('Error in /api/notifications/test-push:', err)
+    console.error('[TestPush] Error in /api/notifications/test-push:', err)
     return Response.json(
       { success: false, error: err.message || 'Internal server error' },
       { status: 500 }

@@ -1,5 +1,5 @@
-import admin from 'firebase-admin'
 import { getFirebaseAdmin } from '@/services/serverFcm'
+import { getAuth } from 'firebase-admin/auth'
 import { db } from '@/lib/firestore'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import crypto from 'crypto'
@@ -18,18 +18,19 @@ export async function POST(req) {
     const idToken = authHeader.replace('Bearer ', '').trim()
     let uid = null
 
-    getFirebaseAdmin()
+    const adminApp = getFirebaseAdmin()
 
-    try {
-      if (admin.apps && admin.apps.length > 0) {
-        const decoded = await admin.auth().verifyIdToken(idToken)
+    if (adminApp) {
+      try {
+        const auth = getAuth(adminApp)
+        const decoded = await auth.verifyIdToken(idToken)
         uid = decoded.uid
+      } catch (authErr) {
+        console.warn('[RegisterToken] verifyIdToken failed:', authErr.message)
       }
-    } catch (authErr) {
-      console.warn('verifyIdToken failed with admin auth:', authErr.message)
     }
 
-    // Fallback: If admin cert is not configured in local environment, decode token payload safely
+    // Fallback: decode JWT payload
     if (!uid) {
       try {
         const parts = idToken.split('.')
@@ -40,7 +41,7 @@ export async function POST(req) {
           }
         }
       } catch (decodeErr) {
-        console.error('Failed to parse token payload:', decodeErr)
+        console.error('[RegisterToken] Failed to parse token payload:', decodeErr)
       }
     }
 
@@ -98,7 +99,7 @@ export async function POST(req) {
       message: 'FCM device token registered successfully',
     })
   } catch (err) {
-    console.error('Error in /api/notifications/register-token:', err)
+    console.error('[RegisterToken] Error in /api/notifications/register-token:', err)
     return Response.json(
       { success: false, error: err.message || 'Internal server error' },
       { status: 500 }
