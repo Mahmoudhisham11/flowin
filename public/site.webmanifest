@@ -25,5 +25,14 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "إضافة مصروف سريع",
+      "short_name": "مصروف سريع",
+      "description": "تسجيل فوري لمصروف جديد",
+      "url": "/quick-expense",
+      "icons": [{ "src": "/web-app-manifest-192x192.png", "sizes": "192x192" }]
+    }
   ]
 }

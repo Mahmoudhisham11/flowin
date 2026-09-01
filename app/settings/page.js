@@ -5,6 +5,7 @@ import { useUser } from '@/contexts/UserContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useLocale } from '@/contexts/LocaleContext'
 import { changePassword } from '@/services/firebaseAuth'
+import { createQuickExpenseToken, revokeQuickExpenseToken } from '@/services/quickTokenService'
 import { t } from '@/lib/translations'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import PricingModal from '@/components/subscription/PricingModal'
@@ -33,6 +34,16 @@ export default function SettingsPage() {
   const [pwdLoading, setPwdLoading] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showPricing, setShowPricing] = useState(false)
+
+  // Quick Expense Token state
+  const [generatedToken, setGeneratedToken] = useState('')
+  const [showTokenModal, setShowTokenModal] = useState(false)
+  const [tokenLoading, setTokenLoading] = useState(false)
+  const [tokenCopied, setTokenCopied] = useState(false)
+  const [tokenError, setTokenError] = useState('')
+  const [tokenActiveState, setTokenActiveState] = useState(userData?.quickExpenseToken?.active || false)
+  const [showRevokeConfirm, setShowRevokeConfirm] = useState(false)
+  const [showGuideModal, setShowGuideModal] = useState(false)
 
   const isAr = lang === 'ar'
 
@@ -86,7 +97,46 @@ export default function SettingsPage() {
 
   const showBanner = userData?.role === 'free'
 
-  const { isClosing: isPwdClosing, handleClose: handleClosePwd } = useSmoothClose(() => setShowPwdModal(false))
+    const handleGenerateToken = async () => {
+    if (!user?.uid) return
+    setTokenLoading(true)
+    setTokenError('')
+    try {
+      const res = await createQuickExpenseToken(user.uid)
+      setGeneratedToken(res.rawToken)
+      setTokenActiveState(true)
+      setShowTokenModal(true)
+    } catch (err) {
+      setTokenError(err.message || 'Failed to generate token')
+    } finally {
+      setTokenLoading(false)
+    }
+  }
+
+  const handleRevokeToken = async () => {
+    if (!user?.uid) return
+    setTokenLoading(true)
+    try {
+      await revokeQuickExpenseToken(user.uid)
+      setTokenActiveState(false)
+      setGeneratedToken('')
+      setShowRevokeConfirm(false)
+    } catch (err) {
+      setTokenError(err.message || 'Failed to revoke token')
+    } finally {
+      setTokenLoading(false)
+    }
+  }
+
+  const handleCopyToken = () => {
+    if (!generatedToken) return
+    navigator.clipboard.writeText(generatedToken)
+    setTokenCopied(true)
+    setTimeout(() => setTokenCopied(false), 2000)
+  }
+
+  const { isClosing: isTokenClosing, handleClose: handleCloseToken } = useSmoothClose(() => setShowTokenModal(false))
+  const { isClosing: isGuideClosing, handleClose: handleCloseGuide } = useSmoothClose(() => setShowGuideModal(false))
 
   return (
     <div className={styles.page}>
@@ -126,6 +176,89 @@ export default function SettingsPage() {
                 <span className={styles.profileEmail}>{displayEmail}</span>
                 <span className={styles.profileMeta}>{t('settings.memberSince')} {memberSince}</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* iPhone Shortcuts & Back Tap Integration Card */}
+        <div className={`${styles.section} ${styles.sectionFull}`}>
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={`${styles.sectionIcon} ${styles.shortcutIcon}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                  <line x1="12" y1="18" x2="12.01" y2="18" />
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className={styles.cardHeaderFlex}>
+                  <h2 className={styles.sectionTitle}>{t('settings.shortcutsTitle')}</h2>
+                  {tokenActiveState && (
+                    <span className={styles.badgeActive}>
+                      <span className={styles.badgeDot}></span>
+                      {t('settings.tokenActive')}
+                    </span>
+                  )}
+                </div>
+                <p className={styles.sectionDesc}>{t('settings.shortcutsDesc')}</p>
+              </div>
+            </div>
+
+            <div className={styles.tokenBox}>
+              <div className={styles.tokenMetaRow}>
+                <div className={styles.tokenStatusText}>
+                  {tokenActiveState ? (
+                    <span>
+                      {isAr ? 'حسابك جاهز لاستقبال مصاريف من الـ Shortcut' : 'Your account is ready for iOS Shortcut logging'}
+                      {userData?.quickExpenseToken?.prefix && (
+                        <code className={styles.tokenPrefixCode}>{userData.quickExpenseToken.prefix}</code>
+                      )}
+                    </span>
+                  ) : (
+                    <span>{isAr ? 'لم تقم بإنشاء API Token بعد للـ Shortcut' : 'No active API token generated yet for Shortcuts'}</span>
+                  )}
+                </div>
+
+                <div className={styles.tokenBtnGroup}>
+                  <button
+                    className={styles.tokenActionBtn}
+                    onClick={handleGenerateToken}
+                    disabled={tokenLoading}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                    </svg>
+                    <span>{tokenActiveState ? t('settings.regenerateToken') : t('settings.generateToken')}</span>
+                  </button>
+
+                  <button
+                    className={styles.tokenGuideBtn}
+                    onClick={() => setShowGuideModal(true)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                    <span>{t('settings.setupGuide')}</span>
+                  </button>
+
+                  {tokenActiveState && (
+                    <button
+                      className={styles.tokenRevokeBtn}
+                      onClick={() => setShowRevokeConfirm(true)}
+                      disabled={tokenLoading}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                      <span>{t('settings.revokeToken')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+              {tokenError && <p className={styles.errorText}>{tokenError}</p>}
             </div>
           </div>
         </div>
@@ -291,6 +424,173 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* Token Generated Modal */}
+      {showTokenModal && (
+        <div className={`${styles.overlay} ${isTokenClosing ? styles.overlayClosing : ''}`} onClick={() => handleCloseToken()}>
+          <div className={`${styles.modal} ${isTokenClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>{isAr ? 'رمز الـ API الشخصي لـ iOS Shortcuts' : 'Personal API Token for Shortcuts'}</h2>
+              <button className={styles.modalClose} onClick={() => handleCloseToken()}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.warningAlert}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                <p className={styles.warningAlertText}>{t('settings.tokenWarning')}</p>
+              </div>
+
+              <div className={styles.field}>
+                <label className={styles.fieldLabel}>{isAr ? 'رمز الـ API الخاص بك (يظهر لمرة واحدة فقط):' : 'Your Personal API Token (shown once):'}</label>
+                <div className={styles.tokenDisplayWrap}>
+                  <input
+                    className={styles.tokenDisplayInput}
+                    type="text"
+                    readOnly
+                    value={generatedToken}
+                    onClick={(e) => e.target.select()}
+                  />
+                  <button className={styles.copyBtn} onClick={handleCopyToken}>
+                    {tokenCopied ? (
+                      <span className={styles.copiedBadge}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        {isAr ? 'تم النسخ' : 'Copied'}
+                      </span>
+                    ) : (
+                      <span className={styles.copyText}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        {isAr ? 'نسخ' : 'Copy'}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.quickStepsBox}>
+                <h4 className={styles.quickStepsTitle}>{isAr ? 'خطوات سريعة لإعداد الـ Shortcut:' : 'Quick Shortcut Setup:'}</h4>
+                <ol className={styles.quickStepsList}>
+                  <li>{t('settings.step1')}</li>
+                  <li>{t('settings.step2')}</li>
+                  <li>{t('settings.step3')}</li>
+                </ol>
+              </div>
+
+              <button className={styles.saveBtn} onClick={() => { handleCloseToken(); setShowGuideModal(true) }}>
+                {isAr ? 'عرض خطوات إنشاء الـ Shortcut بالتفصيل 📱' : 'View Full Shortcut Setup Instructions 📱'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Shortcut Setup Guide Modal */}
+      {showGuideModal && (
+        <div className={`${styles.overlay} ${isGuideClosing ? styles.overlayClosing : ''}`} onClick={() => handleCloseGuide()}>
+          <div className={`${styles.modal} ${styles.guideModal} ${isGuideClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>{isAr ? '📱 خطوات إعداد iPhone Shortcut & Back Tap' : '📱 iPhone Shortcut & Back Tap Setup Guide'}</h2>
+              <button className={styles.modalClose} onClick={() => handleCloseGuide()}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.guideStepList}>
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>1</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'جلب الخيارات المتاحة (Wallets & Categories)' : 'Fetch Options (Wallets & Categories)'}</strong>
+                    <p>{isAr ? 'أضف أكشن Get Contents of URL:' : 'Add "Get Contents of URL" action:'}</p>
+                    <code className={styles.guideCodeBlock}>GET /api/quick-expense/options</code>
+                    <p>{isAr ? 'مع Header:' : 'With Header:'}</p>
+                    <code className={styles.guideCodeBlock}>Authorization: Bearer &lt;Your_Token&gt;</code>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>2</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'اختيار المحفظة (Wallet)' : 'Select Wallet'}</strong>
+                    <p>{isAr ? 'استخرج Wallets من الـ Dictionary ثم استخدم Choose from List.' : 'Get "wallets" from Dictionary and use "Choose from List".'}</p>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>3</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'إدخال المبلغ (Amount)' : 'Ask for Amount'}</strong>
+                    <p>{isAr ? 'أضف Ask for Input بنوع Number (كام دفعت؟).' : 'Add "Ask for Input" with type Number.'}</p>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>4</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'إدخال سبب الصرف (Reason)' : 'Ask for Reason'}</strong>
+                    <p>{isAr ? 'أضف Ask for Input بنوع Text (سبب الصرف؟).' : 'Add "Ask for Input" with type Text.'}</p>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>5</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'اختيار القسم (Category)' : 'Select Category'}</strong>
+                    <p>{isAr ? 'استخرج Categories ثم استخدم Choose from List.' : 'Get "categories" from Dictionary and use "Choose from List".'}</p>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>6</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'إرسال المصروف (POST Request)' : 'Send Expense (POST Request)'}</strong>
+                    <p>{isAr ? 'أضف Get Contents of URL بطريقة POST إلى:' : 'Add "Get Contents of URL" with POST to:'}</p>
+                    <code className={styles.guideCodeBlock}>POST /api/quick-expense</code>
+                    <p>{isAr ? 'JSON Body يحتوي على:' : 'JSON Body containing:'}</p>
+                    <code className={styles.guideCodeBlock}>
+                      {`{\n  "walletId": SelectedWallet.id,\n  "amount": Amount,\n  "reason": Reason,\n  "category": SelectedCategory.id\n}`}
+                    </code>
+                  </div>
+                </div>
+
+                <div className={styles.guideStep}>
+                  <div className={styles.guideStepNum}>7</div>
+                  <div className={styles.guideStepContent}>
+                    <strong>{isAr ? 'تفعيل ميزة Back Tap' : 'Enable Back Tap'}</strong>
+                    <p>{isAr ? 'من إعدادات الآيفون: Settings ➔ Accessibility ➔ Touch ➔ Back Tap ➔ Double Tap ➔ اختر الـ Shortcut' : 'On iPhone: Settings ➔ Accessibility ➔ Touch ➔ Back Tap ➔ Double Tap ➔ Choose your Shortcut.'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <button className={styles.saveBtn} onClick={() => handleCloseGuide()}>
+                {isAr ? 'فهمت، إغلاق' : 'Got it, Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revoke Confirm Dialog */}
+      <ConfirmDialog
+        open={showRevokeConfirm}
+        title={t('settings.revokeToken')}
+        message={isAr ? 'هل أنت متأكد من إلغاء تفعيل رمز الـ API؟ سيتوقف الـ Shortcut المرتبط عن العمل فورًا.' : 'Are you sure you want to revoke this API token? Any linked Shortcuts will stop working immediately.'}
+        confirmLabel={t('settings.revokeToken')}
+        onConfirm={handleRevokeToken}
+        onCancel={() => setShowRevokeConfirm(false)}
+      />
 
       <ConfirmDialog
         open={showLogoutConfirm}

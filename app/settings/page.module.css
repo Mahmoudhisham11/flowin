@@ -431,6 +431,296 @@
   color: var(--success);
 }
 
+.shortcutIcon {
+  background: rgba(139, 92, 246, 0.15);
+  color: #8B5CF6;
+}
+
+.cardHeaderFlex {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badgeActive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22C55E;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 8px #22C55E;
+}
+
+.tokenBox {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tokenMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tokenStatusText {
+  font-size: 13px;
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tokenPrefixCode {
+  font-family: monospace;
+  background: var(--card);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+
+.tokenBtnGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tokenActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary-gradient);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.tokenActionBtn:hover {
+  transform: scale(1.02);
+}
+
+.tokenGuideBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tokenGuideBtn:hover {
+  background: var(--hover-bg);
+}
+
+.tokenRevokeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tokenRevokeBtn:hover {
+  background: var(--danger-bg);
+}
+
+.warningAlert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+}
+
+.warningAlertText {
+  font-size: 12px;
+  color: #D97706;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .warningAlertText {
+  color: #FBBF24;
+}
+
+.tokenDisplayWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 12px;
+  padding: 4px 6px 4px 12px;
+}
+
+.tokenDisplayInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  outline: none;
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copyBtn:hover {
+  opacity: 0.9;
+}
+
+.copyText, .copiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copiedBadge {
+  color: #22C55E;
+}
+
+.quickStepsBox {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.quickStepsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.quickStepsList {
+  font-size: 12px;
+  color: var(--text-gray);
+  line-height: 1.6;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.guideModal {
+  max-width: 540px !important;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.guideStepList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.guideStep {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--bg-secondary);
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.guideStepNum {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.guideStepContent {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-gray);
+  line-height: 1.5;
+}
+
+.guideStepContent strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-dark);
+  margin-bottom: 2px;
+}
+
+.guideCodeBlock {
+  display: block;
+  font-family: monospace;
+  font-size: 11px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--primary);
+  margin: 4px 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 @media (max-width: 767px) {
   .page {
     padding: 16px 16px 90px;
@@ -445,5 +735,16 @@
   }
   .bannerDesc {
     max-width: 100%;
+  }
+  .tokenMetaRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tokenBtnGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tokenActionBtn, .tokenGuideBtn, .tokenRevokeBtn {
+    justify-content: center;
   }
 }
