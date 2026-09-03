@@ -91,18 +91,62 @@ export async function requestAndGetFcmToken(customVapidKey) {
   const DEFAULT_VAPID_KEY =
     'BF6POyd5Xfi_9JlJAnOI3qWKMaVsgcab-FcRGgHWM8n_YT_GORygy5YtSIYSJJknq8EcoCf4FW60x7tQptczylY'
 
-  const vapidKey =
-    customVapidKey ||
-    process.env.NEXT_PUBLIC_FCM_VAPID_KEY ||
-    process.env.NEXT_PUBLIC_VAPID_KEY ||
-    process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY ||
+  // Helper to sanitize any raw key string
+  const cleanKeyString = (raw) => {
+    if (!raw || typeof raw !== 'string') return ''
+    let key = raw.trim()
+    // Remove wrapping single or double quotes
+    key = key.replace(/^['"]+|['"]+$/g, '').trim()
+    // If accidentally pasted with KEY=VALUE format
+    if (key.includes('=')) {
+      const parts = key.split('=')
+      key = parts[parts.length - 1].trim().replace(/^['"]+|['"]+$/g, '').trim()
+    }
+    // Remove any embedded whitespace/newlines
+    key = key.replace(/\s+/g, '')
+    return key
+  }
+
+  let vapidKey =
+    cleanKeyString(customVapidKey) ||
+    cleanKeyString(process.env.NEXT_PUBLIC_FCM_VAPID_KEY) ||
+    cleanKeyString(process.env.NEXT_PUBLIC_VAPID_KEY) ||
+    cleanKeyString(process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) ||
     DEFAULT_VAPID_KEY
 
+  if (!vapidKey || vapidKey.length < 30) {
+    vapidKey = DEFAULT_VAPID_KEY
+  }
+
   const { getToken } = await import('firebase/messaging')
-  const token = await getToken(messaging, {
-    vapidKey: vapidKey || undefined,
-    serviceWorkerRegistration: swRegistration,
-  })
+
+  let token = null
+  try {
+    token = await getToken(messaging, {
+      vapidKey: vapidKey || undefined,
+      serviceWorkerRegistration: swRegistration,
+    })
+  } catch (firstErr) {
+    console.warn('[FCM] First getToken attempt failed, cleaning subscription and retrying with default key:', firstErr)
+
+    // Unsubscribe any stale push subscription that might conflict with the key
+    if (swRegistration && 'pushManager' in swRegistration) {
+      try {
+        const existingSub = await swRegistration.pushManager.getSubscription()
+        if (existingSub) {
+          await existingSub.unsubscribe()
+        }
+      } catch (unsubErr) {
+        console.warn('[FCM] Error unsubscribing stale push subscription:', unsubErr)
+      }
+    }
+
+    // Retry with DEFAULT_VAPID_KEY
+    token = await getToken(messaging, {
+      vapidKey: DEFAULT_VAPID_KEY,
+      serviceWorkerRegistration: swRegistration,
+    })
+  }
 
   if (!token) {
     throw new Error('No registration token available. Please check VAPID key configuration.')
