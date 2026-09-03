@@ -1,7 +1,6 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app'
 import { getMessaging } from 'firebase-admin/messaging'
-import { db } from '@/lib/firestore'
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
+import { getFirestore } from 'firebase-admin/firestore'
 
 let adminApp = null
 
@@ -105,9 +104,14 @@ export async function sendPushNotificationToUser(uid, payload) {
   if (!uid) return { success: false, error: 'User ID is required' }
 
   try {
-    // 1. Fetch active device tokens from Firestore
-    const devicesRef = collection(db, `users/${uid}/devices`)
-    const snap = await getDocs(devicesRef)
+    const app = getFirebaseAdmin()
+    if (!app) {
+      throw new Error('Firebase Admin could not be initialized.')
+    }
+
+    // 1. Fetch active device tokens using Admin Firestore
+    const adminDb = getFirestore(app)
+    const snap = await adminDb.collection(`users/${uid}/devices`).get()
 
     if (snap.empty) {
       console.log(`[FCM Server] No registered devices found for user ${uid}`)
@@ -130,12 +134,7 @@ export async function sendPushNotificationToUser(uid, payload) {
       return { success: true, sentCount: 0, message: 'No active tokens' }
     }
 
-    // 2. Initialize Firebase Admin and get Messaging instance
-    const app = getFirebaseAdmin()
-    if (!app) {
-      throw new Error('Firebase Admin could not be initialized. Please check FIREBASE_PRIVATE_KEY and FIREBASE_CLIENT_EMAIL.')
-    }
-
+    // 2. Get Messaging instance
     const messaging = getMessaging(app)
 
     // 3. Prepare Multicast Message
@@ -175,7 +174,7 @@ export async function sendPushNotificationToUser(uid, payload) {
     const response = await messaging.sendEachForMulticast(message)
     console.log(`[FCM Server] Push send result for user ${uid}: ${response.successCount} success, ${response.failureCount} failed`)
 
-    // 5. Clean up expired / invalid tokens
+    // 5. Clean up expired / invalid tokens using Admin Firestore
     if (response.failureCount > 0) {
       const cleanupPromises = []
       response.responses.forEach((resp, idx) => {
@@ -189,9 +188,11 @@ export async function sendPushNotificationToUser(uid, payload) {
           ) {
             const staleDevice = deviceDocs[idx]
             if (staleDevice) {
-              const staleDocRef = doc(db, `users/${uid}/devices`, staleDevice.id)
               cleanupPromises.push(
-                updateDoc(staleDocRef, { active: false, deactivatedAt: new Date().toISOString() }).catch(() => {})
+                adminDb.doc(`users/${uid}/devices/${staleDevice.id}`).update({
+                  active: false,
+                  deactivatedAt: new Date().toISOString(),
+                }).catch(() => {})
               )
             }
           }

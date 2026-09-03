@@ -1,8 +1,10 @@
 import { getFirebaseAdmin } from '@/services/serverFcm'
 import { getAuth } from 'firebase-admin/auth'
-import { db } from '@/lib/firestore'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { getFirestore } from 'firebase-admin/firestore'
 import crypto from 'crypto'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req) {
   try {
@@ -75,8 +77,9 @@ export async function POST(req) {
     const deviceId = crypto.createHash('sha256').update(cleanToken).digest('hex').slice(0, 24)
     const now = new Date().toISOString()
 
-    const deviceDocRef = doc(db, `users/${uid}/devices`, deviceId)
-    const existingSnap = await getDoc(deviceDocRef)
+    const adminDb = getFirestore(adminApp)
+    const deviceDocRef = adminDb.doc(`users/${uid}/devices/${deviceId}`)
+    const existingSnap = await deviceDocRef.get()
 
     const deviceData = {
       token: cleanToken,
@@ -87,11 +90,11 @@ export async function POST(req) {
       updatedAt: now,
     }
 
-    if (!existingSnap.exists()) {
+    if (!existingSnap.exists) {
       deviceData.createdAt = now
     }
 
-    await setDoc(deviceDocRef, deviceData, { merge: true })
+    await deviceDocRef.set(deviceData, { merge: true })
 
     return Response.json({
       success: true,

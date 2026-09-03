@@ -175,6 +175,12 @@ export async function registerDeviceToken(fcmToken, idToken) {
       }),
     })
 
+    const contentType = res.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Server returned status ${res.status}: ${text.slice(0, 120)}`)
+    }
+
     const data = await res.json()
     return data
   } catch (err) {

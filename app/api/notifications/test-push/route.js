@@ -1,6 +1,9 @@
 import { getFirebaseAdmin, sendPushNotificationToUser } from '@/services/serverFcm'
 import { getAuth } from 'firebase-admin/auth'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function POST(req) {
   try {
     const authHeader = req.headers.get('authorization') || ''

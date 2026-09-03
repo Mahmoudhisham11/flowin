@@ -179,6 +179,12 @@ export default function SettingsPage() {
           Authorization: `Bearer ${idToken}`,
         },
       })
+      const contentType = res.headers.get('content-type') || ''
+      if (!contentType.includes('application/json')) {
+        const text = await res.text().catch(() => '')
+        throw new Error(`Server returned status ${res.status}: ${text.slice(0, 100)}`)
+      }
+
       const data = await res.json()
       if (data.success) {
         setNotifSuccess(isAr ? 'تم إرسال إشعار تجريبي! تفقد شريط الإشعارات 🔔' : 'Test notification sent! Check your notifications 🔔')
