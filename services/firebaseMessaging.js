@@ -88,7 +88,10 @@ export async function requestAndGetFcmToken(customVapidKey) {
     throw new Error('Firebase Messaging is not available')
   }
 
-  const vapidKey = customVapidKey || process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+const DEFAULT_VAPID_KEY =
+  'BF6POyd5Xfi_9JlJAnOI3qWKMaVsgcab-FcRGgHWM8n_YT_GORygy5YtSIYSJJknq8EcoCf4FW60x7tQptczylY'
+
+  const vapidKey = customVapidKey || process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY || DEFAULT_VAPID_KEY
 
   const { getToken } = await import('firebase/messaging')
   const token = await getToken(messaging, {

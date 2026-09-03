@@ -5,6 +5,37 @@ import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
 
 let adminApp = null
 
+const DEFAULT_FIREBASE_PROJECT_ID = 'abodpos-1beee'
+const DEFAULT_FIREBASE_CLIENT_EMAIL = 'firebase-adminsdk-fbsvc@abodpos-1beee.iam.gserviceaccount.com'
+const DEFAULT_FIREBASE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDiZuTxU+2mAF4q
+EHOUJTXRvgDntwP1acJJ4nhPS5zw2w1XGKczG5h8Q57L86t0jckzpcuXaHIK5H9q
+8DFsvRMi4xpFsOoYVs6QKk6XKiYVdkHCdgj9sJd6epXIxa0daMYfMs3Y0Qne6TP/
+8byDWFOwZ/vbF11gAa+dTp3IZHdrnv4qoG0x/umQ2Vvz6fpTRU356Z5DM5NZXSB2
+sYk+Wg7WZtcwBvkY6f7v5yZG4hRwRvkdDKVLhvBDUQfttUWJiQ7XDziIMehFsdLn
+7UT/14jx0+7th8cFxTn4VZML0/b9QhZ5FBwDm1MnfRKT2jvS9FCdNvce/njFzkiV
+ORELkU0FAgMBAAECggEAA6Hp/3M8x2KPIDamXBSiwew+AHm/vwLE4sGW85K/gF/L
+XX/gQuIo9qlxFU2iDRsvRLxewV2kIseawcD70gZQlck2BTM69kwCQW7kVumOtd5x
+XKjfKQ7Zx1XLLG77gZLKRvreMaHc+i4crvkWcLcMlLJ+aHv9/Ana4ve9cVcnUVsy
+d4YgILn1xakr9njjRjvbDasnFwdKhmPRPHj+V3K6J8pnQ+QrE4pp1YMy33Dnf745
+BcHomjuReqaShLVHC+VfTkDiGtBP47g2dtoNfYEWSTyekxD+uyPzzQXbMMO/p7uG
+SfVfJdcEXCNBvOOCAoiTT+/IqZJwo4nOo8WJD2aVkQKBgQD2gbVtpi6rauTmzAR4
+gTdEQco0cvucjamMD17jjhX0frvmTOPhW5oawJKETu+glat/1aWF5dHVd8TmwKDd
+GOG0/TEWklcplqPtIgXsVXEXN6MWqxwg9Nw3f7Co3tivVrG76xNpDdwuf+trOHlS
+KfYjt+rC8quMHmYs1SeR7aeS3QKBgQDrHvlyfwKjw5wsNDpLIj5qu5pMbp6R9V8w
+g4Iq4FU94i7iNTMrSYxsDffm1Y0v5GndWLST2/z+/LbQ4x32dS1zBMrvB2dqj2Ed
+4BJbFhz4SGU8J76Yw7As9hxH4QlMZxksi2hEIiNmmFL+HZnoT58kIMz4j2NOh+Q7
+BBLBO3VcSQKBgQDzaEcHG6ZPu4CFaYUsnKM+8hvBSJytDLETTQYseluxjgbqNJh8
+KaB0tBy5KtyxW7j5xLPqEHHvcJFsLV9qkqwktDJpkF0jAs2hVQw2PnQqMdUHiDSB
+Ume1IZAGX+3kzR05arlC7d2xyLxkpmIdwLN8t5nHoCnGdSn9MQkermXevQKBgBgd
+qzRFNr4ZWDFogfom3wQPjfn89qK96i+NrZI8REH+qxRkpITyHEcQ/7ZbfQnGgd1E
+NfFchQyaWx39zZrz1d+QREhUGBVj83AfBYL2N653rnqHEROWLsHN1ITC3jNJ99kL
+y3wBjGP/h7Os0ZZ0ZDxOaPetrV/mrFApUMslEBqRAoGBAJULTHxz7Q/zUoR+leC1
+EGDxAogAYvusdPCeN7hK4diF7LarU2GgmGAZG9UVP6vBw67AaT9r5Q+nmmV7zqby
+t1VS9JO/Xi5sPbnQAjufXqhGgM5Fir4/P/zI1zsW3A79RixdWW8gjEsnxRL8a08j
+auSp556OcNMt6/6qvrtni47J
+-----END PRIVATE KEY-----`
+
 /**
  * Initializes and returns the Firebase Admin SDK singleton with explicit environment validation.
  */
@@ -16,15 +47,20 @@ export function getFirebaseAdmin() {
 
   if (adminApp) return adminApp
 
-  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.FIREBASE_ADMIN_PROJECT_ID || 'abodpos-1beee'
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_ADMIN_CLIENT_EMAIL
-  let privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.FIREBASE_ADMIN_PRIVATE_KEY
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.FIREBASE_ADMIN_PROJECT_ID ||
+    DEFAULT_FIREBASE_PROJECT_ID
 
-  if (!clientEmail || !privateKey) {
-    console.warn(
-      '[FCM Server] Warning: FIREBASE_CLIENT_EMAIL or FIREBASE_PRIVATE_KEY is missing in environment variables. Web Push sending might fail.'
-    )
-  }
+  const clientEmail =
+    process.env.FIREBASE_CLIENT_EMAIL ||
+    process.env.FIREBASE_ADMIN_CLIENT_EMAIL ||
+    DEFAULT_FIREBASE_CLIENT_EMAIL
+
+  let privateKey =
+    process.env.FIREBASE_PRIVATE_KEY ||
+    process.env.FIREBASE_ADMIN_PRIVATE_KEY ||
+    DEFAULT_FIREBASE_PRIVATE_KEY
 
   if (privateKey) {
     // Handle escaped newlines in environment variables or surrounding quotes
