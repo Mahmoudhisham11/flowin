@@ -6,12 +6,6 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { useLocale } from '@/contexts/LocaleContext'
 import { changePassword } from '@/services/firebaseAuth'
 import { createQuickExpenseToken, revokeQuickExpenseToken } from '@/services/quickTokenService'
-import {
-  isPushNotificationSupported,
-  getNotificationPermissionState,
-  requestAndGetFcmToken,
-  registerDeviceToken,
-} from '@/services/firebaseMessaging'
 import { t } from '@/lib/translations'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -51,19 +45,6 @@ export default function SettingsPage() {
   const [tokenActiveState, setTokenActiveState] = useState(userData?.quickExpenseToken?.active || false)
   const [showRevokeConfirm, setShowRevokeConfirm] = useState(false)
   const [showGuideModal, setShowGuideModal] = useState(false)
-
-  // Push Notifications state
-  const [notifPermission, setNotifPermission] = useState('default')
-  const [notifLoading, setNotifLoading] = useState(false)
-  const [notifSuccess, setNotifSuccess] = useState('')
-  const [notifError, setNotifError] = useState('')
-  const [testPushLoading, setTestPushLoading] = useState(false)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setNotifPermission(getNotificationPermissionState())
-    }
-  }, [])
 
   const isAr = lang === 'ar'
 
@@ -133,70 +114,7 @@ export default function SettingsPage() {
     }
   }
 
-  const handleEnableNotifications = async () => {
-    if (!user) return
-    setNotifLoading(true)
-    setNotifError('')
-    setNotifSuccess('')
 
-    try {
-      const supported = await isPushNotificationSupported()
-      if (!supported) {
-        throw new Error(isAr ? 'الإشعارات الفورية غير مدعومة على هذا المتصفح. إذا كنت تستخدم iPhone، تأكد من إضافة Flowin إلى الشاشة الرئيسية (Add to Home Screen) أولاً.' : 'Push notifications are not supported on this browser. On iPhone, make sure to Add to Home Screen first.')
-      }
-
-      const fcmToken = await requestAndGetFcmToken()
-      const idToken = await user.getIdToken()
-      const res = await registerDeviceToken(fcmToken, idToken)
-
-      if (res.success) {
-        setNotifPermission('granted')
-        setNotifSuccess(isAr ? 'تم تفعيل الإشعارات بنجاح على هذا الجهاز! 🎉' : 'Notifications enabled successfully! 🎉')
-      } else {
-        throw new Error(res.error || 'Failed to register device token')
-      }
-    } catch (err) {
-      console.error('Failed to enable notifications:', err)
-      setNotifPermission(getNotificationPermissionState())
-      setNotifError(err.message || (isAr ? 'فشل تفعيل الإشعارات' : 'Failed to enable notifications'))
-    } finally {
-      setNotifLoading(false)
-    }
-  }
-
-  const handleSendTestPush = async () => {
-    if (!user) return
-    setTestPushLoading(true)
-    setNotifError('')
-    setNotifSuccess('')
-
-    try {
-      const idToken = await user.getIdToken()
-      const res = await fetch('/api/notifications/test-push', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-      })
-      const contentType = res.headers.get('content-type') || ''
-      if (!contentType.includes('application/json')) {
-        const text = await res.text().catch(() => '')
-        throw new Error(`Server returned status ${res.status}: ${text.slice(0, 100)}`)
-      }
-
-      const data = await res.json()
-      if (data.success) {
-        setNotifSuccess(isAr ? 'تم إرسال إشعار تجريبي! تفقد شريط الإشعارات 🔔' : 'Test notification sent! Check your notifications 🔔')
-      } else {
-        throw new Error(data.error || 'Failed to send test push')
-      }
-    } catch (err) {
-      setNotifError(err.message || 'Failed to send test push')
-    } finally {
-      setTestPushLoading(false)
-    }
-  }
 
   const handleRevokeToken = async () => {
     if (!user?.uid) return
@@ -266,101 +184,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Push Notifications Card */}
-        <div className={`${styles.section} ${styles.sectionFull}`}>
-          <div className={styles.sectionCard}>
-            <div className={styles.sectionHeader}>
-              <div className={styles.sectionIcon} style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#F59E0B' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className={styles.cardHeaderFlex}>
-                  <h2 className={styles.sectionTitle}>{t('settings.notifications')}</h2>
-                  {notifPermission === 'granted' && (
-                    <span className={`${styles.notifStatusBadge} ${styles.notifActiveBadge}`}>
-                      <span className={styles.badgeDot}></span>
-                      {t('settings.notificationsEnabled')}
-                    </span>
-                  )}
-                  {notifPermission === 'denied' && (
-                    <span className={`${styles.notifStatusBadge} ${styles.notifDeniedBadge}`}>
-                      {t('settings.notificationsDenied')}
-                    </span>
-                  )}
-                </div>
-                <p className={styles.sectionDesc}>{t('settings.notificationsDesc')}</p>
-              </div>
-            </div>
 
-            <div className={styles.tokenBox}>
-              <div className={styles.notifBtnRow}>
-                <button
-                  className={styles.notifPrimaryBtn}
-                  onClick={handleEnableNotifications}
-                  disabled={notifLoading}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                  </svg>
-                  <span>
-                    {notifLoading
-                      ? (isAr ? 'جاري التفعيل...' : 'Enabling...')
-                      : (notifPermission === 'granted' ? (isAr ? 'إعادة ربط هذا الجهاز' : 'Re-sync this device') : t('settings.enableNotifications'))}
-                  </span>
-                </button>
-
-                {notifPermission === 'granted' && (
-                  <button
-                    className={styles.notifSecondaryBtn}
-                    onClick={handleSendTestPush}
-                    disabled={testPushLoading}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="5 3 19 12 5 21 5 3" />
-                    </svg>
-                    <span>{testPushLoading ? (isAr ? 'جاري الإرسال...' : 'Sending...') : t('settings.sendTestPush')}</span>
-                  </button>
-                )}
-              </div>
-
-              {notifSuccess && (
-                <div className={styles.notifAlertSuccess}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>{notifSuccess}</span>
-                </div>
-              )}
-
-              {notifError && (
-                <div className={styles.notifAlertError}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <span>{notifError}</span>
-                </div>
-              )}
-
-              {/* iOS PWA Instructions Guide Box */}
-              <div className={styles.notifIosGuide}>
-                <div className={styles.notifIosTitle}>
-                  <span>{t('settings.iosPwaGuideTitle')}</span>
-                </div>
-                <ol className={styles.notifIosList}>
-                  <li>{t('settings.iosPwaStep1')}</li>
-                  <li>{t('settings.iosPwaStep2')}</li>
-                  <li>{t('settings.iosPwaStep3')}</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* iPhone Shortcuts & Back Tap Integration Card */}
         <div className={`${styles.section} ${styles.sectionFull}`}>

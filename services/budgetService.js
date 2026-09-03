@@ -1,6 +1,5 @@
 import { db } from '@/lib/firestore'
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
-import { createNotification } from './notificationService'
 import { CATEGORIES } from '@/lib/categories'
 
 const DOC_PATH = (uid) => `users/${uid}/budget/config`
@@ -131,26 +130,8 @@ export async function deductFromBudget(uid, categoryName, amount) {
     match.spent = beforeSpent + Number(amount)
     console.log('deductFromBudget:', { name: match.name, beforeSpent, added: Number(amount), newSpent: match.spent })
 
-    const notified = { ...(data.notifiedThresholds || {}) }
-    const catKey = normalizeArabic(match.name)
-    const thresholdsNotified = new Set(notified[catKey] || [])
-
-    const target = Number(match.amount) || 0
-    const remaining = target - match.spent
-    if (target > 0 && remaining <= target * 0.1 && remaining > 0 && !thresholdsNotified.has(10)) {
-      thresholdsNotified.add(10)
-      notified[catKey] = Array.from(thresholdsNotified)
-      createNotification(uid, {
-        type: 'budget_alert',
-        title: `⚠️ ${match.name}`,
-        message: `باقي ${remaining.toFixed(0)} جم من ${target.toFixed(0)} جم (10%)`,
-        categoryName: match.name,
-      }).catch(() => {})
-    }
-
     await updateDoc(ref, {
       essentialCategories: categories,
-      notifiedThresholds: notified,
       updatedAt: new Date().toISOString(),
     })
     console.log('deductFromBudget saved')
@@ -178,7 +159,6 @@ export async function refundFromBudget(uid, categoryName, amount) {
 
     await updateDoc(ref, {
       essentialCategories: categories,
-      notifiedThresholds: data.notifiedThresholds || {},
       updatedAt: new Date().toISOString(),
     })
     console.log('refundFromBudget saved')
@@ -198,7 +178,6 @@ export async function resetMonthlyBudget(uid) {
   }))
   await updateDoc(ref, {
     essentialCategories: categories,
-    notifiedThresholds: {},
     updatedAt: new Date().toISOString(),
   })
 }
