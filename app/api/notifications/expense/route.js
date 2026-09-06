@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { initFirebaseAdmin } from '@/lib/firebaseAdmin'
+import { getAdminMessaging, getAdminFirestore } from '@/lib/firebaseAdmin'
 
 export async function POST(req) {
   console.log('--- [API: /api/notifications/expense] New request received ---')
@@ -8,7 +8,7 @@ export async function POST(req) {
       console.error('[API Expense Notification] Failed to parse request JSON:', err)
       return {}
     })
-    
+
     const { userId, amount, category, merchant, title, token } = body
     console.log('[API Expense Notification] Request Payload:', {
       userId,
@@ -16,7 +16,7 @@ export async function POST(req) {
       category,
       merchant,
       title,
-      hasDirectToken: !!token,
+      hasDirectToken: Boolean(token),
     })
 
     if (!userId && !token) {
@@ -27,7 +27,7 @@ export async function POST(req) {
       )
     }
 
-    const admin = initFirebaseAdmin()
+    const messaging = getAdminMessaging()
     const tokens = new Set()
 
     if (token) {
@@ -37,8 +37,8 @@ export async function POST(req) {
 
     if (userId) {
       try {
-        const db = admin.firestore()
-        
+        const db = getAdminFirestore()
+
         // 1. Get token from user document
         const userDoc = await db.collection('users').doc(userId).get()
         if (userDoc.exists) {
@@ -111,7 +111,7 @@ export async function POST(req) {
 
     if (tokenList.length === 1) {
       console.log('[API Expense Notification] Sending via messaging.send to single token...')
-      const response = await admin.messaging().send({
+      const response = await messaging.send({
         ...messagePayload,
         token: tokenList[0],
       })
@@ -123,7 +123,7 @@ export async function POST(req) {
       })
     } else {
       console.log(`[API Expense Notification] Sending via messaging.sendEachForMulticast to ${tokenList.length} tokens...`)
-      const response = await admin.messaging().sendEachForMulticast({
+      const response = await messaging.sendEachForMulticast({
         ...messagePayload,
         tokens: tokenList,
       })
@@ -131,7 +131,7 @@ export async function POST(req) {
         successCount: response.successCount,
         failureCount: response.failureCount,
       })
-      
+
       if (response.failureCount > 0) {
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
