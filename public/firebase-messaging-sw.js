@@ -18,13 +18,34 @@ const messaging = firebase.messaging()
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload)
 
+  const tag = payload.data?.notificationId || payload.data?.expenseId || payload.data?.tag || 'flowin-expense'
   const notificationTitle = payload.notification?.title || payload.data?.title || 'Flowin'
   const notificationOptions = {
     body: payload.notification?.body || payload.data?.body || '',
     icon: payload.notification?.icon || '/web-app-manifest-192x192.png',
     badge: '/favicon-96x96.png',
+    tag: tag,
+    renotify: false,
     data: payload.data || {},
   }
 
   self.registration.showNotification(notificationTitle, notificationOptions)
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const targetUrl = event.notification?.data?.url || '/'
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus()
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl)
+      }
+    })
+  )
 })

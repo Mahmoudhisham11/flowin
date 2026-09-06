@@ -134,6 +134,8 @@
 
 /* Wallets */
 .walletsSection {
+  position: relative;
+  z-index: 30;
   margin-top: 32px;
   margin-bottom: 32px;
 }
@@ -143,6 +145,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+  position: relative;
+  z-index: 40;
 }
 
 .sectionTitle {
@@ -156,6 +160,7 @@
   align-items: center;
   gap: 8px;
   position: relative;
+  z-index: 50;
 }
 
 .actionBtnsDesktop {
@@ -167,6 +172,7 @@
 .actionDropdown {
   display: none;
   position: relative;
+  z-index: 60;
 }
 
 .moreBtn {
@@ -194,9 +200,9 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
   padding: 6px;
-  z-index: 50;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 2px;

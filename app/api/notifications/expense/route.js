@@ -43,25 +43,40 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
       }
 
       // 4. Calculate today's total expenses
-      const todayStart = new Date()
-      todayStart.setHours(0, 0, 0, 0)
-      const todayStartIso = todayStart.toISOString()
+      const now = new Date()
+      const fallbackIso = new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString() // 28 hours window for all timezones
 
       const txSnap = await db
         .collection('users')
         .doc(userId)
         .collection('transactions')
-        .where('createdAt', '>=', todayStartIso)
+        .where('createdAt', '>=', fallbackIso)
         .get()
 
       txSnap.forEach((td) => {
         const t = td.data()
         if (t?.type === 'expense') {
-          todayExpenses += Number(t.amount || 0)
+          const tDate = t.createdAt ? new Date(t.createdAt) : null
+          if (tDate) {
+            const isToday =
+              tDate.toDateString() === now.toDateString() ||
+              now.getTime() - tDate.getTime() <= 20 * 60 * 60 * 1000
+            if (isToday) {
+              todayExpenses += Number(t.amount || 0)
+            }
+          }
         }
       })
+
+      // If todayExpenses from DB is 0 or less than the current amount, ensure it includes this transaction
+      if (amount && todayExpenses < Number(amount)) {
+        todayExpenses = Number(amount)
+      }
     } catch (dbErr) {
       console.error('[sendExpenseNotification] DB query error:', dbErr.message)
+      if (amount) {
+        todayExpenses = Number(amount)
+      }
     }
   }
 
@@ -99,6 +114,8 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
     }
   }
 
+  const notificationId = `expense_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+
   const messagePayload = {
     notification: {
       title: notificationTitle,
@@ -107,6 +124,7 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
     data: {
       url: '/',
       type: 'expense',
+      notificationId: notificationId,
       amount: String(amount || 0),
       category: String(category || ''),
       title: String(itemLabel),
@@ -119,6 +137,8 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
         body: notificationBody,
         icon: '/web-app-manifest-192x192.png',
         badge: '/favicon-96x96.png',
+        tag: notificationId,
+        renotify: false,
       },
       fcmOptions: {
         link: '/',

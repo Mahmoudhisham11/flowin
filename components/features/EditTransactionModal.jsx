@@ -178,12 +178,24 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
 
           <div className={styles.actions}>
             <button type="submit" className={styles.saveBtn} disabled={loading}>
-              {loading ? t('saving') : t('common.update')}
+              {loading ? t('saving') : (t('common.update') || 'Update')}
             </button>
-            <button type="button" className={styles.deleteBtn} onClick={() => setShowDeleteConfirm(true)} disabled={loading}>
-                {t('transactions.deleteTransaction')}
+            <div className={styles.secondaryActions}>
+              <button type="button" className={styles.cancelBtn} onClick={handleClose}>
+                {t('cancel')}
               </button>
-            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
+              <button
+                type="button"
+                className={styles.deleteBtn}
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={loading}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                {t('delete')}
+              </button>
+            </div>
           </div>
         </form>
       </div>

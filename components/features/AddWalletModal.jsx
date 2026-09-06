@@ -125,12 +125,28 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
             <button type="submit" className={styles.saveBtn} disabled={loading}>
               {loading ? t('saving') : isEdit ? t('wallet.update') : t('wallet.create')}
             </button>
-            {isEdit && (
-              <button type="button" className={styles.deleteBtn} onClick={() => setShowDeleteConfirm(true)} disabled={loading}>
-                {t('dashboard.deleteWallet')}
+            {isEdit ? (
+              <div className={styles.secondaryActions}>
+                <button type="button" className={styles.cancelBtn} onClick={handleClose}>
+                  {t('cancel')}
+                </button>
+                <button
+                  type="button"
+                  className={styles.deleteBtn}
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={loading}
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                  {t('dashboard.deleteWallet')}
+                </button>
+              </div>
+            ) : (
+              <button type="button" className={styles.cancelBtn} onClick={handleClose}>
+                {t('cancel')}
               </button>
             )}
-            <button type="button" className={styles.cancelBtn} onClick={handleClose}>{t('cancel')}</button>
           </div>
         </form>
       </div>

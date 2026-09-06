@@ -170,7 +170,7 @@ export default function Home() {
         onToggle={() => setShowBalance((prev) => !prev)}
       />
 
-      <Reveal delay={100}>
+      <Reveal delay={100} style={{ position: 'relative', zIndex: showActions ? 80 : 20 }}>
       <div className={styles.walletsSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>{t('dashboard.wallets')}</h2>

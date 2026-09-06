@@ -30,7 +30,7 @@ export default function Reveal({ children, delay = 0, className = '', style = {}
       className={className}
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transform: visible ? 'none' : 'translateY(20px)',
         transition: `opacity 0.5s ease-out, transform 0.5s ease-out`,
         ...style,
       }}

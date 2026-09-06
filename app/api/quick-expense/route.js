@@ -97,15 +97,17 @@ export async function POST(req) {
       balance: newBalance,
     })
 
-    // 9. Send FCM Push Notification to all user devices (fire-and-forget / non-blocking)
-    sendExpenseNotification({
-      userId: uid,
-      amount: numAmount,
-      category: detectedCategory,
-      reason: normalizedReason,
-    }).catch((notifErr) => {
-      console.error('Failed to send quick expense push notification:', notifErr?.message || notifErr)
-    })
+    // 9. Send FCM Push Notification to all user devices (must await so serverless runtime does not terminate early)
+    try {
+      await sendExpenseNotification({
+        userId: uid,
+        amount: numAmount,
+        category: detectedCategory,
+        reason: normalizedReason,
+      })
+    } catch (notifErr) {
+      console.error('[quick-expense] Failed to send push notification:', notifErr?.message || notifErr)
+    }
 
     return Response.json({
       success: true,
