@@ -10,7 +10,6 @@ import { subscribeToWallets, WALLET_TYPES } from '@/services/walletService'
 import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
 import BalanceCard from '@/components/features/BalanceCard'
-import DailyBudgetCard from '@/components/features/DailyBudgetCard'
 import SetDailyBudgetModal from '@/components/features/SetDailyBudgetModal'
 import AddWalletModal from '@/components/features/AddWalletModal'
 import AddIncomeModal from '@/components/features/AddIncomeModal'
@@ -171,14 +170,6 @@ export default function Home() {
         onToggle={() => setShowBalance((prev) => !prev)}
       />
 
-      {/* Interactive Daily Budget Card */}
-      <DailyBudgetCard
-        limit={dailyBudgetLimit}
-        spentToday={todayExpenses}
-        onSetBudget={() => setShowSetDailyBudget(true)}
-        onAddExpense={() => setShowAddExpense(true)}
-      />
-
       <Reveal delay={100}>
       <div className={styles.walletsSection}>
         <div className={styles.sectionHeader}>
@@ -199,6 +190,9 @@ export default function Home() {
               </button>
               <button className={styles.transferBtn} onClick={() => setShowTransfer(true)}>
                 <TransferIcon /> {t('dashboard.transfer')}
+              </button>
+              <button className={styles.budgetBtn} onClick={() => setShowSetDailyBudget(true)}>
+                🎯 {t('dailyBudget.title') || 'ميزانية اليوم'}
               </button>
               <button className={styles.addWalletBtn} onClick={() => setShowAddWallet(true)}>
                 <PlusIcon /> {t('dashboard.addWallet')}
@@ -227,6 +221,9 @@ export default function Home() {
                   <button onClick={() => { setShowTransfer(true); setShowActions(false) }}>
                     <TransferIcon /> {t('dashboard.transfer')}
                   </button>
+                  <button onClick={() => { setShowSetDailyBudget(true); setShowActions(false) }}>
+                    <span>🎯</span> {t('dailyBudget.title') || 'الميزانية اليومية'}
+                  </button>
                   <button onClick={() => { setShowAddWallet(true); setShowActions(false) }}>
                     <PlusIcon /> {t('dashboard.addWallet')}
                   </button>
@@ -235,7 +232,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {wallets.length > 0 ? (
+        {wallets.length > 0 || dailyBudgetLimit > 0 ? (
           <>
             <div className={styles.walletGrid}>
               {wallets.map((w) => {
@@ -253,6 +250,44 @@ export default function Home() {
                   </div>
                 )
               })}
+              {dailyBudgetLimit > 0 && (
+                <div
+                  className={styles.walletCard}
+                  style={{
+                    borderTopColor:
+                      todayExpenses > dailyBudgetLimit
+                        ? '#EF4444'
+                        : todayExpenses >= dailyBudgetLimit * 0.9
+                        ? '#F59E0B'
+                        : '#10B981',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setShowSetDailyBudget(true)}
+                >
+                  <div className={styles.walletTop}>
+                    <span className={styles.walletEmoji}>🎯</span>
+                    <span className={styles.walletType}>{t('dailyBudget.title') || 'الميزانية اليومية'}</span>
+                  </div>
+                  <span className={styles.walletName}>
+                    {todayExpenses > dailyBudgetLimit
+                      ? (t('dailyBudget.exceeded') || 'تجاوزت الحد')
+                      : (t('dailyBudget.remaining') || 'المتبقي لليوم')}
+                  </span>
+                  <span
+                    className={styles.walletBalance}
+                    style={{
+                      color:
+                        todayExpenses > dailyBudgetLimit
+                          ? '#EF4444'
+                          : todayExpenses >= dailyBudgetLimit * 0.9
+                          ? '#F59E0B'
+                          : undefined,
+                    }}
+                  >
+                    EGP <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
+                  </span>
+                </div>
+              )}
             </div>
             <div className={styles.walletSwiper} ref={swiperRef}>
               {wallets.map((w) => {
@@ -270,9 +305,47 @@ export default function Home() {
                   </div>
                 )
               })}
+              {dailyBudgetLimit > 0 && (
+                <div
+                  className={styles.swiperCard}
+                  style={{
+                    borderTopColor:
+                      todayExpenses > dailyBudgetLimit
+                        ? '#EF4444'
+                        : todayExpenses >= dailyBudgetLimit * 0.9
+                        ? '#F59E0B'
+                        : '#10B981',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => setShowSetDailyBudget(true)}
+                >
+                  <div className={styles.walletTop}>
+                    <span className={styles.walletEmoji}>🎯</span>
+                    <span className={styles.walletType}>{t('dailyBudget.title') || 'الميزانية اليومية'}</span>
+                  </div>
+                  <span className={styles.walletName}>
+                    {todayExpenses > dailyBudgetLimit
+                      ? (t('dailyBudget.exceeded') || 'تجاوزت الحد')
+                      : (t('dailyBudget.remaining') || 'المتبقي لليوم')}
+                  </span>
+                  <span
+                    className={styles.walletBalance}
+                    style={{
+                      color:
+                        todayExpenses > dailyBudgetLimit
+                          ? '#EF4444'
+                          : todayExpenses >= dailyBudgetLimit * 0.9
+                          ? '#F59E0B'
+                          : undefined,
+                    }}
+                  >
+                    EGP <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
+                  </span>
+                </div>
+              )}
             </div>
             <div className={styles.swiperDots}>
-              {wallets.map((_, i) => (
+              {Array.from({ length: wallets.length + (dailyBudgetLimit > 0 ? 1 : 0) }).map((_, i) => (
                 <span key={i} className={`${styles.swiperDot} ${i === activeWalletIdx ? styles.swiperDotActive : ''}`} />
               ))}
             </div>

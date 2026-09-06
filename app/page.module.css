@@ -284,6 +284,22 @@
   background: var(--badge-bg);
 }
 
+.budgetBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8B5CF6;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.budgetBtn:hover {
+  background: rgba(139, 92, 246, 0.12);
+}
+
 .walletGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

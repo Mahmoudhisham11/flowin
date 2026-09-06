@@ -3,6 +3,7 @@ import { saveTransaction } from '@/services/transactionsService'
 import { fetchWallets, updateWallet } from '@/services/walletService'
 import { classifyExpenseCategory } from '@/services/aiClassifier'
 import { CATEGORIES } from '@/lib/categories'
+import { sendExpenseNotification } from '@/app/api/notifications/expense/route'
 
 export async function POST(req) {
   try {
@@ -94,6 +95,16 @@ export async function POST(req) {
     const newBalance = currentBalance - numAmount
     await updateWallet(uid, walletId, {
       balance: newBalance,
+    })
+
+    // 9. Send FCM Push Notification to all user devices (fire-and-forget / non-blocking)
+    sendExpenseNotification({
+      userId: uid,
+      amount: numAmount,
+      category: detectedCategory,
+      reason: normalizedReason,
+    }).catch((notifErr) => {
+      console.error('Failed to send quick expense push notification:', notifErr?.message || notifErr)
     })
 
     return Response.json({

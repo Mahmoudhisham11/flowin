@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getMessagingInstance } from '@/lib/firebase'
 import { db } from '@/lib/firestore'
-import { doc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
 
 export function useFCM(user) {
   const [token, setToken] = useState(null)
@@ -12,36 +12,41 @@ export function useFCM(user) {
   const [loading, setLoading] = useState(false)
   const registeredRef = useRef(false)
 
-  // Save token in Firestore for the current user
+  // Save token in Firestore subcollection for the current user & device
   const saveTokenToFirestore = useCallback(async (uid, fcmToken) => {
     if (!uid || !fcmToken) return
     try {
-      // Safe ID for token document
-      const tokenKey = encodeURIComponent(fcmToken.slice(-32))
+      // Safe ID for token document (replace illegal Firestore characters)
+      const tokenKey = fcmToken.replace(/[/.]/g, '_').slice(-80)
       const tokenDocRef = doc(db, `users/${uid}/fcm_tokens`, tokenKey)
+
+      const isMobile = typeof navigator !== 'undefined' ? /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) : false
+      const platformName = typeof navigator !== 'undefined' ? (navigator.userAgentData?.platform || navigator.platform || 'web') : 'web'
 
       await setDoc(tokenDocRef, {
         token: fcmToken,
-        updatedAt: new Date().toISOString(),
+        deviceType: isMobile ? 'mobile' : 'desktop',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        platform: typeof navigator !== 'undefined' ? (navigator.userAgentData?.platform || navigator.platform || 'web') : 'web',
+        platform: platformName,
+        updatedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
       }, { merge: true })
 
       // Also update latest token on user profile
       const userRef = doc(db, 'users', uid)
       await updateDoc(userRef, {
         fcmToken,
-        fcmUpdatedAt: new Date().toISOString(),
+        fcmUpdatedAt: serverTimestamp(),
       }).catch(async () => {
         await setDoc(userRef, {
           fcmToken,
-          fcmUpdatedAt: new Date().toISOString(),
+          fcmUpdatedAt: serverTimestamp(),
         }, { merge: true })
       })
 
-      console.log('FCM token saved to Firestore successfully')
+      console.log('[useFCM] Token saved for device:', isMobile ? 'mobile' : 'desktop')
     } catch (err) {
-      console.error('Error saving FCM token to Firestore:', err)
+      console.error('[useFCM] Error saving token to Firestore:', err)
     }
   }, [])
 

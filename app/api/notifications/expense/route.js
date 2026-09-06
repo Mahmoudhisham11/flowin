@@ -1,154 +1,206 @@
 import { NextResponse } from 'next/server'
 import { getAdminMessaging, getAdminFirestore } from '@/lib/firebaseAdmin'
 
-export async function POST(req) {
-  console.log('--- [API: /api/notifications/expense] New request received ---')
-  try {
-    const body = await req.json().catch((err) => {
-      console.error('[API Expense Notification] Failed to parse request JSON:', err)
-      return {}
+export async function sendExpenseNotification({ userId, amount, category, merchant, reason, title, token }) {
+  console.log('--- [sendExpenseNotification] Sending for user:', userId, 'amount:', amount)
+  const messaging = getAdminMessaging()
+  const db = getAdminFirestore()
+
+  const tokensMap = new Map() // token -> docId (to clean up if expired)
+
+  if (token) {
+    tokensMap.set(token, null)
+  }
+
+  let dailyBudgetLimit = 0
+  let todayExpenses = 0
+
+  if (userId) {
+    try {
+      // 1. Fetch user fcm_tokens subcollection (multi-device)
+      const tokensSnap = await db.collection('users').doc(userId).collection('fcm_tokens').get()
+      tokensSnap.forEach((d) => {
+        const t = d.data()?.token
+        if (t) {
+          tokensMap.set(t, d.id)
+        }
+      })
+
+      // 2. Fetch user document fcmToken if available
+      const userDoc = await db.collection('users').doc(userId).get()
+      if (userDoc.exists) {
+        const uData = userDoc.data()
+        if (uData?.fcmToken && !tokensMap.has(uData.fcmToken)) {
+          tokensMap.set(uData.fcmToken, null)
+        }
+      }
+
+      // 3. Fetch Daily Budget config
+      const budgetDoc = await db.collection('users').doc(userId).collection('budget').doc('config').get()
+      if (budgetDoc.exists) {
+        const bData = budgetDoc.data()
+        dailyBudgetLimit = Number(bData?.dailyBudgetLimit || bData?.aiDailyBudget?.dailyBudget || 0)
+      }
+
+      // 4. Calculate today's total expenses
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+      const todayStartIso = todayStart.toISOString()
+
+      const txSnap = await db
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .where('createdAt', '>=', todayStartIso)
+        .get()
+
+      txSnap.forEach((td) => {
+        const t = td.data()
+        if (t?.type === 'expense') {
+          todayExpenses += Number(t.amount || 0)
+        }
+      })
+    } catch (dbErr) {
+      console.error('[sendExpenseNotification] DB query error:', dbErr.message)
+    }
+  }
+
+  const tokenList = Array.from(tokensMap.keys()).filter(Boolean)
+  console.log(`[sendExpenseNotification] Found ${tokenList.length} unique FCM token(s) for user ${userId}`)
+
+  if (tokenList.length === 0) {
+    return {
+      success: false,
+      message: 'No active FCM tokens found for user',
+    }
+  }
+
+  const itemLabel = merchant || reason || title || category || 'مصروف جديد'
+  const formattedAmount = Number(amount || 0).toLocaleString('en-US')
+
+  // Smart Budget Warning Check
+  let notificationTitle = '💸 تم تسجيل مصروف جديد'
+  let notificationBody = `${itemLabel} - بقيمة ${formattedAmount} ج.م`
+
+  if (dailyBudgetLimit > 0) {
+    const remaining = dailyBudgetLimit - todayExpenses
+    if (todayExpenses > dailyBudgetLimit) {
+      const overBy = Math.round(todayExpenses - dailyBudgetLimit).toLocaleString('en-US')
+      notificationTitle = '🚨 تجاوزت الميزانية اليومية!'
+      notificationBody = `تم تسجيل ${itemLabel} (${formattedAmount} ج.م) - تجاوزت الحد اليومي (${dailyBudgetLimit.toLocaleString('en-US')} ج.م) بمقدار ${overBy} ج.م`
+    } else if (todayExpenses >= dailyBudgetLimit * 0.9) {
+      // Nearing 10% or less remaining
+      const remFormatted = Math.max(0, Math.round(remaining)).toLocaleString('en-US')
+      notificationTitle = '⚠️ تنبيه: اقتربت من حد الميزانية اليومية'
+      notificationBody = `تم تسجيل ${itemLabel} (${formattedAmount} ج.م) - متبقي ${remFormatted} ج.م فقط من ميزانية اليوم (${dailyBudgetLimit.toLocaleString('en-US')} ج.م)`
+    } else {
+      const remFormatted = Math.max(0, Math.round(remaining)).toLocaleString('en-US')
+      notificationBody = `${itemLabel} - بقيمة ${formattedAmount} ج.م (المتبقي لليوم: ${remFormatted} ج.م)`
+    }
+  }
+
+  const messagePayload = {
+    notification: {
+      title: notificationTitle,
+      body: notificationBody,
+    },
+    data: {
+      url: '/',
+      type: 'expense',
+      amount: String(amount || 0),
+      category: String(category || ''),
+      title: String(itemLabel),
+      dailyBudgetLimit: String(dailyBudgetLimit),
+      todayExpenses: String(todayExpenses),
+    },
+    webpush: {
+      notification: {
+        title: notificationTitle,
+        body: notificationBody,
+        icon: '/web-app-manifest-192x192.png',
+        badge: '/favicon-96x96.png',
+      },
+      fcmOptions: {
+        link: '/',
+      },
+    },
+  }
+
+  // Multicast send to all user devices
+  const response = await messaging.sendEachForMulticast({
+    ...messagePayload,
+    tokens: tokenList,
+  })
+
+  console.log('[sendExpenseNotification] Multicast result:', {
+    total: tokenList.length,
+    successCount: response.successCount,
+    failureCount: response.failureCount,
+  })
+
+  // Clean up unregistered / dead tokens
+  if (response.failureCount > 0 && userId) {
+    const expiredTokens = []
+    response.responses.forEach((resp, idx) => {
+      if (!resp.success) {
+        const errCode = resp.error?.code || ''
+        console.warn(`[sendExpenseNotification] Token #${idx} failed:`, errCode, resp.error?.message)
+        if (
+          errCode === 'messaging/registration-token-not-registered' ||
+          errCode === 'messaging/invalid-registration-token'
+        ) {
+          const badToken = tokenList[idx]
+          const docId = tokensMap.get(badToken)
+          if (docId) {
+            expiredTokens.push(docId)
+          }
+        }
+      }
     })
 
-    const { userId, amount, category, merchant, title, token } = body
-    console.log('[API Expense Notification] Request Payload:', {
-      userId,
-      amount,
-      category,
-      merchant,
-      title,
-      hasDirectToken: Boolean(token),
-    })
+    if (expiredTokens.length > 0) {
+      console.log(`[sendExpenseNotification] Cleaning up ${expiredTokens.length} expired token doc(s)...`)
+      Promise.all(
+        expiredTokens.map((docId) =>
+          db.collection('users').doc(userId).collection('fcm_tokens').doc(docId).delete().catch(() => {})
+        )
+      ).catch(() => {})
+    }
+  }
+
+  return {
+    success: true,
+    successCount: response.successCount,
+    failureCount: response.failureCount,
+    tokensCount: tokenList.length,
+  }
+}
+
+export async function POST(req) {
+  try {
+    const body = await req.json().catch(() => ({}))
+    const { userId, amount, category, merchant, reason, title, token } = body
 
     if (!userId && !token) {
-      console.warn('[API Expense Notification] Missing userId and token in request')
       return NextResponse.json(
         { success: false, error: 'userId or token is required' },
         { status: 400 }
       )
     }
 
-    const messaging = getAdminMessaging()
-    const tokens = new Set()
+    const result = await sendExpenseNotification({
+      userId,
+      amount,
+      category,
+      merchant,
+      reason,
+      title,
+      token,
+    })
 
-    if (token) {
-      tokens.add(token)
-      console.log('[API Expense Notification] Added token from request body')
-    }
-
-    if (userId) {
-      try {
-        const db = getAdminFirestore()
-
-        // 1. Get token from user document
-        const userDoc = await db.collection('users').doc(userId).get()
-        if (userDoc.exists) {
-          const userData = userDoc.data()
-          if (userData?.fcmToken) {
-            tokens.add(userData.fcmToken)
-            console.log('[API Expense Notification] Found fcmToken on user document:', userData.fcmToken.slice(0, 16) + '...')
-          } else {
-            console.log('[API Expense Notification] No fcmToken field found on user document')
-          }
-        } else {
-          console.warn('[API Expense Notification] User document does not exist in Firestore for userId:', userId)
-        }
-
-        // 2. Get tokens from user fcm_tokens subcollection
-        const tokensSnap = await db.collection('users').doc(userId).collection('fcm_tokens').get()
-        console.log(`[API Expense Notification] Found ${tokensSnap.size} token document(s) in fcm_tokens subcollection`)
-        tokensSnap.forEach((doc) => {
-          const tData = doc.data()
-          if (tData?.token) {
-            tokens.add(tData.token)
-          }
-        })
-      } catch (dbErr) {
-        console.error('[API Expense Notification] Error querying Firestore for user tokens:', dbErr.message, dbErr.stack)
-      }
-    }
-
-    const tokenList = Array.from(tokens).filter(Boolean)
-    console.log(`[API Expense Notification] Total unique FCM tokens to send to: ${tokenList.length}`)
-
-    if (tokenList.length === 0) {
-      console.warn('[API Expense Notification] No FCM tokens found. Make sure user has enabled notifications in browser.')
-      return NextResponse.json({
-        success: false,
-        message: 'No active FCM tokens found for user. Please ensure notifications are enabled.',
-      }, { status: 200 })
-    }
-
-    const itemLabel = merchant || title || category || 'مصروف جديد'
-    const formattedAmount = Number(amount || 0).toLocaleString('en-US')
-
-    const notificationTitle = '💸 تم تسجيل مصروف جديد'
-    const notificationBody = `${itemLabel} - بقيمة ${formattedAmount} ج.م`
-
-    const messagePayload = {
-      notification: {
-        title: notificationTitle,
-        body: notificationBody,
-      },
-      data: {
-        url: '/',
-        type: 'expense',
-        amount: String(amount || 0),
-        category: String(category || ''),
-        title: String(itemLabel),
-      },
-      webpush: {
-        notification: {
-          title: notificationTitle,
-          body: notificationBody,
-          icon: '/web-app-manifest-192x192.png',
-          badge: '/favicon-96x96.png',
-        },
-        fcmOptions: {
-          link: '/',
-        },
-      },
-    }
-
-    if (tokenList.length === 1) {
-      console.log('[API Expense Notification] Sending via messaging.send to single token...')
-      const response = await messaging.send({
-        ...messagePayload,
-        token: tokenList[0],
-      })
-      console.log('[API Expense Notification] Send successful! Message ID:', response)
-      return NextResponse.json({
-        success: true,
-        messageId: response,
-        tokensCount: 1,
-      })
-    } else {
-      console.log(`[API Expense Notification] Sending via messaging.sendEachForMulticast to ${tokenList.length} tokens...`)
-      const response = await messaging.sendEachForMulticast({
-        ...messagePayload,
-        tokens: tokenList,
-      })
-      console.log('[API Expense Notification] Multicast response:', {
-        successCount: response.successCount,
-        failureCount: response.failureCount,
-      })
-
-      if (response.failureCount > 0) {
-        response.responses.forEach((resp, idx) => {
-          if (!resp.success) {
-            console.error(`[API Expense Notification] Failed token #${idx}:`, resp.error?.message || resp.error)
-          }
-        })
-      }
-
-      return NextResponse.json({
-        success: true,
-        successCount: response.successCount,
-        failureCount: response.failureCount,
-        tokensCount: tokenList.length,
-      })
-    }
+    return NextResponse.json(result, { status: 200 })
   } catch (error) {
-    console.error('[API Expense Notification] Server Error sending notification:', error.message, error.stack)
+    console.error('[API /api/notifications/expense] Error:', error)
     return NextResponse.json(
       {
         success: false,
