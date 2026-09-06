@@ -24,11 +24,20 @@ export async function saveTransaction(uid, data) {
         amount: data.amount,
         category: data.category,
         merchant: data.merchant,
-        title: data.merchant || data.category,
+        title: data.merchant || data.category || 'مصروف جديد',
       }),
-    }).catch((err) => {
-      console.warn('Failed to send expense push notification:', err)
     })
+      .then(async (res) => {
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok || json.success === false) {
+          console.warn('[TransactionsService] Expense notification response:', res.status, json)
+        } else {
+          console.log('[TransactionsService] Expense notification sent successfully:', json)
+        }
+      })
+      .catch((err) => {
+        console.error('[TransactionsService] Failed to trigger expense push notification:', err)
+      })
   }
 
   return docRef.id

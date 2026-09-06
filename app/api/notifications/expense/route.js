@@ -2,13 +2,27 @@ import { NextResponse } from 'next/server'
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin'
 
 export async function POST(req) {
+  console.log('--- [API: /api/notifications/expense] New request received ---')
   try {
-    const body = await req.json().catch(() => ({}))
+    const body = await req.json().catch((err) => {
+      console.error('[API Expense Notification] Failed to parse request JSON:', err)
+      return {}
+    })
+    
     const { userId, amount, category, merchant, title, token } = body
+    console.log('[API Expense Notification] Request Payload:', {
+      userId,
+      amount,
+      category,
+      merchant,
+      title,
+      hasDirectToken: !!token,
+    })
 
     if (!userId && !token) {
+      console.warn('[API Expense Notification] Missing userId and token in request')
       return NextResponse.json(
-        { error: 'userId or token is required' },
+        { success: false, error: 'userId or token is required' },
         { status: 400 }
       )
     }
@@ -18,6 +32,7 @@ export async function POST(req) {
 
     if (token) {
       tokens.add(token)
+      console.log('[API Expense Notification] Added token from request body')
     }
 
     if (userId) {
@@ -30,11 +45,17 @@ export async function POST(req) {
           const userData = userDoc.data()
           if (userData?.fcmToken) {
             tokens.add(userData.fcmToken)
+            console.log('[API Expense Notification] Found fcmToken on user document:', userData.fcmToken.slice(0, 16) + '...')
+          } else {
+            console.log('[API Expense Notification] No fcmToken field found on user document')
           }
+        } else {
+          console.warn('[API Expense Notification] User document does not exist in Firestore for userId:', userId)
         }
 
         // 2. Get tokens from user fcm_tokens subcollection
         const tokensSnap = await db.collection('users').doc(userId).collection('fcm_tokens').get()
+        console.log(`[API Expense Notification] Found ${tokensSnap.size} token document(s) in fcm_tokens subcollection`)
         tokensSnap.forEach((doc) => {
           const tData = doc.data()
           if (tData?.token) {
@@ -42,20 +63,22 @@ export async function POST(req) {
           }
         })
       } catch (dbErr) {
-        console.warn('Could not fetch user FCM tokens from Firestore:', dbErr)
+        console.error('[API Expense Notification] Error querying Firestore for user tokens:', dbErr.message, dbErr.stack)
       }
     }
 
     const tokenList = Array.from(tokens).filter(Boolean)
+    console.log(`[API Expense Notification] Total unique FCM tokens to send to: ${tokenList.length}`)
 
     if (tokenList.length === 0) {
+      console.warn('[API Expense Notification] No FCM tokens found. Make sure user has enabled notifications in browser.')
       return NextResponse.json({
         success: false,
-        message: 'No active FCM tokens found for user',
-      })
+        message: 'No active FCM tokens found for user. Please ensure notifications are enabled.',
+      }, { status: 200 })
     }
 
-    const itemLabel = merchant || title || category || 'مصروف'
+    const itemLabel = merchant || title || category || 'مصروف جديد'
     const formattedAmount = Number(amount || 0).toLocaleString('en-US')
 
     const notificationTitle = '💸 تم تسجيل مصروف جديد'
@@ -87,20 +110,36 @@ export async function POST(req) {
     }
 
     if (tokenList.length === 1) {
+      console.log('[API Expense Notification] Sending via messaging.send to single token...')
       const response = await admin.messaging().send({
         ...messagePayload,
         token: tokenList[0],
       })
+      console.log('[API Expense Notification] Send successful! Message ID:', response)
       return NextResponse.json({
         success: true,
         messageId: response,
         tokensCount: 1,
       })
     } else {
+      console.log(`[API Expense Notification] Sending via messaging.sendEachForMulticast to ${tokenList.length} tokens...`)
       const response = await admin.messaging().sendEachForMulticast({
         ...messagePayload,
         tokens: tokenList,
       })
+      console.log('[API Expense Notification] Multicast response:', {
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+      })
+      
+      if (response.failureCount > 0) {
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            console.error(`[API Expense Notification] Failed token #${idx}:`, resp.error?.message || resp.error)
+          }
+        })
+      }
+
       return NextResponse.json({
         success: true,
         successCount: response.successCount,
@@ -109,7 +148,7 @@ export async function POST(req) {
       })
     }
   } catch (error) {
-    console.error('Error sending expense notification:', error)
+    console.error('[API Expense Notification] Server Error sending notification:', error.message, error.stack)
     return NextResponse.json(
       {
         success: false,
