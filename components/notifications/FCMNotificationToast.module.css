@@ -1,0 +1,136 @@
+.toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 380px;
+  width: calc(100% - 40px);
+  pointer-events: none;
+  animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[dir="rtl"] .toastContainer {
+  right: auto;
+  left: 20px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  background: var(--card, #ffffff);
+  color: var(--text-dark, #0f172a);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-light, rgba(0, 0, 0, 0.08));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.toast:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+}
+
+.toast::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #4DA3FF 0%, #2563EB 100%);
+}
+
+[dir="rtl"] .toast::before {
+  left: auto;
+  right: 0;
+}
+
+.toastIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--hover-bg, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 18px;
+}
+
+.iconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.toastContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.toastTitle {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark, #0f172a);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toastBody {
+  font-size: 12px;
+  color: var(--text-gray, #64748b);
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-light, #94a3b8);
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  color: var(--text-dark, #0f172a);
+  background: var(--hover-bg, #f1f5f9);
+}
+
+@media (max-width: 767px) {
+  .toastContainer {
+    top: 14px;
+    right: 14px;
+    left: 14px;
+    width: auto;
+  }
+}

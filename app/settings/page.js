@@ -8,6 +8,7 @@ import { changePassword } from '@/services/firebaseAuth'
 import { createQuickExpenseToken, revokeQuickExpenseToken } from '@/services/quickTokenService'
 import { t } from '@/lib/translations'
 import useSmoothClose from '@/hooks/useSmoothClose'
+import { useFCM } from '@/hooks/useFCM'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import PricingModal from '@/components/subscription/PricingModal'
 import styles from './page.module.css'
@@ -45,6 +46,8 @@ export default function SettingsPage() {
   const [tokenActiveState, setTokenActiveState] = useState(userData?.quickExpenseToken?.active || false)
   const [showRevokeConfirm, setShowRevokeConfirm] = useState(false)
   const [showGuideModal, setShowGuideModal] = useState(false)
+
+  const { permission: fcmPermission, loading: fcmLoading, requestNotificationPermission } = useFCM(user)
 
   const isAr = lang === 'ar'
 
@@ -367,6 +370,57 @@ export default function SettingsPage() {
                   )}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={`${styles.section} ${styles.sectionFull}`}>
+          <div className={styles.sectionCard}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionIcon}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </div>
+              <div>
+                <h2 className={styles.sectionTitle}>{t('settings.notifications')}</h2>
+                <p className={styles.sectionDesc}>{t('settings.notificationsDesc')}</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginTop: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  background: fcmPermission === 'granted' ? 'rgba(34, 197, 94, 0.12)' : fcmPermission === 'denied' ? 'rgba(239, 68, 68, 0.12)' : 'var(--hover-bg)',
+                  color: fcmPermission === 'granted' ? '#16A34A' : fcmPermission === 'denied' ? '#DC2626' : 'var(--text-gray)',
+                }}>
+                  <span>{fcmPermission === 'granted' ? '🟢' : fcmPermission === 'denied' ? '🔴' : '⚪'}</span>
+                  <span>{fcmPermission === 'granted' ? t('settings.notificationsEnabled') : fcmPermission === 'denied' ? t('settings.notificationsBlocked') : t('settings.notificationsDesc')}</span>
+                </span>
+              </div>
+
+              {fcmPermission !== 'granted' && (
+                <button
+                  className={styles.actionBtn}
+                  onClick={requestNotificationPermission}
+                  disabled={fcmLoading || fcmPermission === 'denied'}
+                  style={{ width: 'auto', padding: '10px 18px' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  <span>{fcmLoading ? t('settings.notificationsLoading') : t('settings.enableNotifications')}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

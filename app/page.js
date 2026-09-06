@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useSubscription } from '@/hooks/useSubscription'
@@ -10,6 +10,8 @@ import { subscribeToWallets, WALLET_TYPES } from '@/services/walletService'
 import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
 import BalanceCard from '@/components/features/BalanceCard'
+import DailyBudgetCard from '@/components/features/DailyBudgetCard'
+import SetDailyBudgetModal from '@/components/features/SetDailyBudgetModal'
 import AddWalletModal from '@/components/features/AddWalletModal'
 import AddIncomeModal from '@/components/features/AddIncomeModal'
 import AddExpenseModal from '@/components/features/AddExpenseModal'
@@ -24,15 +26,17 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Home() {
   const { user, userData, logout } = useUser()
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const { plan } = useSubscription()
   const [showBalance, setShowBalance] = useState(true)
   const [transactions, setTransactions] = useState([])
   const [wallets, setWallets] = useState([])
+  const [budgetData, setBudgetData] = useState(null)
   const [showAddWallet, setShowAddWallet] = useState(false)
   const [showAddIncome, setShowAddIncome] = useState(false)
   const [showAddExpense, setShowAddExpense] = useState(false)
   const [showTransfer, setShowTransfer] = useState(false)
+  const [showSetDailyBudget, setShowSetDailyBudget] = useState(false)
   const [editingWallet, setEditingWallet] = useState(null)
   const [editingTx, setEditingTx] = useState(null)
   const [showActions, setShowActions] = useState(false)
@@ -63,9 +67,14 @@ export default function Home() {
     const unsubTx = subscribeToTransactions(user.uid, setTransactions)
     const unsubWallets = subscribeToWallets(user.uid, setWallets)
     const unsubBudget = subscribeToBudget(user.uid, (data) => {
+      setBudgetData(data)
       setBudgetCategories(data?.essentialCategories || [])
     })
-    return () => { unsubTx(); unsubWallets(); unsubBudget() }
+    return () => {
+      unsubTx()
+      unsubWallets()
+      if (typeof unsubBudget === 'function') unsubBudget()
+    }
   }, [user])
 
   const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0)
@@ -77,6 +86,25 @@ export default function Home() {
   const expenses = transactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+
+  // Calculate today's expenses locally and reactively
+  const todayExpenses = useMemo(() => {
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const todayEnd = new Date()
+    todayEnd.setHours(23, 59, 59, 999)
+
+    return transactions
+      .filter((t) => {
+        if (t.type !== 'expense') return false
+        const td = t.createdAt ? new Date(t.createdAt) : null
+        return td && td >= todayStart && td <= todayEnd
+      })
+      .reduce((sum, t) => sum + Number(t.amount || 0), 0)
+  }, [transactions])
+
+  const dailyBudgetLimit = Number(budgetData?.dailyBudgetLimit || 0)
+  const aiSuggestedDailyLimit = Number(budgetData?.aiDailyBudget?.dailyBudget || 0)
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -141,6 +169,14 @@ export default function Home() {
         balance={totalBalance}
         showBalance={showBalance}
         onToggle={() => setShowBalance((prev) => !prev)}
+      />
+
+      {/* Interactive Daily Budget Card */}
+      <DailyBudgetCard
+        limit={dailyBudgetLimit}
+        spentToday={todayExpenses}
+        onSetBudget={() => setShowSetDailyBudget(true)}
+        onAddExpense={() => setShowAddExpense(true)}
       />
 
       <Reveal delay={100}>
@@ -243,8 +279,8 @@ export default function Home() {
           </>
         ) : (
           <div className={styles.walletsEmpty}>
-            <p className={styles.walletsEmptyText}>No wallets yet</p>
-            <p className={styles.walletsEmptyHint}>Create your first wallet to start tracking your money</p>
+            <p className={styles.walletsEmptyText}>{t('dashboard.noWallets')}</p>
+            <p className={styles.walletsEmptyHint}>{t('dashboard.createFirstWallet')}</p>
             <button className={styles.emptyAddWalletBtn} onClick={() => setShowAddWallet(true)}>
               <PlusIcon /> {t('dashboard.addWallet')}
             </button>
@@ -277,7 +313,7 @@ export default function Home() {
           </div>
           {totalBalance === 0 && transactions.length === 0 && (
             <p className={styles.summaryNote}>
-              Add money to your wallets to start tracking
+              {t('dashboard.addMoneyHint')}
             </p>
           )}
         </div>
@@ -351,6 +387,16 @@ export default function Home() {
 
       <VoiceButton />
 
+      {/* Set Daily Budget Modal */}
+      {showSetDailyBudget && user && (
+        <SetDailyBudgetModal
+          uid={user.uid}
+          currentLimit={dailyBudgetLimit}
+          aiSuggestedLimit={aiSuggestedDailyLimit}
+          onClose={() => setShowSetDailyBudget(false)}
+        />
+      )}
+
       {showAddWallet && user && (
         <AddWalletModal uid={user.uid} onClose={() => setShowAddWallet(false)} />
       )}
@@ -392,4 +438,3 @@ export default function Home() {
     </div>
   )
 }
-

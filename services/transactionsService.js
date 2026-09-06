@@ -13,6 +13,24 @@ export async function saveTransaction(uid, data) {
   if (data.type === 'expense' && data.category) {
     deductFromBudget(uid, data.category, data.amount).catch((err) => console.error('deductFromBudget error:', err))
   }
+
+  // Trigger push notification asynchronously in background
+  if (data.type === 'expense' && typeof window !== 'undefined') {
+    fetch('/api/notifications/expense', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: uid,
+        amount: data.amount,
+        category: data.category,
+        merchant: data.merchant,
+        title: data.merchant || data.category,
+      }),
+    }).catch((err) => {
+      console.warn('Failed to send expense push notification:', err)
+    })
+  }
+
   return docRef.id
 }
 
