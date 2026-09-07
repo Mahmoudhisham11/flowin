@@ -16,6 +16,9 @@ export async function saveTransaction(uid, data) {
 
   // Trigger push notification asynchronously in background
   if (data.type === 'expense' && typeof window !== 'undefined') {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo'
+    const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
+
     fetch('/api/notifications/expense', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -25,6 +28,8 @@ export async function saveTransaction(uid, data) {
         category: data.category,
         merchant: data.merchant,
         title: data.merchant || data.category || 'مصروف جديد',
+        userDate: todayStr,
+        userTimezone: tz,
       }),
     })
       .then(async (res) => {

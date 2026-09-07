@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getAdminMessaging, getAdminFirestore } from '@/lib/firebaseAdmin'
 
-export async function sendExpenseNotification({ userId, amount, category, merchant, reason, title, token }) {
+export async function sendExpenseNotification({ userId, amount, category, merchant, reason, title, token, userDate, userTimezone }) {
   console.log('--- [sendExpenseNotification] Sending for user:', userId, 'amount:', amount)
   const messaging = getAdminMessaging()
   const db = getAdminFirestore()
@@ -42,9 +42,12 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
         dailyBudgetLimit = Number(bData?.dailyBudgetLimit || bData?.aiDailyBudget?.dailyBudget || 0)
       }
 
-      // 4. Calculate today's total expenses
-      const now = new Date()
-      const fallbackIso = new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString() // 28 hours window for all timezones
+      // 4. Calculate today's total expenses strictly for the user's local date
+      const tz = userTimezone || 'Africa/Cairo'
+      const clientTodayStr = userDate || new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
+
+      // Look back 48 hours to cover the calendar day across all potential timezones
+      const fallbackIso = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
 
       const txSnap = await db
         .collection('users')
@@ -53,22 +56,24 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
         .where('createdAt', '>=', fallbackIso)
         .get()
 
+      let calculatedExpenses = 0
+
       txSnap.forEach((td) => {
         const t = td.data()
         if (t?.type === 'expense') {
           const tDate = t.createdAt ? new Date(t.createdAt) : null
-          if (tDate) {
-            const isToday =
-              tDate.toDateString() === now.toDateString() ||
-              now.getTime() - tDate.getTime() <= 20 * 60 * 60 * 1000
-            if (isToday) {
-              todayExpenses += Number(t.amount || 0)
+          if (tDate && !isNaN(tDate.getTime())) {
+            const txDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(tDate)
+            if (txDateStr === clientTodayStr) {
+              calculatedExpenses += Number(t.amount || 0)
             }
           }
         }
       })
 
-      // If todayExpenses from DB is 0 or less than the current amount, ensure it includes this transaction
+      todayExpenses = calculatedExpenses
+
+      // Ensure todayExpenses includes the current transaction if DB index hasn't caught up yet
       if (amount && todayExpenses < Number(amount)) {
         todayExpenses = Number(amount)
       }
@@ -199,7 +204,7 @@ export async function sendExpenseNotification({ userId, amount, category, mercha
 export async function POST(req) {
   try {
     const body = await req.json().catch(() => ({}))
-    const { userId, amount, category, merchant, reason, title, token } = body
+    const { userId, amount, category, merchant, reason, title, token, userDate, userTimezone } = body
 
     if (!userId && !token) {
       return NextResponse.json(
@@ -216,6 +221,8 @@ export async function POST(req) {
       reason,
       title,
       token,
+      userDate,
+      userTimezone,
     })
 
     return NextResponse.json(result, { status: 200 })

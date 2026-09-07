@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { updateTransaction, deleteTransaction } from '@/services/transactionsService'
 import { updateWallet } from '@/services/walletService'
-import { refundFromBudget } from '@/services/budgetService'
+import { refundFromBudget, deductFromBudget } from '@/services/budgetService'
 import { CATEGORIES } from '@/lib/categories'
 import { WALLET_TYPES } from '@/services/walletService'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -45,6 +45,8 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
     setError('')
     try {
       const oldAmount = Number(transaction.amount || 0)
+      const oldCategory = transaction.category
+      const oldType = transaction.type || 'expense'
       const oldWalletId = transaction.walletId || matchedWalletId || null
       const selectedWallet = wallets.find((w) => w.id === walletId)
 
@@ -59,6 +61,33 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
         walletName: selectedWallet?.name || transaction.walletName || '',
         reason: reason.trim(),
       })
+
+      // Adjust essential categories budget if applicable
+      if (oldType === 'expense' && txType === 'expense') {
+        if (oldCategory === category) {
+          const diff = num - oldAmount
+          if (diff > 0) {
+            await deductFromBudget(uid, category, diff).catch((err) => console.error('deductFromBudget error:', err))
+          } else if (diff < 0) {
+            await refundFromBudget(uid, category, Math.abs(diff)).catch((err) => console.error('refundFromBudget error:', err))
+          }
+        } else {
+          if (oldCategory) {
+            await refundFromBudget(uid, oldCategory, oldAmount).catch((err) => console.error('refundFromBudget error:', err))
+          }
+          if (category) {
+            await deductFromBudget(uid, category, num).catch((err) => console.error('deductFromBudget error:', err))
+          }
+        }
+      } else if (oldType === 'expense' && txType !== 'expense') {
+        if (oldCategory) {
+          await refundFromBudget(uid, oldCategory, oldAmount).catch((err) => console.error('refundFromBudget error:', err))
+        }
+      } else if (oldType !== 'expense' && txType === 'expense') {
+        if (category) {
+          await deductFromBudget(uid, category, num).catch((err) => console.error('deductFromBudget error:', err))
+        }
+      }
 
       if (oldWalletId || walletId) {
         const diff = num - oldAmount
@@ -94,13 +123,13 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
     try {
       const amt = Number(transaction.amount || 0)
       const txWalletId = transaction.walletId || matchedWalletId || null
-      const txType = transaction.type
+      const txType = transaction.type || 'expense'
       const txCategory = transaction.category
 
       await deleteTransaction(uid, transaction.id)
 
       if (txType === 'expense' && txCategory) {
-        refundFromBudget(uid, txCategory, amt).catch((err) => console.error('refundFromBudget error:', err))
+        await refundFromBudget(uid, txCategory, amt).catch((err) => console.error('refundFromBudget error:', err))
       }
 
       if (txWalletId) {
