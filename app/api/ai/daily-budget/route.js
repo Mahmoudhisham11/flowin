@@ -153,7 +153,7 @@ export async function POST(req) {
           'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
         },
         body: JSON.stringify({
-          model: 'minimax/minimax-m3:free',
+          model: 'openrouter/free',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: JSON.stringify(payload, null, 2) },

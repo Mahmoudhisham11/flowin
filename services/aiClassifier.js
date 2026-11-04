@@ -103,7 +103,6 @@ Given an expense reason/description, classify it into EXACTLY ONE of the followi
 Output format: Return ONLY the exact category ID (e.g. Food or Transport). No JSON, no explanations, no markdown.`
 
 const FREE_MODELS = [
-  'minimax/minimax-m3:free',
   'openrouter/free',
 ]
 

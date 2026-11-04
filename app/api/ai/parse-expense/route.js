@@ -56,7 +56,6 @@ function extractJSON(raw) {
 }
 
 const FREE_MODELS = [
-  'minimax/minimax-m3:free',
   'openrouter/free',
 ]
 
