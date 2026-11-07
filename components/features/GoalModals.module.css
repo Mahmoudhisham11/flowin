@@ -1,0 +1,10 @@
+.emojis { display: flex; flex-wrap: wrap; gap: 8px; }
+.emoji {
+  width: 44px; height: 44px; border-radius: 12px; border: 1.5px solid var(--input-border);
+  background: transparent; font-size: 22px; cursor: pointer;
+}
+.emojiOn { border-color: var(--primary); background: var(--badge-bg); }
+.chip {
+  align-self: flex-start; margin-top: 8px; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--primary);
+  background: var(--badge-bg); color: var(--primary); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+}

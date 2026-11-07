@@ -75,7 +75,7 @@ function AIPageContent() {
     } finally {
       setLoading(false)
     }
-  }, [input, loading, user, messages])
+  }, [input, loading, user, messages, userData, currency, t])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })

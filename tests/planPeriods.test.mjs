@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getPeriod, computePlan, recommendSavingsPct } from '../lib/planEngine.js'
+import { getPeriod, computePlan, recommendSavingsPct, parseDateStr } from '../lib/planEngine.js'
 
 test('pay periods and plan allocation', () => {
   const d = (s) => { const [y,m,dd]=s.split('-').map(Number); return new Date(y,m-1,dd) }
@@ -51,4 +51,6 @@ test('pay periods and plan allocation', () => {
   assert.equal(recommendSavingsPct(14000,7000),15); assert.equal(recommendSavingsPct(14000,10500),10)
   assert.equal(recommendSavingsPct(14000,12500),5); assert.equal(recommendSavingsPct(14000,15000),0); assert.equal(recommendSavingsPct(0,0),0)
 
+  assert.equal(parseDateStr('2026-13-45'), null); assert.equal(parseDateStr('2026-02-30'), null)
+  assert.equal(parseDateStr('2028-02-29').getDate(), 29); assert.equal(parseDateStr('nope'), null)
 })

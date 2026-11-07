@@ -61,3 +61,5 @@
   align-self: flex-start; padding: 10px 18px; border-radius: 12px; background: var(--primary-gradient);
   color: #fff; font-weight: 700; font-size: 14px; text-decoration: none;
 }
+
+.links { display: flex; gap: 18px; flex-wrap: wrap; }

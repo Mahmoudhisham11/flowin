@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useUser } from '@/contexts/UserContext'
 import { useAppActions } from '@/contexts/AppActionsContext'
-import { BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon } from '@/components/Icons'
+import { BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon, GoalIcon, WeekReportIcon } from '@/components/Icons'
 import styles from './PlusMenu.module.css'
 
 const getItems = (isAdmin) => {
@@ -12,6 +12,8 @@ const getItems = (isAdmin) => {
     { id: 'expense', key: 'quick.expense', icon: <span>💸</span>, modal: 'expense' },
     { id: 'income', key: 'quick.income', icon: <span>💰</span>, modal: 'income' },
     { id: 'purchase', key: 'quick.purchase', icon: <span>🛒</span>, modal: 'purchase' },
+    { id: 'goals', key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
+    { id: 'report', key: 'nav.weeklyReport', icon: <WeekReportIcon />, route: '/report' },
     { id: 'budget', key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
     { id: 'tasks', key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
     { id: 'ai', key: 'nav.aiAssistant', icon: <AIIcon />, route: '/ai' },

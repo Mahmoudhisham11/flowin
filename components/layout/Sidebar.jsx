@@ -5,13 +5,15 @@ import { useUser } from '@/contexts/UserContext'
 import { useTranslation } from '@/hooks/useTranslation'
 import {
   DashboardIcon, ReportIcon,
-  BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon
+  BudgetIcon, AIIcon, SettingsIcon, AdminIcon, TaskIcon, GoalIcon, WeekReportIcon
 } from '@/components/Icons'
 import styles from './Sidebar.module.css'
 
 const mainNav = [
   { key: 'nav.dashboard', icon: <DashboardIcon />, route: '/' },
   { key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
+  { key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
+  { key: 'nav.weeklyReport', icon: <WeekReportIcon />, route: '/report' },
   { key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
   { key: 'nav.reports', icon: <ReportIcon />, route: '/analytics' },
 ]

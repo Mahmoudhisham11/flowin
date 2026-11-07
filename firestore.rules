@@ -40,6 +40,9 @@ service cloud.firestore {
       match /dailyTasks/{id} {
         allow read, write: if isOwner(uid);
       }
+      match /goals/{id} {
+        allow read, write: if isOwner(uid);
+      }
       match /insights/{id} {
         allow read, write: if isOwner(uid);
       }

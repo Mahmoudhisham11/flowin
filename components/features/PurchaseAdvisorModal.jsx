@@ -7,6 +7,8 @@ import { evaluatePurchase } from '@/lib/purchaseAdvisor'
 import { getCategory } from '@/lib/categories'
 import { fillText } from '@/lib/fillText'
 import { toNum } from '@/lib/parseAmount'
+import { toDateStr } from '@/lib/planEngine'
+import { GoalFormModal } from './GoalModals'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useCurrency } from '@/hooks/useCurrency'
 import useSmoothClose from '@/hooks/useSmoothClose'
@@ -25,6 +27,8 @@ export default function PurchaseAdvisorModal({ uid, onClose, onBuy, preloaded })
   const [price, setPrice] = useState('')
   const [kind, setKind] = useState('want')
   const [result, setResult] = useState(null)
+  const [goalForm, setGoalForm] = useState(null)
+  const [goalSaved, setGoalSaved] = useState(false)
 
   useEffect(() => {
     if (preloaded?.today) return
@@ -88,6 +92,8 @@ export default function PurchaseAdvisorModal({ uid, onClose, onBuy, preloaded })
   }, [result, lang, currency])
 
   const canBuy = result && (result.verdict === 'buy' || result.verdict === 'stretch')
+  const saveUpOption = result?.options?.find((o) => o.key === 'saveUp')
+  const canSaveAsGoal = result && result.verdict !== 'buy' && result.verdict !== 'invalid'
 
   return (
     <div className={`${base.overlay} ${isClosing ? base.overlayClosing : ''}`} onClick={handleClose}>
@@ -140,7 +146,14 @@ export default function PurchaseAdvisorModal({ uid, onClose, onBuy, preloaded })
           </form>
         )}
 
-        {today?.hasPlan && result && view && (
+        {goalSaved && (
+          <div className={styles.noPlan}>
+            <p>{t('goals.goalCreated')}</p>
+            <Link href="/goals" className={styles.cta} onClick={handleClose}>{t('goals.seeGoals')}</Link>
+          </div>
+        )}
+
+        {!goalSaved && today?.hasPlan && result && view && (
           <div className={styles.result} data-verdict={result.verdict}>
             <div className={styles.itemLine}>
               <strong>{item.trim() || t('purchase.title')}</strong>
@@ -170,12 +183,22 @@ export default function PurchaseAdvisorModal({ uid, onClose, onBuy, preloaded })
                   {t('purchase.recordIt')}
                 </button>
               )}
+              {canSaveAsGoal && (
+                <button type="button" className={base.cancelBtn} onClick={() => setGoalForm({ name: item.trim(), targetAmount: result.price, targetDate: saveUpOption ? toDateStr(saveUpOption.readyDate) : '', kind: 'purchase' })}>
+                  {t('goals.saveAsGoal')}
+                </button>
+              )}
               <button type="button" className={base.cancelBtn} onClick={reset}>{t('purchase.another')}</button>
               <button type="button" className={base.cancelBtn} onClick={handleClose}>{t('purchase.notNow')}</button>
             </div>
           </div>
         )}
       </div>
+      {goalForm && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <GoalFormModal uid={uid} initial={goalForm} onClose={() => setGoalForm(null)} onSaved={() => setGoalSaved(true)} />
+        </div>
+      )}
     </div>
   )
 }

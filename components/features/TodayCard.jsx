@@ -86,6 +86,10 @@ export default function TodayCard({ today }) {
         </button>
         <Link href="/onboarding" className={styles.edit}>{t('today.editPlan')}</Link>
       </div>
+      <div className={styles.links}>
+        <Link href="/report" className={styles.edit}>{t('nav.weeklyReport')}</Link>
+        <Link href="/goals" className={styles.edit}>{t('nav.goals')}</Link>
+      </div>
     </section>
   )
 }
