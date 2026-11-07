@@ -1,5 +1,6 @@
 import { requireUser, requirePaidUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizeCurrency } from '@/lib/currency'
 
 const SYSTEM_PROMPT = `You are a professional financial advisor AI. You have access to the user's real financial data as context, including their transactions, wallets, budget, and tasks. The user's name is provided in the context - use it to personalize your responses and greet them by name.
 
@@ -41,28 +42,29 @@ export async function POST(req) {
       return Response.json({ error: 'OpenRouter API key not configured' }, { status: 500 })
     }
 
+    const cur = normalizeCurrency(context.currency)
     const fmt = (v) => { try { return Number(v || 0).toLocaleString() } catch { return '0' } }
 
     const contextBlock = `USER: ${context.userName || 'User'}
 
 USER FINANCIAL DATA (${context.period || 'N/A'}):
-- Total Balance: EGP ${fmt(context.totalBalance)}
-- Total Spent: EGP ${fmt(context.totalSpent)}
-- Total Income: EGP ${fmt(context.totalIncome)}
+- Total Balance: ${cur} ${fmt(context.totalBalance)}
+- Total Spent: ${cur} ${fmt(context.totalSpent)}
+- Total Income: ${cur} ${fmt(context.totalIncome)}
 - Transactions in period: ${context.transactionCount || 0}
 
 Spending by Category:
 ${Object.entries(context.categories || {})
-  .map(([cat, amt]) => `  - ${cat}: EGP ${fmt(amt)}`)
+  .map(([cat, amt]) => `  - ${cat}: ${cur} ${fmt(amt)}`)
   .join('\n') || '  (no data)'}
 
 Wallet Activity:
 ${Object.entries(context.walletActivity || {})
-  .map(([name, amt]) => `  - ${name}: EGP ${fmt(amt)}`)
+  .map(([name, amt]) => `  - ${name}: ${cur} ${fmt(amt)}`)
   .join('\n') || '  (no data)'}
 
 Wallets:
-${(context.wallets || []).map((w) => `  - ${w.name} (${w.type || '?'}): EGP ${fmt(w.balance)}`).join('\n') || '  (no wallets)'}
+${(context.wallets || []).map((w) => `  - ${w.name} (${w.type || '?'}): ${cur} ${fmt(w.balance)}`).join('\n') || '  (no wallets)'}
 
 ${context.latestInsight ? `Latest AI Insight:
 - Risk Level: ${context.latestInsight.riskLevel || 'N/A'}
@@ -70,11 +72,11 @@ ${context.latestInsight ? `Latest AI Insight:
 - Recommendation: ${context.latestInsight.recommendation || 'N/A'}` : ''}
 
 ${context.budget ? `MONTHLY BUDGET PLAN:
-- Monthly Income: EGP ${fmt(context.budget.monthlyIncome)}
-- Total Essential Expenses: EGP ${fmt(context.budget.totalEssentials)}
-- Potential Savings: EGP ${fmt((context.budget.monthlyIncome || 0) - (context.budget.totalEssentials || 0))}
+- Monthly Income: ${cur} ${fmt(context.budget.monthlyIncome)}
+- Total Essential Expenses: ${cur} ${fmt(context.budget.totalEssentials)}
+- Potential Savings: ${cur} ${fmt((context.budget.monthlyIncome || 0) - (context.budget.totalEssentials || 0))}
 - Essential Categories:
-${(context.budget.essentialCategories || []).map((c) => `  - ${c.name}: EGP ${fmt(c.amount)}`).join('\n') || '  (none set)'}` : ''}
+${(context.budget.essentialCategories || []).map((c) => `  - ${c.name}: ${cur} ${fmt(c.amount)}`).join('\n') || '  (none set)'}` : ''}
 
 DAILY TASKS (${context.dailyTasks?.total || 0} total, ${context.dailyTasks?.completed || 0} completed):
 Today (${context.dailyTasks?.todayTotal || 0} tasks, ${context.dailyTasks?.todayCompletionRate || 0}% complete):

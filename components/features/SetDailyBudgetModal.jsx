@@ -5,8 +5,10 @@ import { saveBudget } from '@/services/budgetService'
 import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './SetDailyBudgetModal.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function SetDailyBudgetModal({ uid, currentLimit = 0, aiSuggestedLimit = 0, onClose }) {
+  const currency = useCurrency()
   const { t, isAr } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [amount, setAmount] = useState(currentLimit > 0 ? String(currentLimit) : '')
@@ -59,7 +61,7 @@ export default function SetDailyBudgetModal({ uid, currentLimit = 0, aiSuggested
           <div className={styles.inputWrap}>
             <label className={styles.label}>{t('dailyBudget.amountLabel')}</label>
             <div className={styles.currencyInput}>
-              <span className={styles.currencyPrefix}>EGP</span>
+              <span className={styles.currencyPrefix}>{currency}</span>
               <input
                 type="number"
                 step="any"
@@ -101,7 +103,7 @@ export default function SetDailyBudgetModal({ uid, currentLimit = 0, aiSuggested
             >
               <span className={styles.aiSparkle}>✨</span>
               <span>
-                {t('dailyBudget.useAiSuggestion')} (<strong>{aiSuggestedLimit} EGP</strong>)
+                {t('dailyBudget.useAiSuggestion')} (<strong>{aiSuggestedLimit} {currency}</strong>)
               </span>
             </button>
           )}

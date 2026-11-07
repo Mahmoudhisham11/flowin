@@ -127,7 +127,7 @@ async function saveInsight(uid, weekId, data) {
   })
 }
 
-export async function generateInsight(uid) {
+export async function generateInsight(uid, currency = 'EGP') {
   const weekId = getWeekId()
   const ref = doc(db, `users/${uid}/insights`, weekId)
   const existing = await getDoc(ref)
@@ -169,7 +169,7 @@ export async function generateInsight(uid) {
       ? `Used ${Object.keys(stats.byWallet).length} wallet(s) this week.`
       : 'No wallet data.'),
     riskLevel: aiResult?.riskLevel || (stats.totalIncome > 0 && stats.totalSpent > stats.totalIncome * 0.8 ? 'High' : stats.totalSpent > 0 ? 'Medium' : 'Low'),
-    insight: aiResult?.insight || `You spent EGP ${stats.totalSpent.toLocaleString()} across ${stats.transactionCount} transaction(s) this week.`,
+    insight: aiResult?.insight || `You spent ${currency} ${stats.totalSpent.toLocaleString()} across ${stats.transactionCount} transaction(s) this week.`,
     recommendation: aiResult?.recommendation || 'Try to track every expense to get better AI recommendations.',
   }
 

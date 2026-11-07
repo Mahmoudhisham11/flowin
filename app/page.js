@@ -22,8 +22,10 @@ import Reveal from '@/components/features/Reveal'
 import VoiceButton from '@/components/voice/VoiceButton'
 import styles from './page.module.css'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function Home() {
+  const currency = useCurrency()
   const { user, userData, logout } = useUser()
   const { theme, setTheme } = useTheme()
   const { plan } = useSubscription()
@@ -245,7 +247,7 @@ export default function Home() {
                     </div>
                     <span className={styles.walletName}>{w.name}</span>
                     <span className={styles.walletBalance}>
-                      EGP <AnimatedNumber value={w.balance} decimals={0} />
+                      {currency} <AnimatedNumber value={w.balance} decimals={0} />
                     </span>
                   </div>
                 )
@@ -284,7 +286,7 @@ export default function Home() {
                           : undefined,
                     }}
                   >
-                    EGP <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
+                    {currency} <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
                   </span>
                 </div>
               )}
@@ -300,7 +302,7 @@ export default function Home() {
                     </div>
                     <span className={styles.walletName}>{w.name}</span>
                     <span className={styles.walletBalance}>
-                      EGP <AnimatedNumber value={w.balance} decimals={0} />
+                      {currency} <AnimatedNumber value={w.balance} decimals={0} />
                     </span>
                   </div>
                 )
@@ -339,7 +341,7 @@ export default function Home() {
                           : undefined,
                     }}
                   >
-                    EGP <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
+                    {currency} <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
                   </span>
                 </div>
               )}
@@ -372,7 +374,7 @@ export default function Home() {
             </svg>
           </div>
           <div className={styles.summaryAmounts}>
-            <span className={styles.summarySpent}>EGP <AnimatedNumber value={totalBalance} decimals={0} /></span>
+            <span className={styles.summarySpent}>{currency} <AnimatedNumber value={totalBalance} decimals={0} /></span>
           </div>
           <div className={styles.progressTrack}>
             <div
@@ -382,7 +384,7 @@ export default function Home() {
           </div>
           <div className={styles.summarySpentSoFar}>
             <span className={styles.spentLabel}>{t('dashboard.spentSoFar')}</span>
-            <span className={styles.spentAmount}>EGP <AnimatedNumber value={expenses} decimals={0} /></span>
+            <span className={styles.spentAmount}>{currency} <AnimatedNumber value={expenses} decimals={0} /></span>
           </div>
           {totalBalance === 0 && transactions.length === 0 && (
             <p className={styles.summaryNote}>
@@ -399,7 +401,7 @@ export default function Home() {
               </svg>
             </span>
             <span className={styles.statLabel}>{t('common.income')}</span>
-            <span className={styles.statValue}>EGP <AnimatedNumber value={income} decimals={0} /></span>
+            <span className={styles.statValue}>{currency} <AnimatedNumber value={income} decimals={0} /></span>
           </div>
           <div className={styles.statDivider} />
           <div className={styles.statItem}>
@@ -409,7 +411,7 @@ export default function Home() {
               </svg>
             </span>
             <span className={styles.statLabel}>{t('common.expense')}</span>
-            <span className={styles.statValue}>EGP <AnimatedNumber value={expenses} decimals={0} /></span>
+            <span className={styles.statValue}>{currency} <AnimatedNumber value={expenses} decimals={0} /></span>
           </div>
         </div>
       </div>
@@ -442,7 +444,7 @@ export default function Home() {
                   </div>
                   <div className={styles.txRight}>
                     <span className={`${styles.txAmount} ${t.type === 'income' ? styles.txPositive : t.type === 'transfer' ? styles.txNeutral : styles.txNegative}`}>
-                      {t.type === 'income' ? '+' : t.type === 'transfer' ? '↔' : '-'}{t.currency || 'EGP'} {new Intl.NumberFormat('en-US').format(Number(t.amount))}
+                      {t.type === 'income' ? '+' : t.type === 'transfer' ? '↔' : '-'}{t.currency || currency} {new Intl.NumberFormat('en-US').format(Number(t.amount))}
                     </span>
                   </div>
                 </div>

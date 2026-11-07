@@ -7,8 +7,10 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddWalletModal.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function AddWalletModal({ uid, wallet, onClose }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const isEdit = !!wallet
@@ -39,7 +41,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
           type,
           balance: initBalance,
           color,
-          currency: 'EGP',
+          currency,
         })
         if (initBalance > 0) {
           await saveTransaction(uid, {
@@ -49,7 +51,7 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
             merchant: `Initial balance - ${name.trim()}`,
             walletId: newWalletId,
             walletName: name.trim(),
-            currency: 'EGP',
+            currency,
           })
         }
       }

@@ -10,8 +10,10 @@ import { CATEGORIES } from '@/lib/categories'
 import { t } from '@/lib/translations'
 import Link from 'next/link'
 import styles from './page.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function QuickExpensePage() {
+  const currency = useCurrency()
   const router = useRouter()
   const { user, userData } = useUser()
   const { lang } = useLocale()
@@ -61,7 +63,7 @@ export default function QuickExpensePage() {
     try {
       await saveTransaction(user.uid, {
         amount: num,
-        currency: 'EGP',
+        currency,
         category,
         merchant: '',
         reason: reason.trim(),
@@ -143,7 +145,7 @@ export default function QuickExpensePage() {
                       <span className={styles.walletEmoji}>{wt?.emoji || '💳'}</span>
                       <div className={styles.walletInfo}>
                         <span className={styles.walletName}>{w.name}</span>
-                        <span className={styles.walletBalance}>EGP {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
+                        <span className={styles.walletBalance}>{currency} {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
                       </div>
                     </button>
                   )
@@ -155,7 +157,7 @@ export default function QuickExpensePage() {
             <div className={styles.field}>
               <label className={styles.label}>{t('quickExpense.amountLabel')}</label>
               <div className={styles.amountWrap}>
-                <span className={styles.amountCurrency}>EGP</span>
+                <span className={styles.amountCurrency}>{currency}</span>
                 <input
                   className={styles.amountInput}
                   type="number"

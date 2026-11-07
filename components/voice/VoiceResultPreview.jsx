@@ -6,6 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { WALLET_TYPES } from '@/services/walletService'
 import Select from '@/components/ui/Select'
 import styles from './VoiceResultPreview.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 const CATEGORY_IDS = ['Food', 'Transport', 'Shopping', 'Bills', 'Smoking', 'Entertainment', 'Health', 'Other']
 
@@ -18,6 +19,7 @@ export default function VoiceResultPreview({
   onCancel,
   budgetCategories = []
 }) {
+  const currency = useCurrency()
   const [editingIndex, setEditingIndex] = useState(null)
   const [draft, setDraft] = useState(null)
   const [selectedWalletId, setSelectedWalletId] = useState(wallets.length > 0 ? wallets[0].id : '')
@@ -40,7 +42,7 @@ export default function VoiceResultPreview({
     const wt = WALLET_TYPES.find((x) => x.id === w.type)
     return {
       value: w.id,
-      label: `${w.name} (EGP ${new Intl.NumberFormat('en-US').format(Number(w.balance || 0))})`,
+      label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance || 0))})`,
       icon: wt?.emoji || '💳'
     }
   })
@@ -89,16 +91,16 @@ export default function VoiceResultPreview({
             className={styles.totalValue}
             style={{ color: netImpact > 0 ? '#22C55E' : netImpact < 0 ? '#EF4444' : 'var(--text-dark)' }}
           >
-            {netImpact > 0 ? '+' : ''}EGP {new Intl.NumberFormat('en-US').format(Math.abs(netImpact || totalExpense))}
+            {netImpact > 0 ? '+' : ''}{currency} {new Intl.NumberFormat('en-US').format(Math.abs(netImpact || totalExpense))}
           </span>
         </div>
         {totalExpense > 0 && totalIncome > 0 && (
           <div className={styles.subTotals}>
             <span style={{ color: '#EF4444', fontSize: '12px', fontWeight: '600' }}>
-              -EGP {new Intl.NumberFormat('en-US').format(totalExpense)}
+              -{currency} {new Intl.NumberFormat('en-US').format(totalExpense)}
             </span>
             <span style={{ color: '#22C55E', fontSize: '12px', fontWeight: '600' }}>
-              +EGP {new Intl.NumberFormat('en-US').format(totalIncome)}
+              +{currency} {new Intl.NumberFormat('en-US').format(totalIncome)}
             </span>
           </div>
         )}
@@ -121,7 +123,7 @@ export default function VoiceResultPreview({
                   <span>{wt?.emoji || '💳'}</span>
                   <div className={styles.walletOptionInfo}>
                     <span className={styles.walletOptionName}>{w.name}</span>
-                    <span className={styles.walletOptionBal}>EGP {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
+                    <span className={styles.walletOptionBal}>{currency} {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
                   </div>
                   {active && <span className={styles.walletCheck}>✓</span>}
                 </button>
@@ -130,7 +132,7 @@ export default function VoiceResultPreview({
           </div>
           {selectedWallet && (
             <div className={styles.walletPreview}>
-              {t('voice.newBalance')}: EGP {new Intl.NumberFormat('en-US').format((selectedWallet.balance || 0) + netImpact)}
+              {t('voice.newBalance')}: {currency} {new Intl.NumberFormat('en-US').format((selectedWallet.balance || 0) + netImpact)}
             </div>
           )}
         </div>
@@ -271,7 +273,7 @@ export default function VoiceResultPreview({
                   className={styles.itemAmount}
                   style={{ color: isIncome ? '#22C55E' : '#EF4444' }}
                 >
-                  {isIncome ? '+' : '-'}EGP {new Intl.NumberFormat('en-US').format(Number(exp.amount))}
+                  {isIncome ? '+' : '-'}{currency} {new Intl.NumberFormat('en-US').format(Number(exp.amount))}
                 </span>
                 <div className={styles.itemActions}>
                   <button className={styles.editItemBtn} onClick={() => startEdit(i)}>{t('edit')}</button>

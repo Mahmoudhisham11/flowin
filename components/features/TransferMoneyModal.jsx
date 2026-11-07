@@ -8,8 +8,10 @@ import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import Select from '@/components/ui/Select'
 import styles from './AddIncomeModal.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function TransferMoneyModal({ uid, wallets, onClose }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [fromId, setFromId] = useState(wallets.length > 1 ? wallets[0].id : '')
@@ -57,7 +59,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
           walletId: fromId,
           toWalletId: toId,
           toWalletName: toWallet?.name,
-          currency: 'EGP',
+          currency,
           source: 'transfer',
           createdAt: new Date().toISOString(),
         })
@@ -88,7 +90,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
               placeholder="Select source wallet"
               options={wallets.map((w) => {
                 const type = WALLET_TYPES.find((wt) => wt.id === w.type)
-                return { value: w.id, label: `${w.name} (EGP ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
+                return { value: w.id, label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
               })}
             />
           </div>
@@ -101,7 +103,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
               placeholder="Select destination wallet"
               options={wallets.filter((w) => w.id !== fromId).map((w) => {
                 const type = WALLET_TYPES.find((wt) => wt.id === w.type)
-                return { value: w.id, label: `${w.name} (EGP ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
+                return { value: w.id, label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
               })}
             />
           </div>
@@ -109,7 +111,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
           <div className={styles.field}>
             <label className={styles.label}>{t('transfer.amount')}</label>
             <div className={styles.amountWrap}>
-              <span className={styles.amountCurrency}>EGP</span>
+              <span className={styles.amountCurrency}>{currency}</span>
               <input className={styles.amountInput} type="number" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
             </div>
           </div>
@@ -117,7 +119,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
           {fromWallet && (
             <div className={styles.preview}>
               <span className={styles.previewLabel}>Available Balance</span>
-              <span className={styles.previewValue}>EGP {new Intl.NumberFormat('en-US').format(Number(fromWallet.balance))}</span>
+              <span className={styles.previewValue}>{currency} {new Intl.NumberFormat('en-US').format(Number(fromWallet.balance))}</span>
             </div>
           )}
 

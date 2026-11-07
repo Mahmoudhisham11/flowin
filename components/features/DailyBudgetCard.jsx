@@ -4,8 +4,10 @@ import AnimatedNumber from './AnimatedNumber'
 import Reveal from './Reveal'
 import { useTranslation } from '@/hooks/useTranslation'
 import styles from './DailyBudgetCard.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function DailyBudgetCard({ limit = 0, spentToday = 0, onSetBudget, onAddExpense }) {
+  const currency = useCurrency()
   const { t, isAr } = useTranslation()
 
   const hasLimit = limit > 0
@@ -21,7 +23,7 @@ export default function DailyBudgetCard({ limit = 0, spentToday = 0, onSetBudget
 
   if (isOver) {
     statusClass = styles.statusOver
-    statusText = `${t('dailyBudget.overBudget')} (${t('dailyBudget.overBy')} ${new Intl.NumberFormat('en-US').format(overAmount)} EGP)`
+    statusText = `${t('dailyBudget.overBudget')} (${t('dailyBudget.overBy')} ${new Intl.NumberFormat('en-US').format(overAmount)} ${currency})`
     progressColor = 'linear-gradient(90deg, #EF4444 0%, #DC2626 100%)'
   } else if (isNearing) {
     statusClass = styles.statusNearing
@@ -69,7 +71,7 @@ export default function DailyBudgetCard({ limit = 0, spentToday = 0, onSetBudget
                   {isOver ? t('dailyBudget.spentToday') : t('dailyBudget.remainingToday')}
                 </span>
                 <span className={`${styles.remainingValue} ${isOver ? styles.overValue : ''}`}>
-                  EGP <AnimatedNumber value={isOver ? spentToday : remaining} decimals={0} />
+                  {currency} <AnimatedNumber value={isOver ? spentToday : remaining} decimals={0} />
                 </span>
               </div>
 
@@ -77,14 +79,14 @@ export default function DailyBudgetCard({ limit = 0, spentToday = 0, onSetBudget
                 <div className={styles.secItem}>
                   <span className={styles.secLabel}>{t('dailyBudget.spentToday')}</span>
                   <span className={styles.secValue} style={{ color: '#EF4444' }}>
-                    EGP <AnimatedNumber value={spentToday} decimals={0} />
+                    {currency} <AnimatedNumber value={spentToday} decimals={0} />
                   </span>
                 </div>
                 <div className={styles.secDivider} />
                 <div className={styles.secItem}>
                   <span className={styles.secLabel}>{t('dailyBudget.dailyLimit')}</span>
                   <span className={styles.secValue}>
-                    EGP <AnimatedNumber value={limit} decimals={0} />
+                    {currency} <AnimatedNumber value={limit} decimals={0} />
                   </span>
                 </div>
               </div>
@@ -107,11 +109,11 @@ export default function DailyBudgetCard({ limit = 0, spentToday = 0, onSetBudget
                 <span>
                   {isOver ? (
                     <strong style={{ color: '#EF4444' }}>
-                      +{new Intl.NumberFormat('en-US').format(overAmount)} EGP
+                      +{new Intl.NumberFormat('en-US').format(overAmount)} {currency}
                     </strong>
                   ) : (
                     <span>
-                      {new Intl.NumberFormat('en-US').format(remaining)} EGP {t('common.of')} {new Intl.NumberFormat('en-US').format(limit)} EGP
+                      {new Intl.NumberFormat('en-US').format(remaining)} {currency} {t('common.of')} {new Intl.NumberFormat('en-US').format(limit)} {currency}
                     </span>
                   )}
                 </span>

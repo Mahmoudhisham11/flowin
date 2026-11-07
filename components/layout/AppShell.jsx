@@ -7,7 +7,7 @@ import FCMNotificationToast from '@/components/notifications/FCMNotificationToas
 
 export default function AppShell({ children }) {
   const pathname = usePathname()
-  const isAuthPage = pathname === '/login'
+  const isAuthPage = pathname === '/login' || pathname === '/onboarding'
 
   if (isAuthPage) return <>{children}</>
 

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { authFetch } from '@/lib/authFetch'
+import { useCurrency } from '@/hooks/useCurrency'
 import { useSearchParams } from 'next/navigation'
 import { AIIcon } from '@/components/Icons'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -15,6 +16,7 @@ function hasArabic(text) {
 
 function AIPageContent() {
   const { user, userData } = useUser()
+  const currency = useCurrency()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const [messages, setMessages] = useState([])
@@ -31,7 +33,7 @@ function AIPageContent() {
     setLoading(true)
 
     try {
-      const context = await buildChatContext(user.uid, userData?.name)
+      const context = await buildChatContext(user.uid, userData?.name, currency)
       const history = messages.map((m) => ({ role: m.role, text: m.text }))
 
       const res = await authFetch('/api/ai/chat', {

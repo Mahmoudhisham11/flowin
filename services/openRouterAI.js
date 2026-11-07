@@ -1,10 +1,10 @@
 import { authFetch } from '@/lib/authFetch'
 
-export async function parseExpenseFromText(text, budgetCategories = [], wallets = []) {
+export async function parseExpenseFromText(text, budgetCategories = [], wallets = [], currency) {
   const res = await authFetch('/api/ai/parse-expense', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, budgetCategories, wallets }),
+    body: JSON.stringify({ text, budgetCategories, wallets, currency }),
   })
 
   if (!res.ok) {

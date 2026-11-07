@@ -7,6 +7,7 @@ import { deductFromBudgetAdmin } from '@/lib/budgetAdmin'
 import { getUserDoc, HttpError, errorResponse } from '@/lib/serverAuth'
 import { canWrite } from '@/lib/subscriptionLogic'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizeCurrency } from '@/lib/currency'
 
 const MAX_AMOUNT = 1_000_000_000
 
@@ -76,7 +77,7 @@ export async function POST(req) {
 
       t.set(txRef, {
         amount: numAmount,
-        currency: 'EGP',
+        currency: normalizeCurrency(userData?.currency),
         category: detectedCategory,
         merchant: '',
         reason: normalizedReason,

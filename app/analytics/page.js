@@ -13,6 +13,7 @@ import EditTransactionModal from '@/components/features/EditTransactionModal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import styles from './page.module.css'
 import { useTranslation } from '@/hooks/useTranslation'
+import { useCurrency } from '@/hooks/useCurrency'
 
 const TABS = ['Day', 'Week', 'Month', 'Compare']
 const TAB_ICONS = { Day: '📅', Week: '📆', Month: '📊', Compare: '⚖️' }
@@ -172,6 +173,7 @@ function calcStats(txns) {
 }
 
 export default function AnalyticsPage() {
+  const currency = useCurrency()
   const router = useRouter()
   const { user } = useUser()
   const { t, lang, isAr } = useTranslation()
@@ -227,17 +229,17 @@ export default function AnalyticsPage() {
     const msg = encodeURIComponent(
       `I need help saving money. I'm comparing my spending across two periods.\n\n` +
       `Period 1 (${formatLabel(date1, 'Month', 'en')}):\n` +
-      `- Total Spent: EGP ${s1.expenses}\n` +
-      `- Total Income: EGP ${s1.income}\n` +
-      `- Net: EGP ${s1.net}\n` +
-      `- Top Categories: ${s1.categories.slice(0, 3).map((c) => `${c.emoji} ${c.id}: EGP ${c.amount}`).join(', ')}\n\n` +
+      `- Total Spent: ${currency} ${s1.expenses}\n` +
+      `- Total Income: ${currency} ${s1.income}\n` +
+      `- Net: ${currency} ${s1.net}\n` +
+      `- Top Categories: ${s1.categories.slice(0, 3).map((c) => `${c.emoji} ${c.id}: ${currency} ${c.amount}`).join(', ')}\n\n` +
       `Period 2 (${formatLabel(date2, 'Month', 'en')}):\n` +
-      `- Total Spent: EGP ${s2.expenses}\n` +
-      `- Total Income: EGP ${s2.income}\n` +
-      `- Net: EGP ${s2.net}\n` +
-      `- Top Categories: ${s2.categories.slice(0, 3).map((c) => `${c.emoji} ${c.id}: EGP ${c.amount}`).join(', ')}\n\n` +
-      `Difference: Spent ${s2.expenses - s1.expenses >= 0 ? 'increased' : 'decreased'} by EGP ${Math.abs(s2.expenses - s1.expenses)}, ` +
-      `Income ${s2.income - s1.income >= 0 ? 'increased' : 'decreased'} by EGP ${Math.abs(s2.income - s1.income)}.\n\n` +
+      `- Total Spent: ${currency} ${s2.expenses}\n` +
+      `- Total Income: ${currency} ${s2.income}\n` +
+      `- Net: ${currency} ${s2.net}\n` +
+      `- Top Categories: ${s2.categories.slice(0, 3).map((c) => `${c.emoji} ${c.id}: ${currency} ${c.amount}`).join(', ')}\n\n` +
+      `Difference: Spent ${s2.expenses - s1.expenses >= 0 ? 'increased' : 'decreased'} by ${currency} ${Math.abs(s2.expenses - s1.expenses)}, ` +
+      `Income ${s2.income - s1.income >= 0 ? 'increased' : 'decreased'} by ${currency} ${Math.abs(s2.income - s1.income)}.\n\n` +
       `Please suggest a practical savings plan to help me reduce expenses and increase savings based on this comparison.`
     )
     router.push(`/ai?msg=${msg}`)
@@ -315,7 +317,7 @@ export default function AnalyticsPage() {
       `"${(tx.category || '').replace(/"/g, '""')}"`,
       `"${(tx.merchant || '').replace(/"/g, '""')}"`,
       Number(tx.amount || 0),
-      tx.currency || 'EGP',
+      tx.currency || currency,
       `"${(tx.walletName || '').replace(/"/g, '""')}"`,
       `"${(tx.reason || '').replace(/"/g, '""')}"`,
     ])
@@ -371,7 +373,7 @@ export default function AnalyticsPage() {
       {
         label: t('analytics.totalSpent'),
         numValue: s.expenses,
-        prefix: 'EGP ',
+        prefix: `${currency} `,
         color: '#EF4444',
         icon: '💸',
         sub: `${s.expenseCount || 0} ${t('analytics.txCount')}`,
@@ -379,7 +381,7 @@ export default function AnalyticsPage() {
       {
         label: t('analytics.totalIncome'),
         numValue: s.income,
-        prefix: 'EGP ',
+        prefix: `${currency} `,
         color: '#22C55E',
         icon: '💰',
         sub: `${s.incomeCount || 0} ${t('analytics.txCount')}`,
@@ -387,7 +389,7 @@ export default function AnalyticsPage() {
       {
         label: t('analytics.net'),
         numValue: Math.abs(s.net),
-        prefix: s.net >= 0 ? '+EGP ' : '-EGP ',
+        prefix: s.net >= 0 ? `+${currency} ` : `-${currency} `,
         color: s.net >= 0 ? '#22C55E' : '#EF4444',
         icon: s.net >= 0 ? '📈' : '📉',
         sub: s.income > 0 ? `${t('analytics.savingsRate')}: ${s.savingsRate}%` : null,
@@ -503,7 +505,7 @@ export default function AnalyticsPage() {
                   <span className={styles.summaryLabel}>{t('analytics.period1')}</span>
                   <div className={styles.cardIcon} style={{ background: '#4DA3FF18', color: '#4DA3FF' }}>📆</div>
                 </div>
-                <span className={styles.summaryValue}>EGP <AnimatedNumber value={s1.expenses} decimals={0} /></span>
+                <span className={styles.summaryValue}>{currency} <AnimatedNumber value={s1.expenses} decimals={0} /></span>
                 <span className={styles.subText}>{s1.count} {t('analytics.totalTransactions')} ({formatLabel(date1, 'Month', lang)})</span>
               </div>
 
@@ -512,7 +514,7 @@ export default function AnalyticsPage() {
                   <span className={styles.summaryLabel}>{t('analytics.period2')}</span>
                   <div className={styles.cardIcon} style={{ background: '#8B5CF618', color: '#8B5CF6' }}>📆</div>
                 </div>
-                <span className={styles.summaryValue}>EGP <AnimatedNumber value={s2.expenses} decimals={0} /></span>
+                <span className={styles.summaryValue}>{currency} <AnimatedNumber value={s2.expenses} decimals={0} /></span>
                 <span className={styles.subText}>{s2.count} {t('analytics.totalTransactions')} ({formatLabel(date2, 'Month', lang)})</span>
               </div>
 
@@ -524,7 +526,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <span className={`${styles.summaryValue} ${diffSpent <= 0 ? styles.changeUp : styles.changeDown}`}>
-                  {diffSpent <= 0 ? '-' : '+'}EGP <AnimatedNumber value={Math.abs(diffSpent)} decimals={0} />
+                  {diffSpent <= 0 ? '-' : '+'}{currency} <AnimatedNumber value={Math.abs(diffSpent)} decimals={0} />
                 </span>
                 <span className={styles.subText}>
                   {s1.expenses > 0 ? `${Math.round((diffSpent / s1.expenses) * 100)}%` : diffSpent !== 0 ? '+100%' : '0%'}
@@ -539,10 +541,10 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <span className={`${styles.summaryValue} ${diffNet >= 0 ? styles.changeUp : styles.changeDown}`}>
-                  {diffNet >= 0 ? '+' : ''}EGP <AnimatedNumber value={diffNet} decimals={0} />
+                  {diffNet >= 0 ? '+' : ''}{currency} <AnimatedNumber value={diffNet} decimals={0} />
                 </span>
                 <span className={styles.subText}>
-                  {t('analytics.totalIncome')}: {diffIncome >= 0 ? '+' : ''}EGP {new Intl.NumberFormat('en-US').format(diffIncome)}
+                  {t('analytics.totalIncome')}: {diffIncome >= 0 ? '+' : ''}{currency} {new Intl.NumberFormat('en-US').format(diffIncome)}
                 </span>
               </div>
             </div>
@@ -576,8 +578,8 @@ export default function AnalyticsPage() {
                           </div>
                         </div>
                         <div className={styles.compValues}>
-                          <span className={styles.compValue} style={{ color: '#4DA3FF' }}>EGP {new Intl.NumberFormat('en-US').format(c1?.amount || 0)}</span>
-                          <span className={styles.compValue} style={{ color: '#8B5CF6' }}>EGP {new Intl.NumberFormat('en-US').format(c2?.amount || 0)}</span>
+                          <span className={styles.compValue} style={{ color: '#4DA3FF' }}>{currency} {new Intl.NumberFormat('en-US').format(c1?.amount || 0)}</span>
+                          <span className={styles.compValue} style={{ color: '#8B5CF6' }}>{currency} {new Intl.NumberFormat('en-US').format(c2?.amount || 0)}</span>
                         </div>
                       </div>
                     )
@@ -623,7 +625,7 @@ export default function AnalyticsPage() {
                   <div className={styles.chartHeader}>
                     <h3 className={styles.chartTitle}>{t('analytics.topCategories')}</h3>
                     <span className={styles.chartTotal}>
-                      {t('analytics.totalSpent')}: EGP {new Intl.NumberFormat('en-US').format(s1.expenses)}
+                      {t('analytics.totalSpent')}: {currency} {new Intl.NumberFormat('en-US').format(s1.expenses)}
                     </span>
                   </div>
                   <div className={styles.chartArea}>
@@ -657,7 +659,7 @@ export default function AnalyticsPage() {
                           </div>
                         ) : (
                           <div className={styles.pieCenterContent}>
-                            <span className={styles.pieCenterValue}>EGP {new Intl.NumberFormat('en-US', { notation: 'compact' }).format(s1.expenses)}</span>
+                            <span className={styles.pieCenterValue}>{currency} {new Intl.NumberFormat('en-US', { notation: 'compact' }).format(s1.expenses)}</span>
                             <span className={styles.pieCenterLabel}>{t('analytics.totalSpent')}</span>
                           </div>
                         )}
@@ -676,7 +678,7 @@ export default function AnalyticsPage() {
                           <span className={styles.legendLabel}>
                             {c.emoji} {isAr ? (c.labelAr || c.id) : (c.labelEn || c.id)}
                           </span>
-                          <span className={styles.legendAmount}>EGP {new Intl.NumberFormat('en-US').format(c.amount)}</span>
+                          <span className={styles.legendAmount}>{currency} {new Intl.NumberFormat('en-US').format(c.amount)}</span>
                           <span className={styles.legendPct}>{c.percentage}%</span>
                         </div>
                       ))}
@@ -694,7 +696,7 @@ export default function AnalyticsPage() {
                       {tab === 'Month' ? t('analytics.monthlySpending') : t('analytics.weeklySpending')} ({formatLabel(date1, tab, lang)})
                     </h3>
                     <span className={styles.chartTotal}>
-                      {s1.expenses > 0 ? `EGP ${new Intl.NumberFormat('en-US').format(s1.expenses)}` : ''}
+                      {s1.expenses > 0 ? `${currency} ${new Intl.NumberFormat('en-US').format(s1.expenses)}` : ''}
                     </span>
                   </div>
                   <div className={styles.barChart}>
@@ -715,7 +717,7 @@ export default function AnalyticsPage() {
                               {d.amount > 0 && (
                                 <span className={styles.barTooltip}>
                                   <strong>{d.fullDate}</strong>
-                                  <span>EGP {new Intl.NumberFormat('en-US').format(d.amount)}</span>
+                                  <span>{currency} {new Intl.NumberFormat('en-US').format(d.amount)}</span>
                                 </span>
                               )}
                             </div>
@@ -763,9 +765,9 @@ export default function AnalyticsPage() {
                               </div>
                             </td>
                             <td>{c.count}</td>
-                            <td>EGP {new Intl.NumberFormat('en-US').format(c.avg)}</td>
+                            <td>{currency} {new Intl.NumberFormat('en-US').format(c.avg)}</td>
                             <td>
-                              <strong className={styles.tableAmount}>EGP {new Intl.NumberFormat('en-US').format(c.amount)}</strong>
+                              <strong className={styles.tableAmount}>{currency} {new Intl.NumberFormat('en-US').format(c.amount)}</strong>
                             </td>
                             <td>
                               <div className={styles.tableProgressWrap}>
@@ -812,7 +814,7 @@ export default function AnalyticsPage() {
                           </span>
                         </div>
                         <span className={`${styles.txAmount} ${isIncome ? styles.txPositive : isTransfer ? styles.txNeutral : styles.txNegative}`}>
-                          {isIncome ? '+' : isTransfer ? '↔' : '-'}{tx.currency || 'EGP'} {new Intl.NumberFormat('en-US').format(Number(tx.amount || 0))}
+                          {isIncome ? '+' : isTransfer ? '↔' : '-'}{tx.currency || currency} {new Intl.NumberFormat('en-US').format(Number(tx.amount || 0))}
                         </span>
                         <div className={styles.txActions}>
                           <button className={`${styles.txActionBtn} ${styles.txEditBtn}`} onClick={() => setEditingTx(tx)} title="Edit">
@@ -886,7 +888,7 @@ export default function AnalyticsPage() {
       <ConfirmDialog
         open={!!deletingTx}
         title={t('analytics.deleteTxTitle')}
-        message={deletingTx ? `${t('analytics.deleteTxMsg')} (${deletingTx.merchant || deletingTx.category} - EGP ${deletingTx.amount})` : ''}
+        message={deletingTx ? `${t('analytics.deleteTxMsg')} (${deletingTx.merchant || deletingTx.category} - ${currency} ${deletingTx.amount})` : ''}
         confirmLabel={deleteLoading ? t('analytics.deleteLoading') : t('analytics.delete')}
         onConfirm={handleDelete}
         onCancel={() => setDeletingTx(null)}

@@ -8,6 +8,7 @@ import { saveTransaction } from '@/services/transactionsService'
 import { updateWallet } from '@/services/walletService'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firestore'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export const STEPS = {
   IDLE: 'idle',
@@ -19,6 +20,7 @@ export const STEPS = {
 }
 
 export default function useVoiceExpense() {
+  const currency = useCurrency()
   const { user } = useUser()
   const [step, setStep] = useState(STEPS.IDLE)
   const [transcript, setTranscript] = useState('')
@@ -57,7 +59,7 @@ export default function useVoiceExpense() {
         setTranscript(finalText)
         setStep(STEPS.PROCESSING)
         try {
-          const result = await parseExpenseFromText(finalText, budgetRef.current, walletsRef.current)
+          const result = await parseExpenseFromText(finalText, budgetRef.current, walletsRef.current, currency)
           if (result.error) {
             setError(result.error)
             setStep(STEPS.IDLE)
@@ -74,7 +76,7 @@ export default function useVoiceExpense() {
         }
       },
     })
-  }, [])
+  }, [currency])
 
   const stopRecording = useCallback(() => {
     if (sttRef.current) {
@@ -102,7 +104,7 @@ export default function useVoiceExpense() {
 
         return saveTransaction(user.uid, {
           amount: amt,
-          currency: exp.currency || 'EGP',
+          currency: exp.currency || currency,
           category: exp.category || (isIncome ? 'Other' : 'Food'),
           merchant: exp.merchant || '',
           reason: exp.reason || '',
@@ -131,7 +133,7 @@ export default function useVoiceExpense() {
       setError(e.message)
       setStep(STEPS.PREVIEW)
     }
-  }, [user, expenses])
+  }, [user, expenses, currency])
 
   const updateExpense = useCallback((index, fields) => {
     setExpenses((prev) => {

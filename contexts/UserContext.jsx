@@ -85,6 +85,11 @@ export function UserProvider({ children }) {
     return () => { cancelled = true }
   }, [firebaseUser, authLoading])
 
+  // Merge fields into the in-memory profile after they were saved to Firestore.
+  const updateUserData = (patch) => {
+    setUserData((prev) => (prev ? { ...prev, ...patch } : prev))
+  }
+
   const signup = async (name, email, password) => {
     const cred = await firebaseSignup(email, password)
     if (name) {
@@ -110,6 +115,7 @@ export function UserProvider({ children }) {
     userData,
     loading,
     userLoading,
+    updateUserData,
     signup,
     login,
     googleLogin,

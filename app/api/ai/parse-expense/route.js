@@ -1,5 +1,6 @@
 import { requirePaidUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizeCurrency } from '@/lib/currency'
 
 const SYSTEM_PROMPT = `You are an expert financial transaction extractor specialized in Egyptian Arabic dialect (اللهجة المصرية) and English.
 Extract ALL financial transactions (expenses AND income) from the user's text.
@@ -67,7 +68,7 @@ export async function POST(req) {
     const { uid } = await requirePaidUser(req)
     rateLimit(`ai-parse:${uid}`, 20, 60_000)
 
-    const { text: rawText, budgetCategories, wallets } = await req.json()
+    const { text: rawText, budgetCategories, wallets, currency: rawCurrency } = await req.json()
 
     const text = typeof rawText === 'string' ? rawText.slice(0, 2000) : ''
     if (!text.trim()) {
@@ -144,6 +145,8 @@ export async function POST(req) {
       return {
         ...exp,
         type: exp.type === 'income' ? 'income' : 'expense',
+        // Amounts are in the user's own currency (the prompt examples default to EGP).
+        currency: normalizeCurrency(rawCurrency),
         walletId: matchedWalletId,
       }
     })

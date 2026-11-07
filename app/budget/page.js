@@ -6,10 +6,12 @@ import { PlusIcon, CloseIcon, EditIcon } from '@/components/Icons'
 import { subscribeToBudget, saveBudget } from '@/services/budgetService'
 import { useTranslation } from '@/hooks/useTranslation'
 import styles from './page.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function BudgetPage() {
+  const currency = useCurrency()
   const { user } = useUser()
-  const { t, language } = useTranslation()
+  const { t, lang: language } = useTranslation()
   const [budget, setBudget] = useState(null)
   const [monthlyIncome, setMonthlyIncome] = useState(0)
   const [categories, setCategories] = useState([])
@@ -66,6 +68,8 @@ export default function BudgetPage() {
           name: c.name.trim(),
           amount: Number(c.amount) || 0,
           spent: Number(c.spent) || 0,
+          ...(c.categoryId ? { categoryId: c.categoryId } : {}),
+          ...(c.presetId ? { presetId: c.presetId } : {}),
         })),
       })
       setSaved(true)
@@ -84,7 +88,7 @@ export default function BudgetPage() {
           <div>
             <h1 className={styles.title}>
               {incomeNum > 0
-                ? `EGP ${fmt(remaining)} ${t('budget.potentialSavings').toLowerCase()}`
+                ? `${currency} ${fmt(remaining)} ${t('budget.potentialSavings').toLowerCase()}`
                 : t('budget.title')}
             </h1>
             <p className={styles.subtitle}>{t('budget.subtitle')}</p>
@@ -97,18 +101,18 @@ export default function BudgetPage() {
           <div className={styles.overview}>
             <div className={`${styles.overviewCard} ${styles.overviewCardAccent} ${styles.overviewIncome}`}>
               <span className={styles.overviewLabel}>{t('budget.monthlyIncome')}</span>
-              <div className={styles.overviewValue}>EGP {fmt(incomeNum)}</div>
+              <div className={styles.overviewValue}>{currency} {fmt(incomeNum)}</div>
               <span className={styles.overviewSub}>100%</span>
             </div>
             <div className={`${styles.overviewCard} ${styles.overviewCardAccent} ${styles.overviewEssentials}`}>
               <span className={styles.overviewLabel}>{t('budget.totalEssentials')}</span>
-              <div className={styles.overviewValue} style={{ color: 'var(--danger)' }}>EGP {fmt(totalEssentials)}</div>
+              <div className={styles.overviewValue} style={{ color: 'var(--danger)' }}>{currency} {fmt(totalEssentials)}</div>
               <span className={styles.overviewSub}>{essentialsPct.toFixed(0)}% of income</span>
             </div>
             <div className={`${styles.overviewCard} ${styles.overviewCardAccent} ${styles.overviewRemaining}`}>
               <span className={styles.overviewLabel}>{t('budget.potentialSavings')}</span>
               <div className={styles.overviewValue} style={{ color: remaining >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-                EGP {fmt(Math.abs(remaining))}
+                {currency} {fmt(Math.abs(remaining))}
               </div>
               <span className={styles.overviewSub}>
                 {remaining >= 0 ? `${savingsPct.toFixed(0)}% remaining` : 'overspent'}
@@ -134,11 +138,11 @@ export default function BudgetPage() {
             <div className={styles.barLegend}>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ background: '#EF4444' }} />
-                Essentials (EGP {fmt(totalEssentials)})
+                Essentials ({currency} {fmt(totalEssentials)})
               </div>
               <div className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ background: '#4DA3FF' }} />
-                Savings (EGP {fmt(Math.max(remaining, 0))})
+                Savings ({currency} {fmt(Math.max(remaining, 0))})
               </div>
             </div>
           </div>
@@ -149,7 +153,7 @@ export default function BudgetPage() {
         <div className={styles.incomeLabel}>{t('budget.monthlyIncome')}</div>
         <div className={styles.incomeDesc}>{t('budget.incomeDesc')}</div>
         <div className={styles.incomeInputWrap}>
-          <span className={styles.incomePrefix}>EGP</span>
+          <span className={styles.incomePrefix}>{currency}</span>
           <input
             className={styles.incomeInput}
             type="number"
@@ -209,12 +213,12 @@ export default function BudgetPage() {
                         />
                       ) : (
                         <button className={styles.targetDisplay} onClick={() => setEditingAmount(i)}>
-                          <span>EGP {fmt(target)}</span>
+                          <span>{currency} {fmt(target)}</span>
                           <EditIcon width="12" height="12" />
                         </button>
                       )}
                       <span className={styles.spentBadge}>
-                        {language === 'ar' ? 'صرفت' : 'Spent'} <strong>EGP {fmt(spent)}</strong>
+                        {language === 'ar' ? 'صرفت' : 'Spent'} <strong>{currency} {fmt(spent)}</strong>
                       </span>
                     </div>
                     {target > 0 && (
@@ -230,7 +234,7 @@ export default function BudgetPage() {
                     )}
                     {target > 0 && (
                       <div className={styles.remainingBadge} data-over={isOver ? '' : undefined}>
-                        {isOver ? `+${fmt(spent - target)}` : `EGP ${fmt(remainingCat)}`}
+                        {isOver ? `+${fmt(spent - target)}` : `${currency} ${fmt(remainingCat)}`}
                       </div>
                     )}
                   </div>

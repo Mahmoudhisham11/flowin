@@ -36,6 +36,7 @@ export async function generateAIDailyBudget(uid, budgetData, lang = 'ar') {
       totalEssentials: budgetData.totalEssentials,
       remaining: budgetData.remaining,
       lang,
+      currency: budgetData.currency,
     }),
   })
 

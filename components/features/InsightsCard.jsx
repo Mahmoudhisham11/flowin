@@ -6,6 +6,7 @@ import { generateInsight } from '@/services/insightsEngine'
 import { getCategory } from '@/lib/categories'
 import AnimatedNumber from './AnimatedNumber'
 import styles from './InsightsCard.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 const RISK_COLORS = {
   Low: { bg: '#F0FDF4', text: '#22C55E', dot: '#22C55E' },
@@ -14,6 +15,7 @@ const RISK_COLORS = {
 }
 
 export default function InsightsCard({ uid, insight, loading: hookLoading }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState('')
@@ -22,7 +24,7 @@ export default function InsightsCard({ uid, insight, loading: hookLoading }) {
     setGenerating(true)
     setError('')
     try {
-      await generateInsight(uid)
+      await generateInsight(uid, currency)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -90,7 +92,7 @@ export default function InsightsCard({ uid, insight, loading: hookLoading }) {
       {insight.totalSpent > 0 && (
         <div className={styles.mainStat}>
                   <span className={styles.mainLabel}>{t('analytics.totalSpent')}</span>
-                  <span className={styles.mainValue}>EGP <AnimatedNumber value={insight.totalSpent} decimals={0} /></span>
+                  <span className={styles.mainValue}>{currency} <AnimatedNumber value={insight.totalSpent} decimals={0} /></span>
         </div>
       )}
 

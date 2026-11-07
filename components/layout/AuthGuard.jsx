@@ -10,6 +10,9 @@ export default function AuthGuard({ children }) {
   const { userData, loading, userLoading } = useUser()
 
   const isAuthPage = pathname === '/login'
+  const isOnboarding = pathname === '/onboarding'
+  // Every account must set up its plan once (income, fixed expenses, savings).
+  const needsOnboarding = Boolean(userData) && !userData.onboardingCompleted
 
   useEffect(() => {
     if (loading) return
@@ -18,8 +21,12 @@ export default function AuthGuard({ children }) {
     }
     if (userData && isAuthPage) {
       router.replace('/')
+      return
     }
-  }, [userData, loading, isAuthPage, router])
+    if (needsOnboarding && !isOnboarding) {
+      router.replace('/onboarding')
+    }
+  }, [userData, loading, isAuthPage, isOnboarding, needsOnboarding, router])
 
   if (loading) {
     return (
@@ -36,6 +43,9 @@ export default function AuthGuard({ children }) {
   }
 
   if (!userData) return null
+
+  // Avoid flashing the app before redirecting to onboarding.
+  if (needsOnboarding && !isOnboarding) return null
 
   return <>{children}</>
 }

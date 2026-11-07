@@ -8,8 +8,10 @@ import { CATEGORIES } from '@/lib/categories'
 import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddExpenseModal.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function AddExpenseModal({ uid, wallets, onClose }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [walletId, setWalletId] = useState(wallets.length > 0 ? wallets[0].id : '')
@@ -33,7 +35,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
     try {
       await saveTransaction(uid, {
         amount: num,
-        currency: 'EGP',
+        currency,
         category,
         merchant: merchant.trim(),
         reason: reason.trim(),
@@ -80,7 +82,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
                     <span className={styles.walletEmoji}>{wt?.emoji || '💳'}</span>
                     <div className={styles.walletInfo}>
                       <span className={styles.walletName}>{w.name}</span>
-                      <span className={styles.walletBalance}>EGP {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
+                      <span className={styles.walletBalance}>{currency} {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
                     </div>
                   </button>
                 )
@@ -91,7 +93,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
           <div className={styles.field}>
             <label className={styles.label}>{t('income.amount')}</label>
             <div className={styles.amountWrap}>
-              <span className={styles.amountCurrency}>EGP</span>
+              <span className={styles.amountCurrency}>{currency}</span>
               <input
                 className={styles.amountInput}
                 type="number"
@@ -150,7 +152,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
             <div className={styles.preview}>
               <span className={styles.previewLabel}>{t('expense.newBalance')}</span>
               <span className={styles.previewValue}>
-                {WALLET_TYPES.find((t) => t.id === selectedWallet.type)?.emoji} EGP {new Intl.NumberFormat('en-US').format(((selectedWallet.balance || 0) - (parseFloat(amount) || 0)))}
+                {WALLET_TYPES.find((t) => t.id === selectedWallet.type)?.emoji} {currency} {new Intl.NumberFormat('en-US').format(((selectedWallet.balance || 0) - (parseFloat(amount) || 0)))}
               </span>
             </div>
           )}

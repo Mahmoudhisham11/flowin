@@ -4,8 +4,10 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { EyeIcon, EyeOffIcon } from '@/components/Icons'
 import AnimatedNumber from './AnimatedNumber'
 import styles from './BalanceCard.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function BalanceCard({ balance, showBalance, onToggle }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   return (
     <div className={styles.card}>
@@ -17,7 +19,7 @@ export default function BalanceCard({ balance, showBalance, onToggle }) {
       </div>
       <h2 className={styles.balance}>
         {showBalance ? (
-          <AnimatedNumber value={balance} prefix="EGP " decimals={0} />
+          <AnimatedNumber value={balance} prefix={`${currency} `} decimals={0} />
         ) : (
           '••••••'
         )}

@@ -12,7 +12,7 @@ function getTodayDate() {
   return new Date().toISOString().split('T')[0]
 }
 
-export async function buildChatContext(uid, userName) {
+export async function buildChatContext(uid, userName, currency) {
   const { start, end } = getLast30DaysRange()
   const ref = collection(db, `users/${uid}/transactions`)
   const q = query(ref, where('createdAt', '>=', start), where('createdAt', '<=', end), orderBy('createdAt', 'desc'))
@@ -63,6 +63,7 @@ export async function buildChatContext(uid, userName) {
 
   return {
     userName: userName || 'User',
+    currency: currency || 'EGP',
     period: 'Last 30 days',
     totalBalance,
     totalSpent,

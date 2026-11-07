@@ -1,5 +1,6 @@
 import { requireUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
+import { normalizeCurrency, currencyLabelAr } from '@/lib/currency'
 
 const SYSTEM_PROMPT_AR = `أنت مستشار ومخطط مالي ذكي ومحترف.
 المستخدم قام بإدخال بيانات ميزانيته الشهرية:
@@ -80,7 +81,9 @@ export async function POST(req) {
     const { uid } = await requireUser(req)
     rateLimit(`ai-daily-budget:${uid}`, 10, 60_000)
 
-    const { monthlyIncome, essentialCategories, totalEssentials, remaining, lang = 'ar' } = await req.json()
+    const { monthlyIncome, essentialCategories, totalEssentials, remaining, lang = 'ar', currency: rawCurrency } = await req.json()
+    const currency = normalizeCurrency(rawCurrency)
+    const curAr = currencyLabelAr(currency)
 
     const income = Number(monthlyIncome) || 0
     const essentials = Number(totalEssentials) || 0
@@ -109,8 +112,8 @@ export async function POST(req) {
       weekendBuffer: weekendExtra,
       monthlySavingsBuffer: savingsAmount,
       reasoning: isAr
-        ? `بناءً على دخلك الشهري البالغ ${income.toLocaleString()} جنيه، ومصروفاتك الأساسية البالغة ${essentials.toLocaleString()} جنيه، يتبقى لك فائض قدره ${netRemainder.toLocaleString()} جنيه. قمنا بتخصيص 20% (${savingsAmount.toLocaleString()} جنيه) كادخار وطوارئ لحمايتك، وتوزيع الفائض المتاح (${spendablePool.toLocaleString()} جنيه) على 30 يوماً ليكون حد صرفك اليومي الحر هو ${fallbackDaily.toLocaleString()} جنيه / يوم.`
-        : `Based on your monthly income of EGP ${income.toLocaleString()} and essential expenses of EGP ${essentials.toLocaleString()}, you have a net remainder of EGP ${netRemainder.toLocaleString()}. We reserved 20% (EGP ${savingsAmount.toLocaleString()}) for savings/emergencies, distributing the remaining EGP ${spendablePool.toLocaleString()} over 30 days, resulting in a recommended daily spend of EGP ${fallbackDaily.toLocaleString()} / day.`,
+        ? `بناءً على دخلك الشهري البالغ ${income.toLocaleString()} ${curAr}، ومصروفاتك الأساسية البالغة ${essentials.toLocaleString()} ${curAr}، يتبقى لك فائض قدره ${netRemainder.toLocaleString()} ${curAr}. قمنا بتخصيص 20% (${savingsAmount.toLocaleString()} ${curAr}) كادخار وطوارئ لحمايتك، وتوزيع الفائض المتاح (${spendablePool.toLocaleString()} ${curAr}) على 30 يوماً ليكون حد صرفك اليومي الحر هو ${fallbackDaily.toLocaleString()} ${curAr} / يوم.`
+        : `Based on your monthly income of ${currency} ${income.toLocaleString()} and essential expenses of ${currency} ${essentials.toLocaleString()}, you have a net remainder of ${currency} ${netRemainder.toLocaleString()}. We reserved 20% (${currency} ${savingsAmount.toLocaleString()}) for savings/emergencies, distributing the remaining ${currency} ${spendablePool.toLocaleString()} over 30 days, resulting in a recommended daily spend of ${currency} ${fallbackDaily.toLocaleString()} / day.`,
       formulaSteps: isAr ? [
         { step: 'الدخل الشهري', amount: income, note: 'إجمالي الدخل المتاح شهرياً' },
         { step: 'المصروفات الأساسية', amount: -essentials, note: 'المصروفات الثابتة والالتزامات الضرورية' },
@@ -125,11 +128,11 @@ export async function POST(req) {
         { step: 'Daily Spendable Pool', amount: spendablePool, note: 'Divided over 30 days' },
       ],
       tips: isAr ? [
-        `احتفظ بصرفك في الأيام العادية بحدود ${safeLimit.toLocaleString()} جنيه لتوفير مرونة لعطلة نهاية الأسبوع.`,
+        `احتفظ بصرفك في الأيام العادية بحدود ${safeLimit.toLocaleString()} ${curAr} لتوفير مرونة لعطلة نهاية الأسبوع.`,
         `إذا لم تصرف كامل ميزانيتك اليومية، دع الفائض يتراكم في محفظتك ولا تبحث عن سبل لصرفه.`,
         `راجع ميزانيتك أسبوعياً للتأكد من عدم تجاوز المصروفات الأساسية المحددة.`,
       ] : [
-        `Keep normal weekday spend around EGP ${safeLimit.toLocaleString()} to leave room for weekends.`,
+        `Keep normal weekday spend around ${currency} ${safeLimit.toLocaleString()} to leave room for weekends.`,
         `If you spend less than your daily limit, let the surplus accumulate.`,
         `Review your budget weekly to ensure essential categories stay within limits.`,
       ],
@@ -147,7 +150,7 @@ export async function POST(req) {
         amount: Number(c.amount) || 0,
       })),
       netRemainder,
-      currency: 'EGP',
+      currency,
     }
 
     try {

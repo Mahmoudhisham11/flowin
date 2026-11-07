@@ -11,8 +11,10 @@ import useSmoothClose from '@/hooks/useSmoothClose'
 import Select from '@/components/ui/Select'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import styles from './AddIncomeModal.module.css'
+import { useCurrency } from '@/hooks/useCurrency'
 
 export default function EditTransactionModal({ uid, transaction, wallets, onClose, budgetCategories = [] }) {
+  const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [amount, setAmount] = useState(String(transaction.amount || ''))
@@ -164,7 +166,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
           <div className={styles.field}>
             <label className={styles.label}>{t('common.amount')}</label>
             <div className={styles.amountWrap}>
-              <span className={styles.amountCurrency}>EGP</span>
+              <span className={styles.amountCurrency}>{currency}</span>
               <input className={styles.amountInput} type="number" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
             </div>
           </div>
@@ -186,7 +188,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
                 onChange={setWalletId}
                 options={wallets.map((w) => {
                   const wt = WALLET_TYPES.find((x) => x.id === w.type)
-                  return { value: w.id, label: `${w.name} (EGP ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: wt?.emoji }
+                  return { value: w.id, label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: wt?.emoji }
                 })}
               />
             </div>
