@@ -9,8 +9,9 @@ import { subscribeToTransactions } from '@/services/transactionsService'
 import { subscribeToWallets, WALLET_TYPES } from '@/services/walletService'
 import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
+import { computeToday } from '@/lib/planEngine'
 import BalanceCard from '@/components/features/BalanceCard'
-import SetDailyBudgetModal from '@/components/features/SetDailyBudgetModal'
+import TodayCard from '@/components/features/TodayCard'
 import AddWalletModal from '@/components/features/AddWalletModal'
 import AddIncomeModal from '@/components/features/AddIncomeModal'
 import AddExpenseModal from '@/components/features/AddExpenseModal'
@@ -37,7 +38,6 @@ export default function Home() {
   const [showAddIncome, setShowAddIncome] = useState(false)
   const [showAddExpense, setShowAddExpense] = useState(false)
   const [showTransfer, setShowTransfer] = useState(false)
-  const [showSetDailyBudget, setShowSetDailyBudget] = useState(false)
   const [editingWallet, setEditingWallet] = useState(null)
   const [editingTx, setEditingTx] = useState(null)
   const [showActions, setShowActions] = useState(false)
@@ -88,24 +88,17 @@ export default function Home() {
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0)
 
-  // Calculate today's expenses locally and reactively
-  const todayExpenses = useMemo(() => {
-    const todayStart = new Date()
-    todayStart.setHours(0, 0, 0, 0)
-    const todayEnd = new Date()
-    todayEnd.setHours(23, 59, 59, 999)
+  // Re-evaluate "today" every minute so the amount rolls over at midnight without a reload.
+  const [nowTick, setNowTick] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setNowTick(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
-    return transactions
-      .filter((t) => {
-        if (t.type !== 'expense') return false
-        const td = t.createdAt ? new Date(t.createdAt) : null
-        return td && td >= todayStart && td <= todayEnd
-      })
-      .reduce((sum, t) => sum + Number(t.amount || 0), 0)
-  }, [transactions])
-
-  const dailyBudgetLimit = Number(budgetData?.dailyBudgetLimit || 0)
-  const aiSuggestedDailyLimit = Number(budgetData?.aiDailyBudget?.dailyBudget || 0)
+  const today = useMemo(
+    () => computeToday(budgetData, transactions, new Date(nowTick)),
+    [budgetData, transactions, nowTick]
+  )
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -166,6 +159,8 @@ export default function Home() {
         </div>
       </header>
 
+      <TodayCard today={today} />
+
       <BalanceCard
         balance={totalBalance}
         showBalance={showBalance}
@@ -192,9 +187,6 @@ export default function Home() {
               </button>
               <button className={styles.transferBtn} onClick={() => setShowTransfer(true)}>
                 <TransferIcon /> {t('dashboard.transfer')}
-              </button>
-              <button className={styles.budgetBtn} onClick={() => setShowSetDailyBudget(true)}>
-                🎯 {t('dailyBudget.title') || 'ميزانية اليوم'}
               </button>
               <button className={styles.addWalletBtn} onClick={() => setShowAddWallet(true)}>
                 <PlusIcon /> {t('dashboard.addWallet')}
@@ -223,9 +215,6 @@ export default function Home() {
                   <button onClick={() => { setShowTransfer(true); setShowActions(false) }}>
                     <TransferIcon /> {t('dashboard.transfer')}
                   </button>
-                  <button onClick={() => { setShowSetDailyBudget(true); setShowActions(false) }}>
-                    <span>🎯</span> {t('dailyBudget.title') || 'الميزانية اليومية'}
-                  </button>
                   <button onClick={() => { setShowAddWallet(true); setShowActions(false) }}>
                     <PlusIcon /> {t('dashboard.addWallet')}
                   </button>
@@ -234,7 +223,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {wallets.length > 0 || dailyBudgetLimit > 0 ? (
+        {wallets.length > 0 ? (
           <>
             <div className={styles.walletGrid}>
               {wallets.map((w) => {
@@ -252,44 +241,6 @@ export default function Home() {
                   </div>
                 )
               })}
-              {dailyBudgetLimit > 0 && (
-                <div
-                  className={styles.walletCard}
-                  style={{
-                    borderTopColor:
-                      todayExpenses > dailyBudgetLimit
-                        ? '#EF4444'
-                        : todayExpenses >= dailyBudgetLimit * 0.9
-                        ? '#F59E0B'
-                        : '#10B981',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setShowSetDailyBudget(true)}
-                >
-                  <div className={styles.walletTop}>
-                    <span className={styles.walletEmoji}>🎯</span>
-                    <span className={styles.walletType}>{t('dailyBudget.title') || 'الميزانية اليومية'}</span>
-                  </div>
-                  <span className={styles.walletName}>
-                    {todayExpenses > dailyBudgetLimit
-                      ? (t('dailyBudget.exceeded') || 'تجاوزت الحد')
-                      : (t('dailyBudget.remaining') || 'المتبقي لليوم')}
-                  </span>
-                  <span
-                    className={styles.walletBalance}
-                    style={{
-                      color:
-                        todayExpenses > dailyBudgetLimit
-                          ? '#EF4444'
-                          : todayExpenses >= dailyBudgetLimit * 0.9
-                          ? '#F59E0B'
-                          : undefined,
-                    }}
-                  >
-                    {currency} <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
-                  </span>
-                </div>
-              )}
             </div>
             <div className={styles.walletSwiper} ref={swiperRef}>
               {wallets.map((w) => {
@@ -307,47 +258,9 @@ export default function Home() {
                   </div>
                 )
               })}
-              {dailyBudgetLimit > 0 && (
-                <div
-                  className={styles.swiperCard}
-                  style={{
-                    borderTopColor:
-                      todayExpenses > dailyBudgetLimit
-                        ? '#EF4444'
-                        : todayExpenses >= dailyBudgetLimit * 0.9
-                        ? '#F59E0B'
-                        : '#10B981',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => setShowSetDailyBudget(true)}
-                >
-                  <div className={styles.walletTop}>
-                    <span className={styles.walletEmoji}>🎯</span>
-                    <span className={styles.walletType}>{t('dailyBudget.title') || 'الميزانية اليومية'}</span>
-                  </div>
-                  <span className={styles.walletName}>
-                    {todayExpenses > dailyBudgetLimit
-                      ? (t('dailyBudget.exceeded') || 'تجاوزت الحد')
-                      : (t('dailyBudget.remaining') || 'المتبقي لليوم')}
-                  </span>
-                  <span
-                    className={styles.walletBalance}
-                    style={{
-                      color:
-                        todayExpenses > dailyBudgetLimit
-                          ? '#EF4444'
-                          : todayExpenses >= dailyBudgetLimit * 0.9
-                          ? '#F59E0B'
-                          : undefined,
-                    }}
-                  >
-                    {currency} <AnimatedNumber value={Math.max(0, dailyBudgetLimit - todayExpenses)} decimals={0} />
-                  </span>
-                </div>
-              )}
             </div>
             <div className={styles.swiperDots}>
-              {Array.from({ length: wallets.length + (dailyBudgetLimit > 0 ? 1 : 0) }).map((_, i) => (
+              {Array.from({ length: wallets.length }).map((_, i) => (
                 <span key={i} className={`${styles.swiperDot} ${i === activeWalletIdx ? styles.swiperDotActive : ''}`} />
               ))}
             </div>
@@ -461,16 +374,6 @@ export default function Home() {
       </Reveal>
 
       <VoiceButton />
-
-      {/* Set Daily Budget Modal */}
-      {showSetDailyBudget && user && (
-        <SetDailyBudgetModal
-          uid={user.uid}
-          currentLimit={dailyBudgetLimit}
-          aiSuggestedLimit={aiSuggestedDailyLimit}
-          onClose={() => setShowSetDailyBudget(false)}
-        />
-      )}
 
       {showAddWallet && user && (
         <AddWalletModal uid={user.uid} onClose={() => setShowAddWallet(false)} />

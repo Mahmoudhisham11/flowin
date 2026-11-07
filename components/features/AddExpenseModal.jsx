@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { saveTransaction } from '@/services/transactionsService'
 import { updateWallet } from '@/services/walletService'
+import { getBudget } from '@/services/budgetService'
+import Select from '@/components/ui/Select'
 import { WALLET_TYPES } from '@/services/walletService'
 import { CATEGORIES } from '@/lib/categories'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -21,6 +23,17 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [essentials, setEssentials] = useState([])
+  const [essentialKey, setEssentialKey] = useState('')
+
+  // Fixed expenses from the user's plan, so paying e.g. rent is not counted as free spending.
+  useEffect(() => {
+    let cancelled = false
+    getBudget(uid)
+      .then((b) => { if (!cancelled && b?.planVersion) setEssentials(b.essentialCategories || []) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [uid])
 
   const selectedWallet = wallets.find((w) => w.id === walletId)
 
@@ -41,6 +54,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
         reason: reason.trim(),
         type: 'expense',
         source: 'manual',
+        ...(essentialKey ? { essentialKey } : {}),
         walletId,
         walletName: selectedWallet?.name || '',
       })
@@ -125,6 +139,21 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               })}
             </div>
           </div>
+
+          {essentials.length > 0 && (
+            <div className={styles.field}>
+              <label className={styles.label}>{t('today.fixedExpense')}</label>
+              <Select
+                value={essentialKey}
+                onChange={setEssentialKey}
+                options={[
+                  { value: '', label: t('today.fixedExpenseNone') },
+                  ...essentials.map((e) => ({ value: e.presetId || e.name, label: e.name })),
+                ]}
+              />
+              {essentialKey && <p className={styles.subtitle}>{t('today.fixedExpenseHint')}</p>}
+            </div>
+          )}
 
           <div className={styles.field}>
             <label className={styles.label}>{t('expense.merchant')}</label>

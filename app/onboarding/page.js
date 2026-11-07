@@ -203,6 +203,7 @@ export default function OnboardingPage() {
 
       const profile = {
         currency,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo',
         onboardingCompleted: true,
         onboardingCompletedAt: new Date().toISOString(),
       }
