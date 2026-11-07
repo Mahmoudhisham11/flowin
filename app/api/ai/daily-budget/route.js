@@ -1,3 +1,6 @@
+import { requireUser, errorResponse } from '@/lib/serverAuth'
+import { rateLimit } from '@/lib/rateLimit'
+
 const SYSTEM_PROMPT_AR = `أنت مستشار ومخطط مالي ذكي ومحترف.
 المستخدم قام بإدخال بيانات ميزانيته الشهرية:
 - الدخل الشهري (Monthly Income)
@@ -74,6 +77,9 @@ No markdown outside JSON.`
 
 export async function POST(req) {
   try {
+    const { uid } = await requireUser(req)
+    rateLimit(`ai-daily-budget:${uid}`, 10, 60_000)
+
     const { monthlyIncome, essentialCategories, totalEssentials, remaining, lang = 'ar' } = await req.json()
 
     const income = Number(monthlyIncome) || 0
@@ -202,6 +208,6 @@ export async function POST(req) {
       return Response.json(fallbackResult)
     }
   } catch (err) {
-    return Response.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return errorResponse(err)
   }
 }

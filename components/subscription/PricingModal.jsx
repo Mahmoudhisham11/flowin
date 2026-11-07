@@ -74,8 +74,6 @@ export default function PricingModal({ open, onClose }) {
     setError('')
     try {
       await submitUpgradeRequest({
-        uid: userData.uid,
-        email: userData.email || '',
         phone: userPhone,
         refId,
         amount: PRO_PRICE,

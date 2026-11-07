@@ -1,12 +1,25 @@
-import { db } from '@/lib/firestore'
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore'
+import { authFetch } from '@/lib/authFetch'
+
+// Admin operations run on the server (verified admin role); the browser never writes roles.
+
+async function parse(res, fallback) {
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(json.error || fallback)
+  return json
+}
 
 export async function getAllUsers() {
-  const snapshot = await getDocs(collection(db, 'users'))
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
+  const json = await parse(await authFetch('/api/admin/users'), 'Failed to load users')
+  return json.users
 }
 
 export async function updateUserRole(uid, newRole) {
-  const ref = doc(db, 'users', uid)
-  await updateDoc(ref, { role: newRole })
+  await parse(
+    await authFetch('/api/admin/users', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, role: newRole }),
+    }),
+    'Failed to update role'
+  )
 }

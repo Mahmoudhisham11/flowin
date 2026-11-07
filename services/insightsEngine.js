@@ -1,6 +1,7 @@
 import { db } from '@/lib/firestore'
 import { collection, query, where, orderBy, getDocs, doc, setDoc, getDoc } from 'firebase/firestore'
 import { getCategory } from '@/lib/categories'
+import { authFetch } from '@/lib/authFetch'
 
 function getWeekId(date = new Date()) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -103,7 +104,7 @@ function aggregateStats(transactions, walletNames) {
 }
 
 async function callAI(stats) {
-  const res = await fetch('/api/ai/insights', {
+  const res = await authFetch('/api/ai/insights', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ stats }),

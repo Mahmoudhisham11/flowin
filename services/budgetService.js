@@ -1,6 +1,7 @@
 import { db } from '@/lib/firestore'
 import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
-import { CATEGORIES } from '@/lib/categories'
+import { findMatchingCategory } from '@/lib/budgetMatch'
+import { authFetch } from '@/lib/authFetch'
 
 const DOC_PATH = (uid) => `users/${uid}/budget/config`
 
@@ -26,7 +27,7 @@ export async function saveBudget(uid, data) {
 }
 
 export async function generateAIDailyBudget(uid, budgetData, lang = 'ar') {
-  const res = await fetch('/api/ai/daily-budget', {
+  const res = await authFetch('/api/ai/daily-budget', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -75,42 +76,6 @@ export function subscribeToBudget(uid, callback) {
   return onSnapshot(ref, (snap) => {
     callback(snap.exists() ? { id: snap.id, ...snap.data() } : null)
   })
-}
-
-const normalizeArabic = (s) =>
-  String(s).trim()
-    .replace(/[إأآٱ]/g, 'ا')
-    .replace(/[ى]/g, 'ي')
-    .replace(/[ة]/g, 'ه')
-    .toLowerCase()
-
-function findMatchingCategory(categories, categoryName) {
-  const nameLower = normalizeArabic(categoryName)
-
-  let match = categories.find(
-    (c) => normalizeArabic(c.name) === nameLower
-  )
-  if (match) return match
-
-  match = categories.find(
-    (c) => c.categoryId && normalizeArabic(c.categoryId) === nameLower
-  )
-  if (match) return match
-
-  const catInfo = CATEGORIES.find(
-    (c) => normalizeArabic(c.id) === nameLower || c.id.toLowerCase() === nameLower
-  )
-  if (catInfo) {
-    match = categories.find(
-      (c) =>
-        normalizeArabic(c.name) === normalizeArabic(catInfo.labelAr) ||
-        normalizeArabic(c.name) === normalizeArabic(catInfo.labelEn) ||
-        c.name.trim().toLowerCase() === catInfo.labelEn.toLowerCase()
-    )
-    if (match) return match
-  }
-
-  return null
 }
 
 export async function deductFromBudget(uid, categoryName, amount) {

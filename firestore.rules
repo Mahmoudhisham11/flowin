@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Fields only the server (Admin SDK, which bypasses these rules) may change.
+    function touchesProtectedFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'uid', 'email', 'role', 'createdAt', 'provider', 'signUpMethod',
+        'trialStart', 'subStart', 'subEnd', 'quickExpenseToken'
+      ]);
+    }
+
+    match /users/{uid} {
+      // The profile is created by POST /api/account/init, never by the client.
+      allow read: if isOwner(uid);
+      allow create: if false;
+      allow update: if isOwner(uid) && !touchesProtectedFields();
+      allow delete: if false;
+
+      // Each subcollection is listed explicitly so the owner rule can never
+      // accidentally cover the protected profile document above.
+      match /wallets/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /transactions/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /budget/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /dailyTasks/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /insights/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /fcm_tokens/{id} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Shortcut tokens and upgrade requests are only accessed through server API routes.
+    match /quick_expense_tokens/{id} {
+      allow read, write: if false;
+    }
+    match /pending_upgrades/{id} {
+      allow read, write: if false;
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,103 +1,98 @@
-import { verifyQuickToken } from '@/services/quickTokenService'
-import { saveTransaction } from '@/services/transactionsService'
-import { fetchWallets, updateWallet } from '@/services/walletService'
+import { FieldValue } from 'firebase-admin/firestore'
+import { getAdminFirestore } from '@/lib/firebaseAdmin'
+import { verifyQuickTokenAdmin } from '@/lib/quickTokenAdmin'
 import { classifyExpenseCategory } from '@/services/aiClassifier'
-import { CATEGORIES } from '@/lib/categories'
-import { sendExpenseNotification } from '@/app/api/notifications/expense/route'
+import { sendExpenseNotification } from '@/lib/expenseNotification'
+import { deductFromBudgetAdmin } from '@/lib/budgetAdmin'
+import { getUserDoc, HttpError, errorResponse } from '@/lib/serverAuth'
+import { canWrite } from '@/lib/subscriptionLogic'
+import { rateLimit } from '@/lib/rateLimit'
+
+const MAX_AMOUNT = 1_000_000_000
 
 export async function POST(req) {
   try {
-    // 1. Authenticate with Bearer token
+    // 1. Authenticate with the personal shortcut token
     const authHeader = req.headers.get('authorization') || ''
     if (!authHeader.startsWith('Bearer ')) {
-      return Response.json(
-        { success: false, error: 'Missing or invalid Authorization header. Expected: Bearer <token>' },
-        { status: 401 }
-      )
+      throw new HttpError(401, 'Missing or invalid Authorization header. Expected: Bearer <token>')
     }
 
-    const rawToken = authHeader.replace('Bearer ', '').trim()
-    const authResult = await verifyQuickToken(rawToken)
-
-    if (!authResult || !authResult.uid) {
-      return Response.json(
-        { success: false, error: 'Unauthorized: Invalid, expired, or revoked token' },
-        { status: 401 }
-      )
+    const authResult = await verifyQuickTokenAdmin(authHeader.slice(7))
+    if (!authResult) {
+      throw new HttpError(401, 'Unauthorized: Invalid, expired, or revoked token')
     }
 
     const { uid } = authResult
+    rateLimit(`quick-expense:${uid}`, 30, 60_000)
+
+    // The shortcut must respect the same trial/subscription rules as the app.
+    const userData = await getUserDoc(uid)
+    if (!canWrite(userData)) {
+      throw new HttpError(403, 'Your trial or subscription has expired')
+    }
 
     // 2. Parse and validate JSON body
     let body = {}
     try {
       body = await req.json()
     } catch {
-      return Response.json(
-        { success: false, error: 'Malformed JSON in request body' },
-        { status: 400 }
-      )
+      throw new HttpError(400, 'Malformed JSON in request body')
     }
 
-    const { amount, reason } = body
-
-    // 3. Validate Amount
-    const numAmount = parseFloat(amount)
-    if (isNaN(numAmount) || numAmount <= 0) {
-      return Response.json(
-        { success: false, error: 'Amount must be a positive number greater than 0' },
-        { status: 400 }
-      )
+    const numAmount = parseFloat(body.amount)
+    if (!Number.isFinite(numAmount) || numAmount <= 0 || numAmount > MAX_AMOUNT) {
+      throw new HttpError(400, 'Amount must be a positive number greater than 0')
     }
 
-    // 4. Validate Reason
-    const normalizedReason = String(reason || '').trim()
+    const normalizedReason = String(body.reason || '').trim().slice(0, 200)
     if (!normalizedReason) {
-      return Response.json(
-        { success: false, error: 'Reason is required' },
-        { status: 400 }
-      )
+      throw new HttpError(400, 'Reason is required')
     }
 
-    // 5. Fetch user's wallets and pick the first one automatically
-    const wallets = await fetchWallets(uid)
-    if (!wallets || wallets.length === 0) {
-      return Response.json(
-        { success: false, error: 'No wallet is available for this account' },
-        { status: 400 }
-      )
+    // 3. Pick the first wallet
+    const db = getAdminFirestore()
+    const walletsSnap = await db
+      .collection(`users/${uid}/wallets`)
+      .orderBy('createdAt', 'asc')
+      .limit(1)
+      .get()
+
+    if (walletsSnap.empty) {
+      throw new HttpError(400, 'No wallet is available for this account')
     }
 
-    const firstWallet = wallets[0]
-    const walletId = firstWallet.id
-    const walletName = firstWallet.name || 'Main Wallet'
-    const currentBalance = Number(firstWallet.balance || 0)
+    const walletRef = walletsSnap.docs[0].ref
+    const walletName = walletsSnap.docs[0].data().name || 'Main Wallet'
 
-    // 6. AI Category Classification
+    // 4. AI category classification (falls back to keyword matching)
     const detectedCategory = await classifyExpenseCategory(normalizedReason)
 
-    // 7. Save Transaction to Firestore
-    const transactionData = {
-      amount: numAmount,
-      currency: 'EGP',
-      category: detectedCategory,
-      merchant: '',
-      reason: normalizedReason,
-      type: 'expense',
-      source: 'shortcut',
-      walletId,
-      walletName,
-    }
+    // 5. Save the transaction and deduct from the wallet atomically
+    const txRef = db.collection(`users/${uid}/transactions`).doc()
+    const newBalance = await db.runTransaction(async (t) => {
+      const walletSnap = await t.get(walletRef)
+      const balance = Number(walletSnap.data()?.balance || 0) - numAmount
 
-    const expenseId = await saveTransaction(uid, transactionData)
-
-    // 8. Deduct from first wallet balance
-    const newBalance = currentBalance - numAmount
-    await updateWallet(uid, walletId, {
-      balance: newBalance,
+      t.set(txRef, {
+        amount: numAmount,
+        currency: 'EGP',
+        category: detectedCategory,
+        merchant: '',
+        reason: normalizedReason,
+        type: 'expense',
+        source: 'shortcut',
+        walletId: walletRef.id,
+        walletName,
+        createdAt: new Date().toISOString(),
+      })
+      t.update(walletRef, { balance, updatedAt: FieldValue.serverTimestamp() })
+      return balance
     })
 
-    // 9. Send FCM Push Notification to all user devices (must await so serverless runtime does not terminate early)
+    await deductFromBudgetAdmin(db, uid, detectedCategory, numAmount)
+
+    // 6. Push notification (awaited so the serverless runtime does not terminate early)
     try {
       await sendExpenseNotification({
         userId: uid,
@@ -111,7 +106,7 @@ export async function POST(req) {
 
     return Response.json({
       success: true,
-      expenseId,
+      expenseId: txRef.id,
       expense: {
         amount: numAmount,
         reason: normalizedReason,
@@ -121,10 +116,6 @@ export async function POST(req) {
       },
     })
   } catch (err) {
-    console.error('Error in /api/quick-expense:', err)
-    return Response.json(
-      { success: false, error: err.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return errorResponse(err)
   }
 }

@@ -1,36 +1,38 @@
-'use client'
+import { authFetch } from '@/lib/authFetch'
 
-import { db } from '@/lib/firestore'
-import { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore'
-
-const COLLECTION = 'pending_upgrades'
-
-export async function submitUpgradeRequest({ uid, email, phone, refId, amount }) {
-  const ref = collection(db, COLLECTION)
-  await addDoc(ref, {
-    uid,
-    email,
-    phone,
-    refId,
-    amount,
-    status: 'pending',
-    createdAt: Timestamp.now(),
-  })
+async function parse(res, fallback) {
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(json.error || fallback)
+  return json
 }
 
+export async function submitUpgradeRequest({ phone, refId, amount }) {
+  await parse(
+    await authFetch('/api/subscription/upgrade-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, refId, amount }),
+    }),
+    'Failed to submit upgrade request'
+  )
+}
+
+// Admin only (enforced on the server).
 export async function getPendingUpgrades() {
-  const ref = collection(db, COLLECTION)
-  const q = query(ref, orderBy('createdAt', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  const json = await parse(await authFetch('/api/admin/upgrades'), 'Failed to load upgrade requests')
+  return json.upgrades
 }
 
-export async function approveUpgrade(docId) {
-  const ref = doc(db, COLLECTION, docId)
-  await updateDoc(ref, { status: 'approved' })
+async function decide(id, action) {
+  await parse(
+    await authFetch('/api/admin/upgrades', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, action }),
+    }),
+    'Failed to process upgrade request'
+  )
 }
 
-export async function rejectUpgrade(docId) {
-  const ref = doc(db, COLLECTION, docId)
-  await updateDoc(ref, { status: 'rejected' })
-}
+export const approveUpgrade = (docId) => decide(docId, 'approve')
+export const rejectUpgrade = (docId) => decide(docId, 'reject')

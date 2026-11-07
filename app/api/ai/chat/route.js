@@ -1,3 +1,6 @@
+import { requireUser, requirePaidUser, errorResponse } from '@/lib/serverAuth'
+import { rateLimit } from '@/lib/rateLimit'
+
 const SYSTEM_PROMPT = `You are a professional financial advisor AI. You have access to the user's real financial data as context, including their transactions, wallets, budget, and tasks. The user's name is provided in the context - use it to personalize your responses and greet them by name.
 
 Rules:
@@ -23,6 +26,9 @@ No markdown, no code fences, no extra text.`
 
 export async function POST(req) {
   try {
+    const { uid } = await requirePaidUser(req)
+    rateLimit(`ai-chat:${uid}`, 20, 60_000)
+
     const { message, context, history } = await req.json()
 
     if (!message || !context) {
@@ -84,13 +90,16 @@ ${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.
       { role: 'system', content: contextBlock },
     ]
 
-    if (history && Array.isArray(history)) {
-      history.forEach((msg) => {
-        messages.push({ role: msg.role, content: msg.text })
+    // Only user/assistant turns are accepted from the client (never 'system'), with bounded size.
+    if (Array.isArray(history)) {
+      history.slice(-20).forEach((msg) => {
+        if ((msg?.role === 'user' || msg?.role === 'assistant') && typeof msg.text === 'string') {
+          messages.push({ role: msg.role, content: msg.text.slice(0, 4000) })
+        }
       })
     }
 
-    messages.push({ role: 'user', content: message })
+    messages.push({ role: 'user', content: String(message).slice(0, 4000) })
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -134,7 +143,7 @@ ${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.
     const parsed = JSON.parse(cleaned.slice(first, last + 1))
     return Response.json(parsed)
   } catch (err) {
-    return Response.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return errorResponse(err)
   }
 }
 

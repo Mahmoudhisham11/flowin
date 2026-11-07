@@ -1,3 +1,6 @@
+import { requirePaidUser, errorResponse } from '@/lib/serverAuth'
+import { rateLimit } from '@/lib/rateLimit'
+
 const SYSTEM_PROMPT = `You are an expert financial transaction extractor specialized in Egyptian Arabic dialect (اللهجة المصرية) and English.
 Extract ALL financial transactions (expenses AND income) from the user's text.
 
@@ -61,9 +64,13 @@ const FREE_MODELS = [
 
 export async function POST(req) {
   try {
-    const { text, budgetCategories, wallets } = await req.json()
+    const { uid } = await requirePaidUser(req)
+    rateLimit(`ai-parse:${uid}`, 20, 60_000)
 
-    if (!text || !text.trim()) {
+    const { text: rawText, budgetCategories, wallets } = await req.json()
+
+    const text = typeof rawText === 'string' ? rawText.slice(0, 2000) : ''
+    if (!text.trim()) {
       return Response.json({ error: 'No text provided' }, { status: 400 })
     }
 
@@ -143,6 +150,6 @@ export async function POST(req) {
 
     return Response.json({ expenses: enrichedExpenses })
   } catch (err) {
-    return Response.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return errorResponse(err)
   }
 }

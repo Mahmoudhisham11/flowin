@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { db } from '@/lib/firestore'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
+import { authFetch } from '@/lib/authFetch'
 import { useAuth } from '@/hooks/useAuth'
 import {
   signup as firebaseSignup,
@@ -58,22 +59,22 @@ export function UserProvider({ children }) {
         if (snap.exists()) {
           setUserData({ id: firebaseUser.uid, ...snap.data() })
         } else {
-          const newUser = {
-            uid: firebaseUser.uid,
-            name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
-            email: firebaseUser.email,
-            provider: firebaseUser.providerData[0]?.providerId || 'email',
-            createdAt: new Date().toISOString(),
-            signUpMethod: firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
-            role: 'free',
-            trialStart: new Date().toISOString(),
-            subEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          // First sign-in: the server creates the profile and decides role/trial dates.
+          const res = await authFetch('/api/account/init', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: firebaseUser.displayName || '' }),
+          })
+          const json = await res.json().catch(() => ({}))
+          if (!res.ok || !json.user) {
+            throw new Error(json.error || 'Failed to create account profile')
           }
-          await setDoc(userRef, newUser)
           if (!cancelled) {
-            setUserData({ id: firebaseUser.uid, ...newUser })
+            setUserData({ id: firebaseUser.uid, ...json.user })
           }
         }
+      } catch (err) {
+        console.error('[UserContext] Failed to load user profile:', err)
       } finally {
         if (!cancelled) setUserLoading(false)
       }

@@ -106,7 +106,7 @@ export default function SettingsPage() {
     setTokenLoading(true)
     setTokenError('')
     try {
-      const res = await createQuickExpenseToken(user.uid)
+      const res = await createQuickExpenseToken()
       setGeneratedToken(res.rawToken)
       setTokenActiveState(true)
       setShowTokenModal(true)
@@ -123,7 +123,7 @@ export default function SettingsPage() {
     if (!user?.uid) return
     setTokenLoading(true)
     try {
-      await revokeQuickExpenseToken(user.uid)
+      await revokeQuickExpenseToken()
       setTokenActiveState(false)
       setGeneratedToken('')
       setShowRevokeConfirm(false)

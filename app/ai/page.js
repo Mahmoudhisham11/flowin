@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useUser } from '@/contexts/UserContext'
+import { authFetch } from '@/lib/authFetch'
 import { useSearchParams } from 'next/navigation'
 import { AIIcon } from '@/components/Icons'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -33,7 +34,7 @@ function AIPageContent() {
       const context = await buildChatContext(user.uid, userData?.name)
       const history = messages.map((m) => ({ role: m.role, text: m.text }))
 
-      const res = await fetch('/api/ai/chat', {
+      const res = await authFetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

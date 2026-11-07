@@ -1,3 +1,6 @@
+import { requireUser, errorResponse } from '@/lib/serverAuth'
+import { rateLimit } from '@/lib/rateLimit'
+
 const SYSTEM_PROMPT = `You are a financial analyst. Given a user's aggregated weekly financial data, generate a JSON insight.
 
 Rules:
@@ -23,6 +26,9 @@ No markdown, no code fences, no extra text.`
 
 export async function POST(req) {
   try {
+    const { uid } = await requireUser(req)
+    rateLimit(`ai-insights:${uid}`, 10, 60_000)
+
     const { stats } = await req.json()
 
     if (!stats) {
@@ -72,7 +78,7 @@ export async function POST(req) {
 
     return Response.json(parsed)
   } catch (err) {
-    return Response.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return errorResponse(err)
   }
 }
 

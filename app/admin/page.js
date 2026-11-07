@@ -5,7 +5,6 @@ import { useUser } from '@/contexts/UserContext'
 import { useTranslation } from '@/hooks/useTranslation'
 import { getAllUsers, updateUserRole } from '@/services/adminService'
 import { getPendingUpgrades, approveUpgrade, rejectUpgrade } from '@/services/pendingUpgradesService'
-import { upgradeToPro } from '@/services/subscriptionService'
 import { useRouter } from 'next/navigation'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import Select from '@/components/ui/Select'
@@ -161,8 +160,6 @@ export default function AdminPage() {
     if (!upgradeId) return
     try {
       if (upgradeAction === 'approve') {
-        const req = pending.find((p) => p.id === upgradeId)
-        if (req?.uid) await upgradeToPro(req.uid)
         await approveUpgrade(upgradeId)
       } else {
         await rejectUpgrade(upgradeId)

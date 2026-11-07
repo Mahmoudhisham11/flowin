@@ -1,5 +1,6 @@
 import { db } from '@/lib/firestore'
 import { collection, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore'
+import { authFetch } from '@/lib/authFetch'
 import { deductFromBudget } from './budgetService'
 
 const path = (uid) => `users/${uid}/transactions`
@@ -19,7 +20,7 @@ export async function saveTransaction(uid, data) {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo'
     const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
 
-    fetch('/api/notifications/expense', {
+    authFetch('/api/notifications/expense', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
