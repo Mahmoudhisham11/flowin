@@ -1,9 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { saveTransaction } from '@/services/transactionsService'
 import { updateWallet } from '@/services/walletService'
-import { getBudget } from '@/services/budgetService'
+import { fetchTodayState } from '@/services/todayService'
+import { computeToday } from '@/lib/planEngine'
+import { previewAfterExpense } from '@/lib/purchaseAdvisor'
+import { guessCategory, guessEssentialKey } from '@/lib/categoryGuess'
+import { fillText } from '@/lib/fillText'
+import { toNum } from '@/lib/parseAmount'
 import Select from '@/components/ui/Select'
 import { WALLET_TYPES } from '@/services/walletService'
 import { CATEGORIES } from '@/lib/categories'
@@ -12,35 +17,87 @@ import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddExpenseModal.module.css'
 import { useCurrency } from '@/hooks/useCurrency'
 
-export default function AddExpenseModal({ uid, wallets, onClose }) {
+const LAST_WALLET_KEY = 'flowin-last-wallet'
+
+function readLastWallet(wallets) {
+  try {
+    const id = localStorage.getItem(LAST_WALLET_KEY)
+    return wallets.some((w) => w.id === id) ? id : null
+  } catch {
+    return null
+  }
+}
+
+// initial: optional prefill { amount, reason, category }. preloaded: optional { budget, transactions, today }.
+export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, preloaded }) {
   const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
-  const [walletId, setWalletId] = useState(wallets.length > 0 ? wallets[0].id : '')
-  const [amount, setAmount] = useState('')
-  const [category, setCategory] = useState('Food')
+  const [walletId, setWalletId] = useState(() => readLastWallet(wallets) || (wallets.length > 0 ? wallets[0].id : ''))
+  const [amount, setAmount] = useState(initial.amount ? String(initial.amount) : '')
+  const [category, setCategory] = useState(initial.category || guessCategory(initial.reason) || 'Food')
+  const [categoryTouched, setCategoryTouched] = useState(Boolean(initial.category))
   const [merchant, setMerchant] = useState('')
-  const [reason, setReason] = useState('')
+  const [reason, setReason] = useState(initial.reason || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [essentials, setEssentials] = useState([])
+  const [planCtx, setPlanCtx] = useState(preloaded || null)
   const [essentialKey, setEssentialKey] = useState('')
+  const [essentialTouched, setEssentialTouched] = useState(false)
 
-  // Fixed expenses from the user's plan, so paying e.g. rent is not counted as free spending.
+  // The user's plan and this period's spending: gives the fixed-expense list and the live preview.
   useEffect(() => {
+    if (preloaded) return
     let cancelled = false
-    getBudget(uid)
-      .then((b) => { if (!cancelled && b?.planVersion) setEssentials(b.essentialCategories || []) })
+    fetchTodayState(uid)
+      .then((state) => { if (!cancelled) setPlanCtx(state) })
       .catch(() => {})
     return () => { cancelled = true }
-  }, [uid])
+  }, [uid, preloaded])
+
+  const essentials = planCtx?.budget?.planVersion ? planCtx.budget.essentialCategories || [] : []
+  const num = toNum(amount)
+
+  const preview = useMemo(() => {
+    if (!planCtx?.budget?.planVersion || num <= 0) return null
+    const after = previewAfterExpense(computeToday, planCtx.budget, planCtx.transactions, {
+      amount: num,
+      category,
+      essentialKey: essentialKey || undefined,
+    })
+    return after.hasPlan ? after : null
+  }, [planCtx, num, category, essentialKey])
+
+  const handleTextChange = (nextReason, nextMerchant) => {
+    if (!categoryTouched) {
+      const guess = guessCategory(nextReason, nextMerchant)
+      if (guess) setCategory(guess)
+    }
+    if (!essentialTouched) {
+      setEssentialKey(guessEssentialKey(essentials, nextReason, nextMerchant) || '')
+    }
+  }
+
+  const impact = (() => {
+    if (!preview) return null
+    const money = (n) => `${currency} ${fillText('{v}', { v: n })}`
+    const freeUsed = preview.spentTotal - (planCtx.today?.spentTotal || 0)
+    if (freeUsed <= 0) return { cls: styles.impactInfo, text: t('quick.afterFixed') }
+    if (preview.status === 'depleted') return { cls: styles.impactBad, text: t('quick.afterDepleted') }
+    if (preview.remainingToday < 0) {
+      return { cls: styles.impactBad, text: fillText(t('quick.afterOver'), { over: money(-preview.remainingToday) }) }
+    }
+    return {
+      cls: preview.status === 'caution' ? styles.impactWarn : styles.impactOk,
+      text: fillText(t('quick.afterOk'), { left: money(preview.remainingToday) }),
+    }
+  })()
 
   const selectedWallet = wallets.find((w) => w.id === walletId)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!walletId) { setError('Select a wallet'); return }
-    const num = parseFloat(amount)
     if (!num || num <= 0) { setError('Enter a valid amount'); return }
 
     setLoading(true)
@@ -63,6 +120,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
         balance: (selectedWallet?.balance || 0) - num,
       })
 
+      try { localStorage.setItem(LAST_WALLET_KEY, walletId) } catch {}
       handleClose()
     } catch (err) {
       setError(err.message)
@@ -110,13 +168,25 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               <span className={styles.amountCurrency}>{currency}</span>
               <input
                 className={styles.amountInput}
-                type="number"
+                type="text"
+                inputMode="decimal"
                 placeholder="0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 autoFocus
               />
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>{t('expense.reason')}</label>
+            <input
+              className={styles.input}
+              type="text"
+              placeholder={t('expense.reasonPlaceholder')}
+              value={reason}
+              onChange={(e) => { setReason(e.target.value); handleTextChange(e.target.value, merchant) }}
+            />
           </div>
 
           <div className={styles.field}>
@@ -130,7 +200,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
                     type="button"
                     className={`${styles.categoryBtn} ${active ? styles.categoryActive : ''}`}
                     style={active ? { borderColor: c.color, background: c.color + '15' } : {}}
-                    onClick={() => setCategory(c.id)}
+                    onClick={() => { setCategory(c.id); setCategoryTouched(true) }}
                   >
                     <span className={styles.categoryEmoji}>{c.emoji}</span>
                     <span className={styles.categoryName}>{c.labelEn}</span>
@@ -145,7 +215,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               <label className={styles.label}>{t('today.fixedExpense')}</label>
               <Select
                 value={essentialKey}
-                onChange={setEssentialKey}
+                onChange={(v) => { setEssentialKey(v); setEssentialTouched(true) }}
                 options={[
                   { value: '', label: t('today.fixedExpenseNone') },
                   ...essentials.map((e) => ({ value: e.presetId || e.name, label: e.name })),
@@ -162,18 +232,7 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               type="text"
               placeholder="e.g. Restaurant, Store..."
               value={merchant}
-              onChange={(e) => setMerchant(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label}>{t('expense.reason')}</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder={t('expense.reasonPlaceholder')}
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => { setMerchant(e.target.value); handleTextChange(reason, e.target.value) }}
             />
           </div>
 
@@ -185,6 +244,8 @@ export default function AddExpenseModal({ uid, wallets, onClose }) {
               </span>
             </div>
           )}
+
+          {impact && <div className={`${styles.impact} ${impact.cls}`} role="status">{impact.text}</div>}
 
           {error && <p className={styles.error}>{error}</p>}
 

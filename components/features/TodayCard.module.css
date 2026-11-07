@@ -48,7 +48,12 @@
 .weekHead { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-gray); font-variant-numeric: tabular-nums; }
 .weekOver { color: var(--danger); font-weight: 700; }
 
-.edit { align-self: flex-start; font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.buyBtn {
+  min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1.5px solid var(--primary);
+  background: var(--badge-bg); color: var(--primary); font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer;
+}
+.edit { font-size: 13px; font-weight: 600; color: var(--primary); text-decoration: none; }
 
 .setupTitle { margin: 0; font-size: 18px; color: var(--text-dark); }
 .setupSub { margin: 0; font-size: 14px; color: var(--text-gray); line-height: 1.6; }

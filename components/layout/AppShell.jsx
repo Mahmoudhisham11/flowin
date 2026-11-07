@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Sidebar from '@/components/layout/Sidebar'
 import BottomNav from '@/components/navigation/BottomNav'
 import FCMNotificationToast from '@/components/notifications/FCMNotificationToast'
+import QuickActionsHost from '@/components/navigation/QuickActionsHost'
 
 export default function AppShell({ children }) {
   const pathname = usePathname()
@@ -17,6 +18,7 @@ export default function AppShell({ children }) {
       <main className="main-content">{children}</main>
       <BottomNav />
       <FCMNotificationToast />
+      <QuickActionsHost />
     </div>
   )
 }

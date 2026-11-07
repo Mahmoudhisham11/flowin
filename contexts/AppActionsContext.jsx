@@ -6,12 +6,20 @@ const AppActionsContext = createContext(null)
 
 export function AppActionsProvider({ children }) {
   const [activeModal, setActiveModal] = useState(null)
+  const [modalProps, setModalProps] = useState({})
 
-  const openModal = useCallback((name) => setActiveModal(name), [])
-  const closeModal = useCallback(() => setActiveModal(null), [])
+  // openModal('expense', { amount: 120, reason: 'Headphones' }) opens a global modal with optional prefill.
+  const openModal = useCallback((name, props = {}) => {
+    setModalProps(props)
+    setActiveModal(name)
+  }, [])
+  const closeModal = useCallback(() => {
+    setActiveModal(null)
+    setModalProps({})
+  }, [])
 
   return (
-    <AppActionsContext.Provider value={{ activeModal, openModal, closeModal }}>
+    <AppActionsContext.Provider value={{ activeModal, modalProps, openModal, closeModal }}>
       {children}
     </AppActionsContext.Provider>
   )

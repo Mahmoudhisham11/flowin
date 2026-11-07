@@ -10,6 +10,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { getBudget, saveBudget } from '@/services/budgetService'
 import { CURRENCIES, normalizeCurrency } from '@/lib/currency'
 import { getPeriod, computePlan, recommendSavingsPct, toDateStr, PAY_CYCLES } from '@/lib/planEngine'
+import { toNum } from '@/lib/parseAmount'
 import { ESSENTIAL_PRESETS, WEAK_SPOTS, SAVINGS_OPTIONS } from '@/lib/planPresets'
 import Button from '@/components/ui/Button'
 import Select from '@/components/ui/Select'
@@ -18,16 +19,6 @@ import styles from './page.module.css'
 const TOTAL_STEPS = 5
 let idCounter = 0
 const newId = () => `r${++idCounter}`
-
-// Accepts Arabic-Indic digits and stray characters; returns a non-negative number.
-function toNum(value) {
-  const normalized = String(value ?? '')
-    .replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
-    .replace(/[٫,]/g, '.')
-    .replace(/[^\d.]/g, '')
-  const n = parseFloat(normalized)
-  return Number.isFinite(n) && n > 0 ? n : 0
-}
 
 const fmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0))
 

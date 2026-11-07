@@ -4,22 +4,16 @@ import Link from 'next/link'
 import AnimatedNumber from './AnimatedNumber'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useCurrency } from '@/hooks/useCurrency'
+import { fillText as fill } from '@/lib/fillText'
+import { useAppActions } from '@/contexts/AppActionsContext'
 import styles from './TodayCard.module.css'
 
 const fmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0))
 
-// Replaces {placeholders} with formatted numbers (percentages and day counts stay as-is).
-function fill(text, params = {}) {
-  return text.replace(/\{(\w+)\}/g, (_, key) => {
-    const v = params[key]
-    if (v === undefined) return ''
-    return key === 'used' || key === 'elapsed' || key === 'days' ? String(v) : fmt(v)
-  })
-}
-
 export default function TodayCard({ today }) {
   const { t } = useTranslation()
   const currency = useCurrency()
+  const { openModal } = useAppActions()
 
   if (!today?.hasPlan) {
     return (
@@ -86,7 +80,12 @@ export default function TodayCard({ today }) {
         </div>
       </div>
 
-      <Link href="/onboarding" className={styles.edit}>{t('today.editPlan')}</Link>
+      <div className={styles.footer}>
+        <button type="button" className={styles.buyBtn} onClick={() => openModal('purchase')}>
+          🛒 {t('quick.purchase')}
+        </button>
+        <Link href="/onboarding" className={styles.edit}>{t('today.editPlan')}</Link>
+      </div>
     </section>
   )
 }

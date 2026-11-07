@@ -1,0 +1,30 @@
+.note { text-align: center; color: var(--text-gray); font-size: 14px; margin: 8px 0 16px; }
+
+.noPlan { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; color: var(--text-gray); font-size: 14px; }
+.cta {
+  padding: 10px 18px; border-radius: 12px; background: var(--primary-gradient);
+  color: #fff; font-weight: 700; font-size: 14px; text-decoration: none;
+}
+
+.kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kind {
+  min-height: 44px; padding: 8px 10px; border-radius: 14px; border: 1.5px solid var(--input-border);
+  background: transparent; color: var(--text-dark); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.kindOn { border-color: var(--primary); background: var(--badge-bg); }
+
+.result { --accent: var(--success); --accent-bg: var(--success-bg); display: flex; flex-direction: column; gap: 12px; }
+.result[data-verdict='stretch'] { --accent: var(--warning); --accent-bg: var(--warning-bg); }
+.result[data-verdict='wait'] { --accent: var(--danger); --accent-bg: var(--danger-bg); }
+
+.itemLine { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; color: var(--text-dark); }
+.itemLine span { color: var(--text-gray); font-variant-numeric: tabular-nums; }
+
+.verdict { align-self: flex-start; padding: 6px 14px; border-radius: 999px; background: var(--accent-bg); color: var(--accent); font-weight: 800; font-size: 15px; }
+.headline { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--accent-bg); color: var(--text-dark); font-size: 14px; line-height: 1.7; }
+
+.impact { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-gray); }
+
+.options { padding: 12px 14px; border-radius: 14px; background: var(--input-bg); }
+.options h3 { margin: 0 0 8px; font-size: 13px; color: var(--text-dark); }
+.options ul { margin: 0; padding-inline-start: 18px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.7; color: var(--text-dark); }

@@ -171,6 +171,7 @@
 
 .amountInput {
   flex: 1;
+  min-width: 0;
   padding: 16px 0;
   font-size: 24px;
   font-weight: 800;
@@ -187,7 +188,7 @@
 
 .categoryGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -223,6 +224,10 @@
   font-weight: 600;
   color: var(--text-dark);
   text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .input {
@@ -345,7 +350,19 @@
     padding: 10px 0;
   }
   .categoryGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
   }
 }
+
+.impact {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+.impactOk { background: var(--success-bg); color: var(--success); }
+.impactWarn { background: var(--warning-bg); color: var(--warning); }
+.impactBad { background: var(--danger-bg); color: var(--danger); }
+.impactInfo { background: var(--badge-bg); color: var(--primary); }
