@@ -12,15 +12,15 @@
 .hero p { margin: 0; font-size: clamp(16px, 2.4vw, 19px); line-height: 1.7; color: var(--text-gray); max-width: 600px; }
 .hero small { font-size: 13px; color: var(--text-light); }
 .cta {
-  display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; border-radius: 16px;
-  background: var(--primary-gradient); color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; box-shadow: var(--shadow-md);
+  display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 30px; border-radius: 18px;
+  background: var(--primary); color: #fff; font-size: 17px; font-weight: 700; text-decoration: none;
 }
 
 .section { max-width: 1040px; margin: 0 auto; padding: 32px 20px; }
 .section h2 { margin: 0 0 20px; font-size: 26px; text-align: center; }
 .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
 .card { padding: 20px; border-radius: var(--radius-md); background: var(--card); border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 6px; }
-.icon { font-size: 28px; }
+.icon { width: 48px; height: 48px; border-radius: 14px; background: var(--badge-bg); color: var(--primary-dark); display: flex; align-items: center; justify-content: center; }
 .card h3 { margin: 4px 0 0; font-size: 17px; }
 .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-gray); }
 

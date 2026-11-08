@@ -10,6 +10,7 @@ import { guessCategory, guessEssentialKey } from '@/lib/categoryGuess'
 import { fillText } from '@/lib/fillText'
 import { toNum } from '@/lib/parseAmount'
 import Select from '@/components/ui/Select'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 import { WALLET_TYPES } from '@/services/walletService'
 import { CATEGORIES } from '@/lib/categories'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -31,7 +32,7 @@ function readLastWallet(wallets) {
 // initial: optional prefill { amount, reason, category }. preloaded: optional { budget, transactions, today }.
 export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, preloaded }) {
   const currency = useCurrency()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [walletId, setWalletId] = useState(() => readLastWallet(wallets) || (wallets.length > 0 ? wallets[0].id : ''))
   const [amount, setAmount] = useState(initial.amount ? String(initial.amount) : '')
@@ -139,30 +140,6 @@ export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, p
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
-            <label className={styles.label}>{t('income.wallet')}</label>
-            <div className={styles.walletGrid}>
-              {wallets.map((w) => {
-                const wt = WALLET_TYPES.find((t) => t.id === w.type)
-                const active = walletId === w.id
-                return (
-                  <button
-                    key={w.id}
-                    type="button"
-                    className={`${styles.walletBtn} ${active ? styles.walletActive : ''}`}
-                    onClick={() => setWalletId(w.id)}
-                  >
-                    <span className={styles.walletEmoji}>{wt?.emoji || '💳'}</span>
-                    <div className={styles.walletInfo}>
-                      <span className={styles.walletName}>{w.name}</span>
-                      <span className={styles.walletBalance}>{currency} {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className={styles.field}>
             <label className={styles.label}>{t('income.amount')}</label>
             <div className={styles.amountWrap}>
               <span className={styles.amountCurrency}>{currency}</span>
@@ -202,8 +179,32 @@ export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, p
                     style={active ? { borderColor: c.color, background: c.color + '15' } : {}}
                     onClick={() => { setCategory(c.id); setCategoryTouched(true) }}
                   >
-                    <span className={styles.categoryEmoji}>{c.emoji}</span>
-                    <span className={styles.categoryName}>{c.labelEn}</span>
+                    <CategoryIcon id={c.id} size={22} />
+                    <span className={styles.categoryName}>{lang === 'ar' ? c.labelAr : c.id === 'Entertainment' ? 'Fun' : c.labelEn}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>{t('income.wallet')}</label>
+            <div className={styles.walletGrid}>
+              {wallets.map((w) => {
+                const wt = WALLET_TYPES.find((t) => t.id === w.type)
+                const active = walletId === w.id
+                return (
+                  <button
+                    key={w.id}
+                    type="button"
+                    className={`${styles.walletBtn} ${active ? styles.walletActive : ''}`}
+                    onClick={() => setWalletId(w.id)}
+                  >
+                    <span className={styles.walletEmoji}>{wt?.emoji || '💳'}</span>
+                    <div className={styles.walletInfo}>
+                      <span className={styles.walletName}>{w.name}</span>
+                      <span className={styles.walletBalance}>{currency} {new Intl.NumberFormat('en-US').format(Number(w.balance || 0))}</span>
+                    </div>
                   </button>
                 )
               })}

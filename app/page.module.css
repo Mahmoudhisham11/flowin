@@ -819,3 +819,16 @@
   }
 }
 
+
+.askBtn {
+  width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--card-border);
+  background: var(--card); color: var(--text-dark); display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; flex: none;
+}
+.homeActions { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin: 14px 0; }
+.primaryAction, .secondaryAction {
+  min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+}
+.primaryAction { border: 0; background: var(--primary); color: #fff; }
+.secondaryAction { border: 1.5px solid var(--card-border); background: var(--card); color: var(--text-dark); font-size: 14px; }

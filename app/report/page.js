@@ -6,6 +6,7 @@ import { useUser } from '@/contexts/UserContext'
 import { fetchReportData } from '@/services/reportService'
 import { buildReport } from '@/lib/reportEngine'
 import { getCategory } from '@/lib/categories'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 import { fillText } from '@/lib/fillText'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useCurrency } from '@/hooks/useCurrency'
@@ -82,7 +83,7 @@ export default function ReportPage({ preloaded } = {}) {
 
   const m = (n) => `${currency} ${money(n)}`
   const dateFmt = (d) => d.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-GB', { day: 'numeric', month: 'short' })
-  const catLabel = (id) => { const c = getCategory(id); return `${c.emoji} ${lang === 'ar' ? c.labelAr : c.labelEn}` }
+  const catLabel = (id) => { const c = getCategory(id); return lang === 'ar' ? c.labelAr : c.labelEn }
 
   const insightText = (ins) => {
     const p = { ...ins.params }
@@ -160,7 +161,7 @@ export default function ReportPage({ preloaded } = {}) {
               {report.topCategories.map((c) => (
                 <li key={c.category}>
                   <div className={styles.catRow}>
-                    <span>{catLabel(c.category)}</span>
+                    <span className={styles.catName}><CategoryIcon id={c.category} size={16} tile />{catLabel(c.category)}</span>
                     <strong>{m(c.amount)}</strong>
                   </div>
                   <div className={styles.track} aria-hidden="true"><div className={styles.fillBlue} style={{ width: `${c.pct}%` }} /></div>

@@ -2,16 +2,19 @@
 
 import { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { DashboardIcon, BudgetIcon, ReportIcon, TaskIcon } from '@/components/Icons'
+import { DayIcon, PlanIcon, GoalIcon, InsightsIcon } from '@/components/Icons'
 import { useTranslation } from '@/hooks/useTranslation'
 import PlusMenu from './PlusMenu'
 import styles from './BottomNav.module.css'
 
-const navItems = [
-  { key: 'nav.dashboard', icon: <DashboardIcon />, route: '/' },
-  { key: 'nav.budget', icon: <BudgetIcon />, route: '/budget' },
-  { key: 'nav.dailyTasks', icon: <TaskIcon />, route: '/tasks' },
-  { key: 'nav.reports', icon: <ReportIcon />, route: '/analytics' },
+// Today, Plan | quick add | Goals, Insights. Everything else lives in the quick-add menu.
+const leftItems = [
+  { key: 'nav.today', icon: <DayIcon />, route: '/' },
+  { key: 'nav.plan', icon: <PlanIcon />, route: '/budget' },
+]
+const rightItems = [
+  { key: 'nav.goals', icon: <GoalIcon />, route: '/goals' },
+  { key: 'nav.insights', icon: <InsightsIcon />, route: '/report' },
 ]
 
 export default function BottomNav() {
@@ -20,54 +23,44 @@ export default function BottomNav() {
   const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const activeIndex = navItems.findIndex((item) => item.route === pathname)
+  const renderTab = (item) => {
+    const active = item.route === pathname
+    return (
+      <button
+        key={item.key}
+        type="button"
+        className={`${styles.tab} ${active ? styles.tabActive : ''}`}
+        aria-current={active ? 'page' : undefined}
+        onClick={() => router.push(item.route)}
+      >
+        <span className={styles.tabIcon}>{item.icon}</span>
+        <span className={styles.tabLabel}>{t(item.key)}</span>
+      </button>
+    )
+  }
 
   return (
     <>
-      <nav className={styles.nav}>
+      <nav className={styles.nav} aria-label="Main">
         <div className={styles.inner}>
-          {navItems.map((item, i) => {
-            const isActive = i === activeIndex
-            return (
-              <button
-                key={item.key}
-                className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
-                onClick={() => router.push(item.route)}
-              >
-                {isActive && <div className={styles.pill} />}
-                <span className={`${styles.tabIcon} ${isActive ? styles.tabIconActive : ''}`}>
-                  {item.icon}
-                </span>
-                {isActive && (
-                  <span className={styles.tabLabel}>
-                    {t(item.key)}
-                  </span>
-                )}
-              </button>
-            )
-          })}
+          {leftItems.map(renderTab)}
 
           <div className={styles.centerWrap}>
             <button
+              type="button"
               className={`${styles.fab} ${menuOpen ? styles.fabActive : ''}`}
+              aria-label={t('quick.title')}
+              aria-expanded={menuOpen}
               onClick={() => setMenuOpen((v) => !v)}
             >
-              <svg
-                className={`${styles.fabIcon} ${menuOpen ? styles.fabIconRotated : ''}`}
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg className={`${styles.fabIcon} ${menuOpen ? styles.fabIconRotated : ''}`} width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </button>
           </div>
+
+          {rightItems.map(renderTab)}
         </div>
       </nav>
 

@@ -13,15 +13,15 @@
 .range { margin: 0; font-size: 13px; color: var(--text-gray); }
 
 .card {
-  --accent: var(--primary);
+  --accent: var(--primary); --accent-fill: var(--primary);
   display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: var(--radius-md);
   background: var(--card); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);
 }
 .card p { margin: 0; }
-.card[data-rating='great'], .card[data-rating='good'] { --accent: var(--success); }
-.card[data-rating='attention'] { --accent: var(--warning); }
-.card[data-rating='over'] { --accent: var(--danger); }
-.card[data-rating='none'] { --accent: var(--text-light); }
+.card[data-rating='great'], .card[data-rating='good'] { --accent: var(--success); --accent-fill: var(--success-fill); }
+.card[data-rating='attention'] { --accent: var(--warning); --accent-fill: var(--warning-fill); }
+.card[data-rating='over'] { --accent: var(--danger); --accent-fill: var(--danger-fill); }
+.card[data-rating='none'] { --accent: var(--text-light); --accent-fill: var(--text-light); }
 
 .ratingRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .rating { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
@@ -29,7 +29,7 @@
 .bigNumber { font-size: 34px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
 .sub { font-size: 13px; color: var(--text-gray); }
 .track { height: 8px; border-radius: 999px; background: var(--bg-secondary); overflow: hidden; }
-.fill { height: 100%; border-radius: 999px; background: var(--accent); }
+.fill { height: 100%; border-radius: 999px; background: var(--accent-fill); }
 .fillBlue { height: 100%; border-radius: 999px; background: var(--primary); }
 
 .facts { margin: 4px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -40,7 +40,7 @@
 .h2 { margin: 0; font-size: 15px; color: var(--text-dark); }
 .chart { width: 100%; height: auto; direction: ltr; }
 .bar { fill: var(--primary); }
-.barOver { fill: var(--danger); }
+.barOver { fill: var(--danger-fill); }
 .limit { stroke: var(--text-light); stroke-width: 1; stroke-dasharray: 4 4; }
 .limitText { font-size: 9px; fill: var(--text-gray); }
 .axis { font-size: 9px; fill: var(--text-gray); }
@@ -57,3 +57,5 @@
   align-self: flex-start; padding: 10px 18px; border-radius: 12px; background: var(--primary-gradient);
   color: #fff; font-weight: 700; font-size: 14px; text-decoration: none;
 }
+
+.catName { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; }

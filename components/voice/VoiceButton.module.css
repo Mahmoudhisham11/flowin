@@ -376,7 +376,7 @@
   font-size: 12px;
   font-weight: 700;
   color: #fff;
-  background: var(--danger);
+  background: var(--danger-fill);
   border-radius: 100px;
   border: none;
   cursor: pointer;

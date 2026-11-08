@@ -211,3 +211,23 @@ export const WeekReportIcon = (props) => (
     <polyline points="7 17 10 14 13 16 17 12" />
   </svg>
 );
+
+export const DayIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="3" y="5" width="18" height="16" rx="3" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </svg>
+);
+
+export const PlanIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 3v9h9" />
+    <path d="M20.5 15A9 9 0 1 1 9 3.5" />
+  </svg>
+);
+
+export const InsightsIcon = (props) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M5 20v-9M12 20V5M19 20v-6" />
+  </svg>
+);

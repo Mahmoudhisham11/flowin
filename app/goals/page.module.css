@@ -23,15 +23,15 @@
 .sectionTitle { margin: 8px 0 0; font-size: 16px; color: var(--text-gray); }
 
 .card {
-  --accent: var(--primary);
+  --accent: var(--primary); --accent-fill: var(--primary);
   display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: var(--radius-md);
   background: var(--card); border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);
 }
-.card[data-status='onTrack'] { --accent: var(--success); }
-.card[data-status='done'] { --accent: var(--success); }
-.card[data-status='behind'] { --accent: var(--warning); }
-.card[data-status='overdue'] { --accent: var(--danger); }
-.card[data-status='noDate'] { --accent: var(--primary); }
+.card[data-status='onTrack'] { --accent: var(--success); --accent-fill: var(--success-fill); }
+.card[data-status='done'] { --accent: var(--success); --accent-fill: var(--success-fill); }
+.card[data-status='behind'] { --accent: var(--warning); --accent-fill: var(--warning-fill); }
+.card[data-status='overdue'] { --accent: var(--danger); --accent-fill: var(--danger-fill); }
+.card[data-status='noDate'] { --accent: var(--primary); --accent-fill: var(--primary); }
 
 .cardHead { display: flex; align-items: center; gap: 12px; }
 .emoji { font-size: 30px; }
@@ -43,7 +43,7 @@
 .amounts strong { font-size: 20px; color: var(--text-dark); }
 .amounts span { font-size: 13px; color: var(--text-gray); }
 .track { height: 10px; border-radius: 999px; background: var(--bg-secondary); overflow: hidden; }
-.fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.4s ease; }
+.fill { height: 100%; border-radius: 999px; background: var(--accent-fill); transition: width 0.4s ease; }
 .hint { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-gray); }
 
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }

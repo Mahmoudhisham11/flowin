@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useUser } from '@/contexts/UserContext'
+import { useAppActions } from '@/contexts/AppActionsContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useSubscription } from '@/hooks/useSubscription'
 import { PlusIcon, TransferIcon } from '@/components/Icons'
@@ -9,8 +10,9 @@ import { subscribeToTransactions } from '@/services/transactionsService'
 import { subscribeToWallets, WALLET_TYPES } from '@/services/walletService'
 import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
+import CategoryIcon from '@/components/ui/CategoryIcon'
 import { computeToday } from '@/lib/planEngine'
-import BalanceCard from '@/components/features/BalanceCard'
+import Link from 'next/link'
 import TodayCard from '@/components/features/TodayCard'
 import AddWalletModal from '@/components/features/AddWalletModal'
 import AddIncomeModal from '@/components/features/AddIncomeModal'
@@ -49,6 +51,7 @@ export default function Home() {
   const swiperRef = useRef(null)
   const avatarMenuRef = useRef(null)
   const { t } = useTranslation()
+  const { openModal } = useAppActions()
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -157,15 +160,25 @@ export default function Home() {
             <span className={styles.userPlan}>{plan === 'pro' ? 'Pro' : plan === 'admin' ? 'Admin' : 'Free'}</span>
           </div>
         </div>
+        <Link href="/ai" className={styles.askBtn} aria-label={t('ai.title')}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 12a8 8 0 0 1-11.7 7L4 20l1.1-4.3A8 8 0 1 1 21 12z" />
+          </svg>
+        </Link>
       </header>
 
       <TodayCard today={today} />
 
-      <BalanceCard
-        balance={totalBalance}
-        showBalance={showBalance}
-        onToggle={() => setShowBalance((prev) => !prev)}
-      />
+      <div className={styles.homeActions}>
+        <button type="button" className={styles.primaryAction} onClick={() => openModal('expense')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          {t('dashboard.addExpense')}
+        </button>
+        <button type="button" className={styles.secondaryAction} onClick={() => openModal('purchase')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M3 4h2.5l2.4 11h10.2l2-8H7" /></svg>
+          {t('quick.purchase')}
+        </button>
+      </div>
 
       <Reveal delay={100} style={{ position: 'relative', zIndex: showActions ? 80 : 20 }}>
       <div className={styles.walletsSection}>
@@ -277,58 +290,6 @@ export default function Home() {
       </div>
       </Reveal>
 
-      <Reveal delay={200}>
-      <div className={styles.statsRow}>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryHeader}>
-            <h3 className={styles.summaryTitle}>{t('dashboard.totalCapital')}</h3>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-            </svg>
-          </div>
-          <div className={styles.summaryAmounts}>
-            <span className={styles.summarySpent}>{currency} <AnimatedNumber value={totalBalance} decimals={0} /></span>
-          </div>
-          <div className={styles.progressTrack}>
-            <div
-              className={styles.progressBar}
-              style={{ width: `${totalBalance > 0 ? Math.min((expenses / totalBalance) * 100, 100) : 0}%` }}
-            />
-          </div>
-          <div className={styles.summarySpentSoFar}>
-            <span className={styles.spentLabel}>{t('dashboard.spentSoFar')}</span>
-            <span className={styles.spentAmount}>{currency} <AnimatedNumber value={expenses} decimals={0} /></span>
-          </div>
-          {totalBalance === 0 && transactions.length === 0 && (
-            <p className={styles.summaryNote}>
-              {t('dashboard.addMoneyHint')}
-            </p>
-          )}
-        </div>
-
-        <div className={styles.quickStats}>
-          <div className={styles.statItem}>
-            <span className={styles.statIcon}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-              </svg>
-            </span>
-            <span className={styles.statLabel}>{t('common.income')}</span>
-            <span className={styles.statValue}>{currency} <AnimatedNumber value={income} decimals={0} /></span>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <span className={styles.statIcon}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><polyline points="5 12 12 5 19 12" />
-              </svg>
-            </span>
-            <span className={styles.statLabel}>{t('common.expense')}</span>
-            <span className={styles.statValue}>{currency} <AnimatedNumber value={expenses} decimals={0} /></span>
-          </div>
-        </div>
-      </div>
-      </Reveal>
 
       <Reveal delay={300} className={styles.dashboardSection}>
       <section className={styles.transactions}>
@@ -341,16 +302,13 @@ export default function Home() {
         {recent.length > 0 ? (
           <div className={styles.transactionList}>
             {recent.map((t) => {
-              const category = getCategory(t.category)
               return (
                 <div key={t.id} className={styles.transactionItem} onClick={() => setEditingTx(t)}>
-                  <div className={styles.txAvatar} style={{ background: `${category.color}20` }}>
-                    <span>{category.emoji}</span>
-                  </div>
+                  <CategoryIcon id={t.category} size={20} tile />
                   <div className={styles.txInfo}>
                     <span className={styles.txName}>{t.merchant || t.category || 'Transaction'}</span>
                     <span className={styles.txMeta}>
-                      {category.emoji} {t.category}
+                      {t.category}
                       {t.reason && <span className={styles.txReason}> · {t.reason}</span>}
                       {t.walletName && <span className={styles.txWallet}> · {t.walletName}</span>}
                     </span>

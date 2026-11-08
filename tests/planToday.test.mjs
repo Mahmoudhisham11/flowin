@@ -71,6 +71,10 @@ test('allocation of spending and the safe-to-spend-today engine', () => {
   // weekly budget slices
   r = computeToday(cfg, [tx('2026-11-02', 100, 'Food'), tx('2026-11-09', 300, 'Food')], d('2026-11-09')) // day index 8 -> week 1
   assert.equal(r.weekLength, 7); assert.equal(r.weekSpent, 300); assert.ok(Math.abs(r.weekBudget - 4900/30*7) < 1e-9)
+  // per-day free spending of the current week (days still to come are not included)
+  r = computeToday(cfg, [tx('2026-11-02', 100, 'Food'), tx('2026-11-03', 50, 'Food')], d('2026-11-04'))
+  assert.deepEqual(r.weekDays, [0, 100, 50, 0]); assert.equal(r.weekStartIndex, 0)
+  r = computeToday(cfg, [tx('2026-11-09', 300, 'Food')], d('2026-11-09')); assert.equal(r.weekStartIndex, 7); assert.deepEqual(r.weekDays, [0, 300])
   // last (short) week of a 30-day period = 2 days
   r = computeToday(cfg, [], d('2026-11-29')); assert.equal(r.weekLength, 2)
 

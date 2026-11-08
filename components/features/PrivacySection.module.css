@@ -11,7 +11,7 @@
 }
 .btn:disabled { opacity: 0.6; cursor: default; }
 .danger { border-color: transparent; background: var(--danger-bg); color: var(--danger); }
-.deleteBtn { background: var(--danger) !important; color: #fff !important; }
+.deleteBtn { background: var(--danger-fill) !important; color: #fff !important; }
 .deleteBtn:disabled { opacity: 0.45; }
 .error { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--danger-bg); color: var(--danger); font-size: 13px; }
 .links { display: flex; gap: 16px; font-size: 13px; }

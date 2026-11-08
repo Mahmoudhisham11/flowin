@@ -1,117 +1,123 @@
+/*
+ * Flowin design tokens (see the "Flowin Redesign" canvas, Foundations board).
+ * Blue is action, green is safe, amber is careful, red is over.
+ * Each status has a text colour (>= 4.5:1 on its soft background) and a fill colour for bars and dots.
+ */
 :root {
-  /* ===== Apple iOS Glassmorphism (Light Mode) ===== */
-  --primary: #007AFF;
-  --primary-light: #47A1FF;
-  --primary-dark: #0056B3;
-  --primary-gradient: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-  --bg: #F2F2F7;
-  --bg-secondary: #E5E5EA;
-  --card: rgba(255, 255, 255, 0.82);
-  --card-hover: rgba(255, 255, 255, 0.95);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-border-highlight: rgba(255, 255, 255, 0.9);
-  --text-dark: #000000;
-  --text-gray: #636366;
-  --text-light: #8E8E93;
-  --success: #34C759;
-  --danger: #FF3B30;
-  --warning: #FF9500;
-  --border: rgba(0, 0, 0, 0.08);
-  --border-light: rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1);
-  --radius-sm: 14px;
-  --radius-md: 20px;
-  --radius-lg: 28px;
-  --radius-xl: 36px;
-  --modal-bg: #FFFFFF;
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --nav-border: rgba(0, 0, 0, 0.08);
-  --overlay: rgba(0, 0, 0, 0.45);
-  --input-bg: rgba(0, 0, 0, 0.04);
-  --input-border: rgba(0, 0, 0, 0.1);
-  --sidebar-bg: rgba(255, 255, 255, 0.85);
-  --sidebar-border: rgba(0, 0, 0, 0.06);
-  --hover-bg: rgba(0, 0, 0, 0.05);
-  --badge-bg: rgba(0, 122, 255, 0.1);
-  --card-border: rgba(0, 0, 0, 0.06);
-  --success-bg: rgba(52, 199, 89, 0.12);
-  --danger-bg: rgba(255, 59, 48, 0.12);
-  --warning-bg: rgba(255, 149, 0, 0.12);
-  --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+  --primary: #2F4BEA;
+  --primary-light: #5B72F2;
+  --primary-dark: #2438C4;
+  --primary-gradient: linear-gradient(#2F4BEA, #2F4BEA);
 
-  /* Active Pill Styles */
-  --pill-active-bg: #000000;
+  --bg: #F4F6FA;
+  --bg-secondary: #E9EDF5;
+  --card: #FFFFFF;
+  --card-hover: #FFFFFF;
+  --glass-border: #E2E7F0;
+  --glass-border-highlight: #E2E7F0;
+
+  --text-dark: #0F172A;
+  --text-gray: #556079;
+  --text-light: #667289;
+
+  --success: #0B7A55;
+  --success-fill: #10B981;
+  --success-bg: #E5F6EE;
+  --danger: #B42318;
+  --danger-fill: #EF4444;
+  --danger-bg: #FDEBEA;
+  --warning: #8A5200;
+  --warning-fill: #F59E0B;
+  --warning-bg: #FEF1DC;
+
+  --border: #E2E7F0;
+  --border-light: #EDF0F6;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.16);
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
+  --radius-xl: 28px;
+
+  --modal-bg: #FFFFFF;
+  --nav-bg: #FFFFFF;
+  --nav-border: #E2E7F0;
+  --overlay: rgba(15, 23, 42, 0.55);
+  --input-bg: #F4F6FA;
+  --input-border: #D8DFEB;
+  --sidebar-bg: #FFFFFF;
+  --sidebar-border: #E2E7F0;
+  --hover-bg: rgba(15, 23, 42, 0.05);
+  --badge-bg: #EAEEFF;
+  --card-border: #E2E7F0;
+  --scrollbar-thumb: rgba(15, 23, 42, 0.18);
+
+  --pill-active-bg: #2F4BEA;
   --pill-active-text: #FFFFFF;
-  --pill-active-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  --pill-inactive-bg: rgba(0, 0, 0, 0.05);
-  --pill-inactive-border: rgba(0, 0, 0, 0.08);
+  --pill-active-shadow: none;
+  --pill-inactive-bg: #E9EDF5;
+  --pill-inactive-border: #E2E7F0;
+  --pill-inactive-text: #0F172A;
+  --bar-past: #C9D2FA;
 }
 
 [data-theme="dark"] {
-  /* ===== Apple iOS 26 Deep Charcoal Box Aesthetic (From Image) ===== */
-  --primary: #0A84FF;
-  --primary-light: #5AC8FA;
-  --primary-dark: #0064D2;
-  --primary-gradient: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
-  
-  /* Pure Pitch OLED Background */
-  --bg: #000000;
-  --bg-secondary: #08080A;
-  
-  /* Rich Silky Charcoal Card Surface (Matching Reference Box Image) */
-  --card: #18181B;
-  --card-hover: #222226;
-  --card-gradient: linear-gradient(180deg, #1E1E22 0%, #151518 100%);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-border-highlight: rgba(255, 255, 255, 0.22);
-  
-  /* Apple Crisp High-Contrast Typography */
-  --text-dark: #FFFFFF;
-  --text-gray: rgba(255, 255, 255, 0.65);
-  --text-light: rgba(255, 255, 255, 0.42);
-  
-  /* Apple Dynamic System Accents */
-  --success: #30D158;
-  --danger: #FF453A;
-  --warning: #FF9F0A;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-light: rgba(255, 255, 255, 0.06);
-  
-  /* Soft Ambient Glows & Box Shadows */
-  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.12);
-  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  
-  /* Opaque rich surfaces for Modals and Sheets */
-  --modal-bg: #161619;
-  --nav-bg: rgba(22, 22, 26, 0.95);
-  --nav-border: rgba(255, 255, 255, 0.12);
-  --overlay: rgba(0, 0, 0, 0.75);
-  --input-bg: #242428;
-  --input-border: rgba(255, 255, 255, 0.12);
-  --sidebar-bg: #121215;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --hover-bg: rgba(255, 255, 255, 0.08);
-  --badge-bg: rgba(10, 132, 255, 0.16);
-  --card-border: rgba(255, 255, 255, 0.1);
-  --success-bg: rgba(48, 209, 88, 0.15);
-  --danger-bg: rgba(255, 69, 58, 0.15);
-  --warning-bg: rgba(255, 159, 10, 0.15);
+  --primary: #5870FF;
+  --primary-light: #8EA2FF;
+  --primary-dark: #A9B7FF;
+  --primary-gradient: linear-gradient(#5870FF, #5870FF);
+
+  --bg: #0B1020;
+  --bg-secondary: #131A2E;
+  --card: #131A2E;
+  --card-hover: #18213A;
+  --glass-border: #25304D;
+  --glass-border-highlight: #25304D;
+
+  --text-dark: #F2F5FB;
+  --text-gray: #A6B0C6;
+  --text-light: #8A95AD;
+
+  --success: #4ADE9E;
+  --success-fill: #34D399;
+  --success-bg: #0F2F25;
+  --danger: #FF8A80;
+  --danger-fill: #F87171;
+  --danger-bg: #3A1618;
+  --warning: #FBBF24;
+  --warning-fill: #F59E0B;
+  --warning-bg: #33260F;
+
+  --border: #25304D;
+  --border-light: #1B2440;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+
+  --modal-bg: #131A2E;
+  --nav-bg: #131A2E;
+  --nav-border: #25304D;
+  --overlay: rgba(2, 5, 14, 0.7);
+  --input-bg: #0F1629;
+  --input-border: #2A3556;
+  --sidebar-bg: #0F1629;
+  --sidebar-border: #25304D;
+  --hover-bg: rgba(255, 255, 255, 0.07);
+  --badge-bg: #1C2548;
+  --card-border: #25304D;
   --scrollbar-thumb: rgba(255, 255, 255, 0.2);
 
-  /* Reference Image: Pills inside the Box */
-  --pill-active-bg: #FFFFFF;
-  --pill-active-text: #000000;
-  --pill-active-shadow: 0 4px 20px rgba(255, 255, 255, 0.25);
-  --pill-inactive-bg: #28282C;
-  --pill-inactive-border: rgba(255, 255, 255, 0.08);
-  --pill-inactive-text: #FFFFFF;
+  --pill-active-bg: #5870FF;
+  --pill-active-text: #FFFFFF;
+  --pill-inactive-bg: #1E2742;
+  --pill-inactive-border: #25304D;
+  --pill-inactive-text: #F2F5FB;
+  --bar-past: #34407A;
 }
 
 html.rtl {
-  --font-primary: var(--font-tajawal), var(--font-inter), -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+  --font-primary: var(--font-tajawal), var(--font-inter), system-ui, sans-serif;
 }
 
 * {
@@ -123,7 +129,7 @@ html.rtl {
 html,
 body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', var(--font-inter), var(--font-tajawal), 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-inter), var(--font-tajawal), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
@@ -136,30 +142,10 @@ html.rtl button,
 html.rtl input,
 html.rtl textarea,
 html.rtl select {
-  font-family: var(--font-tajawal), -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  font-family: var(--font-tajawal), var(--font-inter), system-ui, sans-serif;
 }
 
-/* Ambient Radial Glow on Dark Background */
-[data-theme="dark"] body {
-  background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(10, 132, 255, 0.08), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(94, 92, 230, 0.05), transparent 60%);
-  background-attachment: fixed;
-}
-
-/* Glassmorphism Surface Defaults */
-.glass-panel,
-[class*="Card_"],
-[class*="card_"],
-[class*="overviewCard"],
-[class*="widget_"] {
-  backdrop-filter: blur(28px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-/* Tactile Spring Micro-Interactions (Apple Physics) */
+/* Buttons respond to touch without bouncing */
 button,
 a,
 [role="button"],
@@ -169,7 +155,7 @@ input[type="submit"] {
   font-family: inherit;
   border: none;
   background: none;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
+  transition: transform 0.15s ease, 
               box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
               background-color 0.2s ease,
               border-color 0.2s ease,
@@ -180,7 +166,7 @@ input[type="submit"] {
 button:active,
 a:active,
 [role="button"]:active {
-  transform: scale(0.96) !important;
+  transform: scale(0.98) !important;
 }
 
 input, textarea, select {
@@ -212,12 +198,12 @@ input, textarea, select {
   flex: 1;
   min-width: 0;
   overflow-x: hidden;
-  animation: pageFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: pageFadeIn 0.25s ease-out;
 }
 
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.99); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 768px) {
@@ -231,12 +217,20 @@ input, textarea, select {
     flex-direction: column;
   }
   .main-content {
-    padding-bottom: calc(115px + env(safe-area-inset-bottom, 16px));
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 }
 
 @media (max-width: 480px) {
   .page, [class*="page_"] {
     padding: 16px 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

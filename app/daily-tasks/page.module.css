@@ -774,7 +774,7 @@
 }
 
 .stripDayDotDone {
-  background: var(--success);
+  background: var(--success-fill);
 }
 
 /* Empty State */

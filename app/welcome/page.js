@@ -7,6 +7,16 @@ import { welcomeContent } from '@/lib/welcomeContent'
 import { PRO_PRICE, PRO_PRICE_CURRENCY } from '@/lib/plans'
 import styles from './page.module.css'
 
+// Line icons for the feature cards (no emoji).
+const ICONS = {
+  day: <><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18M8 3v4M16 3v4" /></>,
+  cart: <><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M3 4h2.5l2.4 11h10.2l2-8H7" /></>,
+  goal: <><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4.5" /><circle cx="12" cy="12" r=".8" /></>,
+  chart: <path d="M5 20v-9M12 20V5M19 20v-6" />,
+  chat: <path d="M21 12a8 8 0 0 1-11.7 7L4 20l1.1-4.3A8 8 0 1 1 21 12z" />,
+  mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>,
+}
+
 export default function WelcomePage() {
   const { user } = useUser()
   const { lang, setLang } = useLocale()
@@ -39,7 +49,9 @@ export default function WelcomePage() {
           <div className={styles.grid}>
             {c.features.map((f) => (
               <article key={f.h} className={styles.card}>
-                <span className={styles.icon} aria-hidden="true">{f.icon}</span>
+                <span className={styles.icon} aria-hidden="true">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{ICONS[f.icon]}</svg>
+                </span>
                 <h3>{f.h}</h3>
                 <p>{f.p}</p>
               </article>
