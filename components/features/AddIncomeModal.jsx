@@ -24,9 +24,9 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!walletId) { setError('Select a wallet'); return }
+    if (!walletId) { setError(t('money.selectWallet')); return }
     const num = parseFloat(amount)
-    if (!num || num <= 0) { setError('Enter a valid amount'); return }
+    if (!num || num <= 0) { setError(t('money.invalidAmount')); return }
     if (!source.trim()) { setError('Enter the income source'); return }
 
     setLoading(true)
@@ -60,7 +60,7 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
       <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('income.title')}</h2>
-          <p className={styles.subtitle}>Add money to your wallet</p>
+          <p className={styles.subtitle}>{t('money.incomeSub')}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -108,7 +108,7 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
             <input
               className={styles.input}
               type="text"
-              placeholder="e.g. Salary, Freelance, Gift"
+              placeholder={t('money.incomePh')}
               value={source}
               onChange={(e) => setSource(e.target.value)}
             />
@@ -116,7 +116,7 @@ export default function AddIncomeModal({ uid, wallets, onClose }) {
 
           {selectedWallet && (
             <div className={styles.preview}>
-              <span className={styles.previewLabel}>New balance</span>
+              <span className={styles.previewLabel}>{t('money.newBalance')}</span>
               <span className={styles.previewValue}>
                 {walletType?.emoji} {currency} {new Intl.NumberFormat('en-US').format(((selectedWallet.balance || 0) + (parseFloat(amount) || 0)))}
               </span>

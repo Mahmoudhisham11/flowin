@@ -98,8 +98,8 @@ export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, p
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!walletId) { setError('Select a wallet'); return }
-    if (!num || num <= 0) { setError('Enter a valid amount'); return }
+    if (!walletId) { setError(t('money.selectWallet')); return }
+    if (!num || num <= 0) { setError(t('money.invalidAmount')); return }
 
     setLoading(true)
     setError('')
@@ -135,7 +135,7 @@ export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, p
       <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('expense.title')}</h2>
-          <p className={styles.subtitle}>Record a new expense</p>
+          <p className={styles.subtitle}>{t('money.expenseSub')}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -231,7 +231,7 @@ export default function AddExpenseModal({ uid, wallets, onClose, initial = {}, p
             <input
               className={styles.input}
               type="text"
-              placeholder="e.g. Restaurant, Store..."
+              placeholder={t('money.merchantPh')}
               value={merchant}
               onChange={(e) => { setMerchant(e.target.value); handleTextChange(reason, e.target.value) }}
             />

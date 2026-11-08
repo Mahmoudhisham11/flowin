@@ -42,7 +42,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
   const handleSave = async (e) => {
     e.preventDefault()
     const num = parseFloat(amount)
-    if (!num || num <= 0) { setError('Enter a valid amount'); return }
+    if (!num || num <= 0) { setError(t('money.invalidAmount')); return }
     setLoading(true)
     setError('')
     try {
@@ -159,7 +159,7 @@ export default function EditTransactionModal({ uid, transaction, wallets, onClos
       <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('transactions.editTransaction')}</h2>
-          <p className={styles.subtitle}>Update transaction details</p>
+          <p className={styles.subtitle}>{t('money.editSub')}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSave}>

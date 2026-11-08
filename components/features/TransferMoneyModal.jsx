@@ -26,7 +26,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const num = parseFloat(amount)
-    if (!num || num <= 0) { setError('Enter a valid amount'); return }
+    if (!num || num <= 0) { setError(t('money.invalidAmount')); return }
     if (!fromId || !toId) { setError('Select both wallets'); return }
     if (fromId === toId) { setError(t('transfer.sameWallet')); return }
     if (fromWallet && Number(fromWallet.balance) < num) { setError(t('wallet.insufficientBalance')); return }
@@ -78,7 +78,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
       <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{t('transfer.title')}</h2>
-          <p className={styles.subtitle}>Move money between your wallets</p>
+          <p className={styles.subtitle}>{t('money.transferSub')}</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
@@ -87,7 +87,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
             <Select
               value={fromId}
               onChange={setFromId}
-              placeholder="Select source wallet"
+              placeholder={t('money.fromPh')}
               options={wallets.map((w) => {
                 const type = WALLET_TYPES.find((wt) => wt.id === w.type)
                 return { value: w.id, label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
@@ -100,7 +100,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
             <Select
               value={toId}
               onChange={setToId}
-              placeholder="Select destination wallet"
+              placeholder={t('money.toPh')}
               options={wallets.filter((w) => w.id !== fromId).map((w) => {
                 const type = WALLET_TYPES.find((wt) => wt.id === w.type)
                 return { value: w.id, label: `${w.name} (${currency} ${new Intl.NumberFormat('en-US').format(Number(w.balance))})`, icon: type?.emoji }
@@ -118,7 +118,7 @@ export default function TransferMoneyModal({ uid, wallets, onClose }) {
 
           {fromWallet && (
             <div className={styles.preview}>
-              <span className={styles.previewLabel}>Available Balance</span>
+              <span className={styles.previewLabel}>{t('money.available')}</span>
               <span className={styles.previewValue}>{currency} {new Intl.NumberFormat('en-US').format(Number(fromWallet.balance))}</span>
             </div>
           )}

@@ -15,8 +15,6 @@ import { computeToday } from '@/lib/planEngine'
 import Link from 'next/link'
 import TodayCard from '@/components/features/TodayCard'
 import AddWalletModal from '@/components/features/AddWalletModal'
-import AddIncomeModal from '@/components/features/AddIncomeModal'
-import AddExpenseModal from '@/components/features/AddExpenseModal'
 import TransferMoneyModal from '@/components/features/TransferMoneyModal'
 import EditTransactionModal from '@/components/features/EditTransactionModal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -37,17 +35,13 @@ export default function Home() {
   const [wallets, setWallets] = useState([])
   const [budgetData, setBudgetData] = useState(null)
   const [showAddWallet, setShowAddWallet] = useState(false)
-  const [showAddIncome, setShowAddIncome] = useState(false)
-  const [showAddExpense, setShowAddExpense] = useState(false)
   const [showTransfer, setShowTransfer] = useState(false)
   const [editingWallet, setEditingWallet] = useState(null)
   const [editingTx, setEditingTx] = useState(null)
-  const [showActions, setShowActions] = useState(false)
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [activeWalletIdx, setActiveWalletIdx] = useState(0)
   const [budgetCategories, setBudgetCategories] = useState([])
-  const actionRef = useRef(null)
   const swiperRef = useRef(null)
   const avatarMenuRef = useRef(null)
   const { t } = useTranslation()
@@ -55,16 +49,13 @@ export default function Home() {
 
   useEffect(() => {
     const handleClick = (e) => {
-      if (actionRef.current && !actionRef.current.contains(e.target)) {
-        setShowActions(false)
-      }
       if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target)) {
         setShowAvatarMenu(false)
       }
     }
-    if (showActions || showAvatarMenu) document.addEventListener('mousedown', handleClick)
+    if (showAvatarMenu) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [showActions, showAvatarMenu])
+  }, [showAvatarMenu])
 
   useEffect(() => {
     if (!user) return
@@ -128,21 +119,21 @@ export default function Home() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
                   </svg>
-                  <span>Light</span>
+                  <span>{t('money.light')}</span>
                   {theme === 'light' && <span className={styles.dropdownCheck}>✓</span>}
                 </button>
                 <button className={styles.dropdownItem} onClick={() => { setTheme('dark'); setShowAvatarMenu(false) }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                   </svg>
-                  <span>Dark</span>
+                  <span>{t('money.dark')}</span>
                   {theme === 'dark' && <span className={styles.dropdownCheck}>✓</span>}
                 </button>
                 <button className={styles.dropdownItem} onClick={() => { setTheme('system'); setShowAvatarMenu(false) }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
                   </svg>
-                  <span>System</span>
+                  <span>{t('money.system')}</span>
                   {theme === 'system' && <span className={styles.dropdownCheck}>✓</span>}
                 </button>
                 <div className={styles.dropdownDivider} />
@@ -178,64 +169,27 @@ export default function Home() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M3 4h2.5l2.4 11h10.2l2-8H7" /></svg>
           {t('quick.purchase')}
         </button>
+        <VoiceButton inline />
       </div>
 
-      <Reveal delay={100} style={{ position: 'relative', zIndex: showActions ? 80 : 20 }}>
+      <Reveal delay={100} style={{ position: 'relative', zIndex: 20 }}>
       <div className={styles.walletsSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>{t('dashboard.wallets')}</h2>
           <div className={styles.walletActions}>
-            <div className={styles.actionBtnsDesktop}>
-              <button className={styles.incomeBtn} onClick={() => setShowAddIncome(true)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-                </svg>
-                {t('dashboard.addIncome')}
-              </button>
-              <button className={styles.expenseBtn} onClick={() => setShowAddExpense(true)}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
-                </svg>
-                {t('dashboard.addExpense')}
-              </button>
-              <button className={styles.transferBtn} onClick={() => setShowTransfer(true)}>
+            {wallets.length > 1 && (
+              <button type="button" className={styles.walletHeaderBtn} onClick={() => setShowTransfer(true)}>
                 <TransferIcon /> {t('dashboard.transfer')}
               </button>
-              <button className={styles.addWalletBtn} onClick={() => setShowAddWallet(true)}>
+            )}
+            {wallets.length > 0 && (
+              <button type="button" className={styles.walletHeaderBtn} onClick={() => setShowAddWallet(true)}>
                 <PlusIcon /> {t('dashboard.addWallet')}
               </button>
-            </div>
-            <div className={styles.actionDropdown} ref={actionRef}>
-              <button className={styles.moreBtn} onClick={() => setShowActions((prev) => !prev)}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
-                </svg>
-              </button>
-              {showActions && (
-                <div className={styles.dropdownMenu}>
-                  <button onClick={() => { setShowAddIncome(true); setShowActions(false) }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19" /><polyline points="19 12 12 19 5 12" />
-                    </svg>
-                    {t('dashboard.addIncome')}
-                  </button>
-                  <button onClick={() => { setShowAddExpense(true); setShowActions(false) }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" />
-                    </svg>
-                    {t('dashboard.addExpense')}
-                  </button>
-                  <button onClick={() => { setShowTransfer(true); setShowActions(false) }}>
-                    <TransferIcon /> {t('dashboard.transfer')}
-                  </button>
-                  <button onClick={() => { setShowAddWallet(true); setShowActions(false) }}>
-                    <PlusIcon /> {t('dashboard.addWallet')}
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
+        <p className={styles.walletsHelp}>{t('money.walletsHelp')}</p>
         {wallets.length > 0 ? (
           <>
             <div className={styles.walletGrid}>
@@ -325,13 +279,12 @@ export default function Home() {
         ) : (
           <div className={styles.emptyState}>
             <p className={styles.emptyText}>{t('transactions.noTransactions')}</p>
-            <p className={styles.emptyHint}>Add your first transaction to get started</p>
+            <p className={styles.emptyHint}>{t('money.noTxHint')}</p>
           </div>
         )}
       </section>
       </Reveal>
 
-      <VoiceButton />
 
       {showAddWallet && user && (
         <AddWalletModal uid={user.uid} onClose={() => setShowAddWallet(false)} />
@@ -339,14 +292,6 @@ export default function Home() {
 
       {editingWallet && user && (
         <AddWalletModal uid={user.uid} wallet={editingWallet} onClose={() => setEditingWallet(null)} />
-      )}
-
-      {showAddIncome && user && wallets.length > 0 && (
-        <AddIncomeModal uid={user.uid} wallets={wallets} onClose={() => setShowAddIncome(false)} />
-      )}
-
-      {showAddExpense && user && wallets.length > 0 && (
-        <AddExpenseModal uid={user.uid} wallets={wallets} onClose={() => setShowAddExpense(false)} />
       )}
 
       {showTransfer && user && wallets.length > 1 && (

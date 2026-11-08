@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import { createWallet, updateWallet, deleteWallet, WALLET_TYPES, WALLET_COLORS } from '@/services/walletService'
-import { saveTransaction } from '@/services/transactionsService'
+import { toNum } from '@/lib/parseAmount'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddWalletModal.module.css'
 import { useCurrency } from '@/hooks/useCurrency'
 
-export default function AddWalletModal({ uid, wallet, onClose }) {
+// intro: optional { title, body } shown above the form (used when the first wallet is required).
+// onSaved: called after a successful create/update, before the modal closes.
+export default function AddWalletModal({ uid, wallet, onClose, onSaved, intro }) {
   const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
@@ -24,37 +26,30 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!name.trim()) { setError('Enter wallet name'); return }
+    if (!name.trim()) { setError(t('money.walletName')); return }
     setLoading(true)
     setError('')
     try {
+      const newBalance = toNum(balance)
       if (isEdit) {
+        // Editing the balance corrects it; it is not recorded as income or spending.
         await updateWallet(uid, wallet.id, {
           name: name.trim(),
           type,
           color,
+          ...(String(balance) !== String(wallet.balance ?? '') ? { balance: newBalance } : {}),
         })
       } else {
-        const initBalance = parseFloat(balance) || 0
-        const newWalletId = await createWallet(uid, {
+        // The opening balance is money you already had, not income: no transaction is recorded.
+        await createWallet(uid, {
           name: name.trim(),
           type,
-          balance: initBalance,
+          balance: newBalance,
           color,
           currency,
         })
-        if (initBalance > 0) {
-          await saveTransaction(uid, {
-            type: 'income',
-            amount: initBalance,
-            category: 'Other',
-            merchant: `Initial balance - ${name.trim()}`,
-            walletId: newWalletId,
-            walletName: name.trim(),
-            currency,
-          })
-        }
       }
+      onSaved?.()
       handleClose()
     } catch (err) {
       setError(err.message)
@@ -83,8 +78,15 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
       <div className={`${styles.modal} ${isClosing ? styles.modalClosing : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{isEdit ? t('dashboard.editWallet') : t('dashboard.addWallet')}</h2>
-          <p className={styles.subtitle}>{isEdit ? 'Update wallet details' : 'Create a new wallet or account'}</p>
+          <p className={styles.subtitle}>{isEdit ? t('money.walletEditSub') : t('money.walletNewSub')}</p>
         </div>
+
+        {intro && (
+          <div className={styles.intro} role="note">
+            <strong>{intro.title}</strong>
+            <span>{intro.body}</span>
+          </div>
+        )}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.field}>
@@ -105,15 +107,14 @@ export default function AddWalletModal({ uid, wallet, onClose }) {
             </div>
           </div>
 
-          {!isEdit && (
-            <div className={styles.field}>
-              <label className={styles.label}>{t('dashboard.initialBalance')}</label>
-              <input className={styles.input} type="number" placeholder="0" value={balance} onChange={(e) => setBalance(e.target.value)} />
-            </div>
-          )}
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="wallet-balance">{t('money.currentBalance')} ({currency})</label>
+            <input id="wallet-balance" className={styles.input} type="text" inputMode="decimal" placeholder="0" value={balance} onChange={(e) => setBalance(e.target.value)} />
+            {isEdit && <span className={styles.hint}>{t('money.balanceHint')}</span>}
+          </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Color</label>
+            <label className={styles.label}>{t('money.color')}</label>
             <div className={styles.colorGrid}>
               {WALLET_COLORS.map((c) => (
                 <button key={c} type="button" className={`${styles.colorBtn} ${color === c ? styles.colorActive : ''}`} style={{ background: c }} onClick={() => setColor(c)} />

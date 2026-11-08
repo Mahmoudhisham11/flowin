@@ -498,3 +498,11 @@
     max-width: 300px;
   }
 }
+
+/* Compact trigger placed next to the home actions */
+.inlineBtn {
+  width: 52px; min-height: 52px; border-radius: 16px; border: 1.5px solid var(--card-border);
+  background: var(--card); color: var(--primary-dark); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+}
+.inlineBtn svg { width: 22px; height: 22px; }

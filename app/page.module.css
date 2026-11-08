@@ -825,10 +825,18 @@
   background: var(--card); color: var(--text-dark); display: inline-flex; align-items: center; justify-content: center;
   text-decoration: none; flex: none;
 }
-.homeActions { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin: 14px 0; }
+.homeActions { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 52px; gap: 10px; margin: 14px 0; }
 .primaryAction, .secondaryAction {
   min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; font-family: inherit;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
 }
 .primaryAction { border: 0; background: var(--primary); color: #fff; }
 .secondaryAction { border: 1.5px solid var(--card-border); background: var(--card); color: var(--text-dark); font-size: 14px; }
+
+.walletHeaderBtn {
+  min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--card-border);
+  background: var(--card); color: var(--text-dark); font-size: 13px; font-weight: 700; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.walletHeaderBtn svg { width: 16px; height: 16px; }
+.walletsHelp { margin: -4px 0 12px; font-size: 13px; line-height: 1.6; color: var(--text-gray); }

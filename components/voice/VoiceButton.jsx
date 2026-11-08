@@ -10,7 +10,8 @@ import useVoiceExpense, { STEPS } from '@/hooks/useVoiceExpense'
 import { useTranslation } from '@/hooks/useTranslation'
 import styles from './VoiceButton.module.css'
 
-export default function VoiceButton() {
+// inline: render the idle trigger as a compact button inside the page instead of a floating pill.
+export default function VoiceButton({ inline = false } = {}) {
   const { t } = useTranslation()
   const { user } = useUser()
   const [recLang, setRecLang] = useState('ar-EG')
@@ -83,10 +84,15 @@ export default function VoiceButton() {
     <>
       {/* 1. Default Idle Trigger Button */}
       {voice.step === STEPS.IDLE && !voice.error && (
+        inline ? (
+          <button type="button" className={styles.inlineBtn} onClick={handleStart} aria-label={t('money.voiceLabel')} title={t('money.voiceLabel')}>
+            <MicIcon />
+          </button>
+        ) : (
         <button
           className={styles.fab}
           onClick={handleStart}
-          aria-label="تسجيل مصروف بالصوت"
+          aria-label={t('money.voiceLabel')}
         >
           <div className={styles.fabGlow} />
           <div className={styles.fabIcon}>
@@ -94,6 +100,7 @@ export default function VoiceButton() {
           </div>
           <span className={styles.fabLabel}>{t('voice.title') || 'تسجيل صوتي'}</span>
         </button>
+        )
       )}
 
       {/* 2. Recording State: Smooth In-Place Floating Soundbar (No Live Transcript) */}
