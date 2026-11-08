@@ -825,7 +825,7 @@
   background: var(--card); color: var(--text-dark); display: inline-flex; align-items: center; justify-content: center;
   text-decoration: none; flex: none;
 }
-.homeActions { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 52px; gap: 10px; margin: 14px 0; }
+.homeActions { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; margin: 14px 0; }
 .primaryAction, .secondaryAction {
   min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; font-family: inherit;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
@@ -840,3 +840,15 @@
 }
 .walletHeaderBtn svg { width: 16px; height: 16px; }
 .walletsHelp { margin: -4px 0 12px; font-size: 13px; line-height: 1.6; color: var(--text-gray); }
+
+.voiceSpacer { height: 72px; }
+@media (min-width: 768px) { .voiceSpacer { height: 40px; } }
+.promptCard {
+  display: flex; flex-direction: column; gap: 8px; padding: 16px; margin-bottom: 14px;
+  border-radius: var(--radius-md); background: var(--badge-bg); border: 1px solid var(--card-border);
+}
+.promptCard h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--text-dark); }
+.promptCard p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-dark); }
+.promptCard > button { align-self: flex-start; padding: 0 20px; }
+.promptActions { display: flex; gap: 10px; flex-wrap: wrap; }
+.promptActions button { padding: 0 20px; }

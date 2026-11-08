@@ -9,13 +9,14 @@ import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './AddIncomeModal.module.css'
 import { useCurrency } from '@/hooks/useCurrency'
 
-export default function AddIncomeModal({ uid, wallets, onClose }) {
+// initial: optional prefill { amount, source }
+export default function AddIncomeModal({ uid, wallets, onClose, initial = {} }) {
   const currency = useCurrency()
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onClose)
   const [walletId, setWalletId] = useState(wallets.length > 0 ? wallets[0].id : '')
-  const [amount, setAmount] = useState('')
-  const [source, setSource] = useState('')
+  const [amount, setAmount] = useState(initial.amount ? String(Math.round(initial.amount)) : '')
+  const [source, setSource] = useState(initial.source || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 

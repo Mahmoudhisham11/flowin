@@ -65,7 +65,7 @@ export default function QuickActionsHost() {
     return <AddExpenseModal key="expense" uid={user.uid} wallets={wallets} initial={modalProps} onClose={closeModal} />
   }
   if (activeModal === 'income') {
-    return <AddIncomeModal key="income" uid={user.uid} wallets={wallets} onClose={closeModal} />
+    return <AddIncomeModal key="income" uid={user.uid} wallets={wallets} initial={modalProps} onClose={closeModal} />
   }
   return null
 }

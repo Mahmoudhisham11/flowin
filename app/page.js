@@ -12,8 +12,10 @@ import { subscribeToBudget } from '@/services/budgetService'
 import { getCategory } from '@/lib/categories'
 import CategoryIcon from '@/components/ui/CategoryIcon'
 import { computeToday } from '@/lib/planEngine'
+import { walletsTotal } from '@/lib/walletTotal'
 import Link from 'next/link'
 import TodayCard from '@/components/features/TodayCard'
+import FixedDueCard from '@/components/features/FixedDueCard'
 import AddWalletModal from '@/components/features/AddWalletModal'
 import TransferMoneyModal from '@/components/features/TransferMoneyModal'
 import EditTransactionModal from '@/components/features/EditTransactionModal'
@@ -89,10 +91,27 @@ export default function Home() {
     return () => clearInterval(id)
   }, [])
 
+  const [paydayDismissed, setPaydayDismissed] = useState(() => {
+    try { return localStorage.getItem('flowin-payday-dismissed') || '' } catch { return '' }
+  })
+
   const today = useMemo(
-    () => computeToday(budgetData, transactions, new Date(nowTick)),
-    [budgetData, transactions, nowTick]
+    () => computeToday(budgetData, transactions, new Date(nowTick), undefined, { walletsTotal: walletsTotal(wallets) }),
+    [budgetData, transactions, nowTick, wallets]
   )
+
+  // Payday: the first days of a new pay period with no income recorded yet.
+  const showPayday = useMemo(() => {
+    if (!today?.hasPlan || today.dayIndex > 2 || paydayDismissed === today.period.startStr) return false
+    const start = today.period.start.getTime()
+    return !transactions.some((tx) => tx.type === 'income' && tx.createdAt && new Date(tx.createdAt).getTime() >= start)
+  }, [today, transactions, paydayDismissed])
+
+  const dismissPayday = () => {
+    const key = today?.period?.startStr || ''
+    try { localStorage.setItem('flowin-payday-dismissed', key) } catch {}
+    setPaydayDismissed(key)
+  }
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -169,8 +188,28 @@ export default function Home() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M3 4h2.5l2.4 11h10.2l2-8H7" /></svg>
           {t('quick.purchase')}
         </button>
-        <VoiceButton inline />
       </div>
+
+      {today?.hasPlan && wallets.length === 0 && (
+        <section className={styles.promptCard}>
+          <h2>{t('plan.noWalletTitle')}</h2>
+          <p>{t('plan.noWalletBody')}</p>
+          <button type="button" className={styles.primaryAction} onClick={() => setShowAddWallet(true)}>{t('plan.addWallet')}</button>
+        </section>
+      )}
+
+      {showPayday && (
+        <section className={styles.promptCard}>
+          <h2>{t('plan.paydayTitle')}</h2>
+          <p>{t('plan.paydayBody')}</p>
+          <div className={styles.promptActions}>
+            <button type="button" className={styles.primaryAction} onClick={() => openModal('income', { amount: today.plan.income, source: t('onboarding.defaultSource') })}>{t('plan.paydayCta')}</button>
+            <button type="button" className={styles.secondaryAction} onClick={dismissPayday}>{t('plan.paydayLater')}</button>
+          </div>
+        </section>
+      )}
+
+      {user && <FixedDueCard uid={user.uid} budget={budgetData} today={today} variant="due" />}
 
       <Reveal delay={100} style={{ position: 'relative', zIndex: 20 }}>
       <div className={styles.walletsSection}>
@@ -285,6 +324,10 @@ export default function Home() {
       </section>
       </Reveal>
 
+
+      {/* Room so the floating voice button never covers the last row */}
+      <div className={styles.voiceSpacer} aria-hidden="true" />
+      <VoiceButton />
 
       {showAddWallet && user && (
         <AddWalletModal uid={user.uid} onClose={() => setShowAddWallet(false)} />

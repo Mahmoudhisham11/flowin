@@ -99,3 +99,49 @@ test('allocation of spending and the safe-to-spend-today engine', () => {
   assert.equal(r.status, 'caution'); assert.equal(r.coach.key, 'nearLimit'); assert.equal(r.coach.params.left, 28)
 
 })
+
+test('real money: today never exceeds what the wallets allow until payday', () => {
+  const d = (s) => { const [y, m, dd] = s.split('-').map(Number); return new Date(y, m - 1, dd) }
+  const tx = (day, amount, category = 'Other', extra = {}) => ({ type: 'expense', amount, category, createdAt: `${day}T12:00:00`, ...extra })
+  const cfg = {
+    planVersion: 1, payCycle: 'monthly', payDay: 1, savingsPct: 15, incomeSources: [{ amount: 14000 }],
+    essentialCategories: [{ name: 'Rent', amount: 6000, presetId: 'rent' }, { name: 'Bills', amount: 1000, presetId: 'bills', categoryId: 'Bills' }],
+  } // plan: 4900 free / 30 days in November
+
+  // Day 8, only 800 left in the wallets, rent and bills already paid (marked) -> 800 over 23 days
+  const marked = { ...cfg, fixedPaid: { periodStart: '2026-11-01', keys: ['rent', 'bills'] } }
+  let r = computeToday(marked, [], d('2026-11-08'), undefined, { walletsTotal: 800 })
+  assert.equal(r.daysLeft, 23); assert.equal(r.dueNow, 0)
+  assert.equal(r.limitedBy, 'cash'); assert.ok(Math.abs(r.todayAllowance - 800 / 23) < 1e-9)
+  assert.ok(r.planAllowance > 100)                                  // the plan alone would say ~163
+  assert.equal(r.poolRemaining, 800); assert.equal(r.coach.key, 'cashLimited')
+  assert.equal(r.coach.params.daily, 35); assert.equal(r.coach.params.cash, 800)
+
+  // the same, but nothing marked: rent + bills (7000) are still due and 800 cannot cover them
+  r = computeToday(cfg, [], d('2026-11-08'), undefined, { walletsTotal: 800 })
+  assert.equal(r.dueNow, 7000); assert.equal(r.todayAllowance, 0); assert.equal(r.coach.key, 'cantCoverFixed')
+  assert.equal(r.status, 'depleted')
+  // marks from an older pay period do not count
+  r = computeToday({ ...cfg, fixedPaid: { periodStart: '2026-10-01', keys: ['rent', 'bills'] } }, [], d('2026-11-08'), undefined, { walletsTotal: 800 })
+  assert.equal(r.dueNow, 7000)
+
+  // a logged rent payment counts as paid, partial payments leave the rest due
+  r = computeToday(cfg, [tx('2026-11-02', 6000, 'Other', { essentialKey: 'rent' }), tx('2026-11-03', 400, 'Bills')], d('2026-11-08'), undefined, { walletsTotal: 2000 })
+  assert.equal(r.dueNow, 600); assert.ok(Math.abs(r.todayAllowance - 1400 / 23) < 1e-9)
+  assert.deepEqual(r.essentialsDue.map((e) => [e.key, e.due]), [['rent', 0], ['bills', 600]])
+
+  // today's spending: the wallets already went down, the amount for today is from the start of the day
+  r = computeToday(marked, [tx('2026-11-08', 20, 'Food')], d('2026-11-08'), undefined, { walletsTotal: 780 })
+  assert.ok(Math.abs(r.todayAllowance - 800 / 23) < 1e-9); assert.ok(Math.abs(r.remainingToday - (800 / 23 - 20)) < 1e-9)
+  assert.ok(Math.abs(r.tomorrowAllowance - 780 / 22) < 1e-9)
+  // income received today is not part of the start-of-day money
+  r = computeToday(marked, [{ type: 'income', amount: 500, createdAt: '2026-11-08T09:00:00' }], d('2026-11-08'), undefined, { walletsTotal: 1300 })
+  assert.ok(Math.abs(r.todayAllowance - 800 / 23) < 1e-9)
+
+  // more money than the plan: the plan still wins (savings stay protected)
+  r = computeToday(marked, [], d('2026-11-08'), undefined, { walletsTotal: 50000 })
+  assert.equal(r.limitedBy, 'plan'); assert.equal(r.todayAllowance, r.planAllowance); assert.ok(r.cash.gap < 0)
+  // no wallets passed: plan-only behaviour, unchanged
+  r = computeToday(marked, [], d('2026-11-08'))
+  assert.equal(r.cash, null); assert.equal(r.limitedBy, 'plan')
+})

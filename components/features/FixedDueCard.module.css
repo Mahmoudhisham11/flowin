@@ -1,0 +1,24 @@
+.card {
+  display: flex; flex-direction: column; gap: 8px; padding: 16px; margin-bottom: 14px;
+  border-radius: var(--radius-md); background: var(--card); border: 1px solid var(--card-border);
+}
+.title { margin: 0; font-size: 15px; font-weight: 700; color: var(--text-dark); }
+.hint { margin: 0; font-size: 13px; line-height: 1.6; color: var(--text-gray); }
+.list { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; border-top: 1px solid var(--border-light); }
+.row:first-child { border-top: 0; }
+.info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.name { font-size: 15px; font-weight: 600; color: var(--text-dark); overflow-wrap: anywhere; }
+.amount { font-size: 13px; color: var(--text-gray); font-variant-numeric: tabular-nums; }
+.row[data-state='due'] .amount { color: var(--warning); font-weight: 600; }
+.mark {
+  flex: none; min-height: 40px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--primary);
+  background: transparent; color: var(--primary-dark); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+}
+.mark:disabled, .undo:disabled { opacity: 0.6; cursor: default; }
+.undo {
+  flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; min-height: 44px;
+  border: 0; background: transparent; font-family: inherit; cursor: pointer; padding: 0;
+}
+.undoText { font-size: 11px; color: var(--text-gray); text-decoration: underline; }
+.badge { padding: 4px 10px; border-radius: 999px; background: var(--success-bg); color: var(--success); font-size: 12px; font-weight: 700; white-space: nowrap; }
