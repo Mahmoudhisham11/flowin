@@ -1,0 +1,45 @@
+.page { min-height: 100vh; background: var(--bg); color: var(--text-dark); }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; max-width: 1040px; margin: 0 auto; }
+.brand { font-size: 22px; font-weight: 800; }
+.navRight { display: flex; align-items: center; gap: 10px; }
+.langs { display: flex; gap: 4px; padding: 3px; border-radius: 12px; background: var(--input-bg); }
+.langs button { min-height: 34px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--text-gray); font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.langs .langOn { background: var(--modal-bg); color: var(--text-dark); box-shadow: var(--shadow-sm); }
+.signIn { padding: 8px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--primary); text-decoration: none; }
+
+.hero { max-width: 760px; margin: 0 auto; padding: 48px 20px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.hero h1 { margin: 0; font-size: clamp(30px, 6vw, 48px); line-height: 1.2; font-weight: 800; }
+.hero p { margin: 0; font-size: clamp(16px, 2.4vw, 19px); line-height: 1.7; color: var(--text-gray); max-width: 600px; }
+.hero small { font-size: 13px; color: var(--text-light); }
+.cta {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; border-radius: 16px;
+  background: var(--primary-gradient); color: #fff; font-size: 16px; font-weight: 800; text-decoration: none; box-shadow: var(--shadow-md);
+}
+
+.section { max-width: 1040px; margin: 0 auto; padding: 32px 20px; }
+.section h2 { margin: 0 0 20px; font-size: 26px; text-align: center; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
+.card { padding: 20px; border-radius: var(--radius-md); background: var(--card); border: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 6px; }
+.icon { font-size: 28px; }
+.card h3 { margin: 4px 0 0; font-size: 17px; }
+.card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-gray); }
+
+.steps { list-style: none; margin: 0 auto; padding: 0; max-width: 640px; display: flex; flex-direction: column; gap: 16px; }
+.steps li { display: flex; gap: 14px; align-items: flex-start; }
+.num { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--primary-gradient); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.steps h3 { margin: 0 0 4px; font-size: 17px; }
+.steps p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-gray); }
+
+.plans { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); max-width: 720px; margin: 0 auto; }
+.plan { padding: 22px; border-radius: var(--radius-md); background: var(--card); border: 1px solid var(--card-border); }
+.planPro { border: 2px solid var(--primary); }
+.plan h3 { margin: 0 0 6px; font-size: 18px; }
+.price { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+.price small { font-size: 13px; font-weight: 600; color: var(--text-gray); }
+.plan ul { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--text-dark); line-height: 1.6; }
+.center { display: flex; justify-content: center; margin-top: 24px; }
+
+.footer { max-width: 1040px; margin: 0 auto; padding: 28px 20px 48px; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; color: var(--text-light); text-align: center; }
+.footer p { margin: 0; }
+.footer nav { display: flex; gap: 18px; }
+.footer a { color: var(--primary); font-weight: 600; text-decoration: none; }

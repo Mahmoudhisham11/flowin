@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -206,6 +207,9 @@ export default function LoginForm() {
           </p>
         )}
       </div>
+      <p className={styles.switchText} style={{ marginTop: 12, fontSize: 12 }}>
+        <Link href="/privacy">{t('privacy.policy')}</Link> · <Link href="/terms">{t('privacy.terms')}</Link>
+      </p>
     </div>
   )
 }

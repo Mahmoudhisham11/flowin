@@ -8,7 +8,7 @@ import QuickActionsHost from '@/components/navigation/QuickActionsHost'
 
 export default function AppShell({ children }) {
   const pathname = usePathname()
-  const isAuthPage = pathname === '/login' || pathname === '/onboarding'
+  const isAuthPage = ['/login', '/onboarding', '/welcome', '/privacy', '/terms'].includes(pathname)
 
   if (isAuthPage) return <>{children}</>
 

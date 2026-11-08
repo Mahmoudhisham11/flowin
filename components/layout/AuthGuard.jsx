@@ -4,20 +4,26 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { useEffect } from 'react'
 
+// Pages anyone can open without signing in.
+const PUBLIC_PATHS = ['/welcome', '/privacy', '/terms']
+
 export default function AuthGuard({ children }) {
   const pathname = usePathname()
   const router = useRouter()
   const { userData, loading, userLoading } = useUser()
 
   const isAuthPage = pathname === '/login'
+  const isPublic = PUBLIC_PATHS.includes(pathname)
   const isOnboarding = pathname === '/onboarding'
   // Every account must set up its plan once (income, fixed expenses, savings).
   const needsOnboarding = Boolean(userData) && !userData.onboardingCompleted
 
   useEffect(() => {
+    if (isPublic) return
     if (loading) return
     if (!userData && !isAuthPage) {
-      router.replace('/login')
+      // Visitors see the landing page at the root, everything else asks them to sign in.
+      router.replace(pathname === '/' ? '/welcome' : '/login')
     }
     if (userData && isAuthPage) {
       router.replace('/')
@@ -26,7 +32,9 @@ export default function AuthGuard({ children }) {
     if (needsOnboarding && !isOnboarding) {
       router.replace('/onboarding')
     }
-  }, [userData, loading, isAuthPage, isOnboarding, needsOnboarding, router])
+  }, [userData, loading, isAuthPage, isPublic, isOnboarding, needsOnboarding, pathname, router])
+
+  if (isPublic) return <>{children}</>
 
   if (loading) {
     return (

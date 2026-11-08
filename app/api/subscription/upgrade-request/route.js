@@ -2,9 +2,10 @@ import { Timestamp } from 'firebase-admin/firestore'
 import { getAdminFirestore } from '@/lib/firebaseAdmin'
 import { requireUser, HttpError, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
+import { PRO_PRICE as LIST_PRICE } from '@/lib/plans'
 
 // The price is decided here, not by the client.
-const PRO_PRICE = Number(process.env.PRO_PRICE_EGP) || null
+const PRO_PRICE = Number(process.env.PRO_PRICE_EGP) || Number(LIST_PRICE)
 
 export async function POST(req) {
   try {
@@ -34,7 +35,7 @@ export async function POST(req) {
       email: email || '',
       phone: cleanPhone,
       refId: cleanRef,
-      amount: PRO_PRICE ?? (Number(amount) || 0),
+      amount: PRO_PRICE,
       status: 'pending',
       createdAt: Timestamp.now(),
     })

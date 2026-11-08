@@ -5,11 +5,11 @@ import { useUser } from '@/contexts/UserContext'
 import { useSubscription } from '@/hooks/useSubscription'
 import { useTranslation } from '@/hooks/useTranslation'
 import { submitUpgradeRequest } from '@/services/pendingUpgradesService'
+import { PRO_PRICE } from '@/lib/plans'
 import PlanCard from './PlanCard'
 import styles from './PricingModal.module.css'
 
 const VODAFONE_NUMBER = '01097025743'
-const PRO_PRICE = '99.99'
 
 const PLANS = {
   free: {

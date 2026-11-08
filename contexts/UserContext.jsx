@@ -38,13 +38,16 @@ export function UserProvider({ children }) {
   useEffect(() => {
     if (authLoading) return
 
-    setLoading(false)
-
     if (!firebaseUser) {
       setUserData(null)
       setUserLoading(false)
+      setLoading(false)
       return
     }
+
+    // Signed in: keep "loading" until the profile document is known, so route guards never
+    // mistake a signed-in user for a signed-out one while the profile is being fetched.
+    setLoading(true)
 
     let cancelled = false
 
@@ -76,7 +79,10 @@ export function UserProvider({ children }) {
       } catch (err) {
         console.error('[UserContext] Failed to load user profile:', err)
       } finally {
-        if (!cancelled) setUserLoading(false)
+        if (!cancelled) {
+          setUserLoading(false)
+          setLoading(false)
+        }
       }
     }
 

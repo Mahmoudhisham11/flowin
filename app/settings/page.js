@@ -10,6 +10,7 @@ import { t } from '@/lib/translations'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import { useFCM } from '@/hooks/useFCM'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import PrivacySection from '@/components/features/PrivacySection'
 import PricingModal from '@/components/subscription/PricingModal'
 import styles from './page.module.css'
 
@@ -425,6 +426,8 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      <PrivacySection />
 
       <div className={styles.logoutSection}>
         <button className={styles.logoutBtn} onClick={() => setShowLogoutConfirm(true)}>
