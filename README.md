@@ -96,3 +96,46 @@ graph TD
 * **فهم اللهجات والسياق المالي:** القدرة على استخراج التفاصيل المالية من الجمل الصوتية العفوية.
 * **الوعي المالي الكامل (Live Financial Awareness):** يرى الذكاء الاصطناعي أرقامك الحقيقية ومحافظك ومصروفاتك لحظياً للإجابة على استفساراتك بأرقام واقعية وليست نصائح عامة.
 * **التحليل الاستباقي:** اكتشاف أنماط الصرف الزائد وتنبيه المستخدم لاقتناص فرص توفير إضافية.
+---
+
+## 🛠️ الإعداد والنشر (Setup & Deployment)
+
+### المتطلبات
+- Node.js 20 أو أحدث، ومشروع Firebase (Authentication + Firestore + Cloud Messaging)، وحساب Vercel، ومفتاح OpenRouter.
+
+### متغيرات البيئة
+القالب الكامل في [`.env.example`](.env.example). أضفها في Vercel لبيئتي **Production و Preview** (النسخ التجريبية بدونها بتفشل في أي API يحتاج Firebase أو الذكاء الاصطناعي).
+
+| المتغير | مطلوب | الاستخدام |
+|---|---|---|
+| `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | نعم | Firebase Admin على السيرفر (التحقق من الهوية، الأدمن، الاختصار السريع، الإشعارات). اجعل المفتاح الخاص **Sensitive** |
+| `OPENROUTER_API_KEY` | نعم | المدير المالي، الإدخال الصوتي، التحليلات |
+| `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | للإشعارات | Web Push |
+| `NEXT_PUBLIC_APP_URL` | اختياري | رابط التطبيق (يُرسل لـ OpenRouter) |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | اختياري | إيميل التواصل في صفحتي الخصوصية والشروط |
+| `PRO_PRICE_EGP` | اختياري | سعر Pro (الافتراضي 99.99) |
+| `AI_CHAT_DAILY_LIMIT` | اختياري | رسائل الشات اليومية لكل مستخدم (الافتراضي 40) |
+
+### إعداد Firebase (مرة واحدة)
+1. **Authentication:** فعّل Email/Password وGoogle، وأضف نطاق التطبيق (`*.vercel.app` والنطاق المخصص) في *Authorized domains*.
+2. **قواعد Firestore:** انشرها بعد نشر الكود: `firebase deploy --only firestore:rules` (الملف `firestore.rules`). من غيرها قاعدة البيانات مش محمية.
+3. **أول أدمن:** سجّل بحسابك في التطبيق، ثم من Firebase console افتح `users/{uid}` وغيّر الحقل `role` إلى `admin`. العميل لا يستطيع تغييره بعد نشر القواعد.
+4. **الإشعارات:** أنشئ Web Push key pair وضعه في `NEXT_PUBLIC_FIREBASE_VAPID_KEY`.
+
+### التحقق بعد كل نشر
+افتح **لوحة الأدمن ← System**: تعرض حالة كل إعداد (نعم/لا بدون أي قيمة سرية)، واتصال قاعدة البيانات، وزرار **Test the AI** يجرّب مزوّد الذكاء الاصطناعي فعليًا.
+
+### التشغيل محليًا
+```bash
+npm install
+cp .env.example .env.local   # ثم املأ القيم
+npm run dev
+npm test                     # اختبارات المحرك (الخطة، التقارير، الأهداف، الشات، الاشتراكات)
+npm run lint
+```
+
+### بنية المشروع المختصرة
+- `lib/planEngine.js` و`reportEngine.js` و`goalEngine.js` و`purchaseAdvisor.js`: منطق خالص بلا Firebase ولا React، مغطّى بالاختبارات في `tests/`.
+- `app/api/*`: كل المسارات تتحقق من هوية المستخدم (`lib/serverAuth.js`)، والأدمن والاشتراكات والتوكنات تتم عبر Admin SDK فقط.
+- `firestore.rules`: كل مستخدم يقرأ ويكتب بياناته فقط، وحقول الدور والاشتراك محمية من العميل.
+- التصميم: متغيرات الألوان والمسافات في `app/globals.css` (فاتح وداكن).

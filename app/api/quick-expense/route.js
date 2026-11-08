@@ -9,6 +9,9 @@ import { canWrite } from '@/lib/subscriptionLogic'
 import { rateLimit } from '@/lib/rateLimit'
 import { normalizeCurrency } from '@/lib/currency'
 
+// Free AI models can be slow: allow the function to run longer than the platform default.
+export const maxDuration = 60
+
 const MAX_AMOUNT = 1_000_000_000
 
 export async function POST(req) {

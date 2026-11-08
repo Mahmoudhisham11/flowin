@@ -2,6 +2,9 @@ import { requirePaidUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
 import { normalizeCurrency } from '@/lib/currency'
 
+// Free AI models can be slow: allow the function to run longer than the platform default.
+export const maxDuration = 60
+
 const SYSTEM_PROMPT = `You are an expert financial transaction extractor specialized in Egyptian Arabic dialect (اللهجة المصرية) and English.
 Extract ALL financial transactions (expenses AND income) from the user's text.
 
@@ -88,6 +91,7 @@ export async function POST(req) {
       try {
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
+          signal: AbortSignal.timeout(40_000),
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${apiKey}`,

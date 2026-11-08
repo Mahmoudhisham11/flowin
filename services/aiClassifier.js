@@ -123,6 +123,7 @@ export async function classifyExpenseCategory(reason) {
 
         const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
+          signal: AbortSignal.timeout(15_000),
           signal: controller.signal,
           headers: {
             'Content-Type': 'application/json',

@@ -2,6 +2,9 @@ import { requireUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
 import { normalizeCurrency, currencyLabelAr } from '@/lib/currency'
 
+// Free AI models can be slow: allow the function to run longer than the platform default.
+export const maxDuration = 60
+
 const SYSTEM_PROMPT_AR = `أنت مستشار ومخطط مالي ذكي ومحترف.
 المستخدم قام بإدخال بيانات ميزانيته الشهرية:
 - الدخل الشهري (Monthly Income)
@@ -156,6 +159,7 @@ export async function POST(req) {
     try {
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
+        signal: AbortSignal.timeout(40_000),
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { useTranslation } from '@/hooks/useTranslation'
 import { getAllUsers, updateUserRole } from '@/services/adminService'
+import AdminSystemPanel from '@/components/features/AdminSystemPanel'
 import { getPendingUpgrades, approveUpgrade, rejectUpgrade } from '@/services/pendingUpgradesService'
 import { useRouter } from 'next/navigation'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
@@ -240,8 +241,15 @@ export default function AdminPage() {
           {t('admin.pendingUpgrades')}
           {pending.length > 0 && <span className={styles.tabCount}>{pending.length}</span>}
         </button>
+        <button
+          className={`${styles.tab} ${tab === 'system' ? styles.tabActive : ''}`}
+          onClick={() => setTab('system')}
+        >
+          {t('admin.sys.system')}
+        </button>
       </div>
 
+      {tab !== 'system' && (
       <div className={styles.searchSection}>
         <div className={styles.searchBar}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -289,8 +297,11 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+      )}
 
-      {tab === 'users' ? (
+      {tab === 'system' ? (
+        <AdminSystemPanel />
+      ) : tab === 'users' ? (
         <div className={styles.cardList}>
           {loading ? (
             <div className={styles.loading}>{t('loading')}</div>

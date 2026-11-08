@@ -1,6 +1,9 @@
 import { requireUser, errorResponse } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
 
+// Free AI models can be slow: allow the function to run longer than the platform default.
+export const maxDuration = 60
+
 const SYSTEM_PROMPT = `You are a financial analyst. Given a user's aggregated weekly financial data, generate a JSON insight.
 
 Rules:
@@ -43,6 +46,7 @@ export async function POST(req) {
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
+      signal: AbortSignal.timeout(40_000),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,

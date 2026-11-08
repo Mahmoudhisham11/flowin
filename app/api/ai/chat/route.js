@@ -8,6 +8,9 @@ import { formatChatContext } from '@/lib/chatContext'
 import { systemPrompt, parseModelAnswer } from '@/lib/chatPrompt'
 import { normalizeCurrency } from '@/lib/currency'
 
+// Free AI models can be slow: allow the function to run longer than the platform default.
+export const maxDuration = 60
+
 const MODEL = 'openrouter/free'
 const MAX_MESSAGE = 2000
 
@@ -65,6 +68,7 @@ export async function POST(req) {
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
+      signal: AbortSignal.timeout(40_000),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,

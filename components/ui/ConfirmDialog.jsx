@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import useSmoothClose from '@/hooks/useSmoothClose'
 import styles from './ConfirmDialog.module.css'
 
-export default function ConfirmDialog({ open, title, message, confirmLabel, cancelLabel, confirmColor = '#EF4444', onConfirm, onCancel }) {
+export default function ConfirmDialog({ open = true, title, message, confirmLabel, cancelLabel, confirmColor = '#EF4444', onConfirm, onCancel }) {
   const { t } = useTranslation()
   const { isClosing, handleClose } = useSmoothClose(onCancel)
 
