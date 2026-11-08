@@ -3,11 +3,10 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import { useUser } from '@/contexts/UserContext'
 import { authFetch } from '@/lib/authFetch'
-import { useCurrency } from '@/hooks/useCurrency'
 import { useSearchParams } from 'next/navigation'
 import { AIIcon } from '@/components/Icons'
 import { useTranslation } from '@/hooks/useTranslation'
-import { buildChatContext } from '@/services/chatContextBuilder'
+import { fillText } from '@/lib/fillText'
 import styles from './page.module.css'
 
 function hasArabic(text) {
@@ -16,12 +15,12 @@ function hasArabic(text) {
 
 function AIPageContent() {
   const { user, userData } = useUser()
-  const currency = useCurrency()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const searchParams = useSearchParams()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [quota, setQuota] = useState(null) // { limit, remaining } (limit null = unlimited)
   const bottomRef = useRef(null)
   const initSent = useRef(false)
 
@@ -33,25 +32,26 @@ function AIPageContent() {
     setLoading(true)
 
     try {
-      const context = await buildChatContext(user.uid, userData?.name, currency)
-      const history = messages.map((m) => ({ role: m.role, text: m.text }))
+      const history = messages.filter((m) => !m.error).map((m) => ({ role: m.role, text: m.text }))
 
       const res = await authFetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMsg.text,
-          context,
           history,
+          lang,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
 
+      const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || 'AI request failed')
+        const e = new Error(data.error || 'AI request failed')
+        e.code = data.code
+        throw e
       }
-
-      const data = await res.json()
+      if (data.quota) setQuota(data.quota)
 
       setMessages((prev) => [
         ...prev,
@@ -63,19 +63,31 @@ function AIPageContent() {
         },
       ])
     } catch (err) {
+      if (err.code === 'DAILY_LIMIT') setQuota((q) => ({ ...(q || {}), remaining: 0 }))
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          text: t('ai.error'),
-          suggestions: ['Try asking about my spending', 'How are my finances?', 'Show me my top categories'],
+          text: err.code === 'DAILY_LIMIT' ? t('ai.limitReached') : err.message && err.message !== 'AI request failed' ? err.message : t('ai.busy'),
+          suggestions: [],
           error: true,
         },
       ])
     } finally {
       setLoading(false)
     }
-  }, [input, loading, user, messages, userData, currency, t])
+  }, [input, loading, user, messages, lang, t])
+
+  // How many messages are left today.
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    authFetch('/api/ai/chat')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d?.quota) setQuota(d.quota) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [user])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -117,7 +129,7 @@ function AIPageContent() {
               <h2 className={styles.welcomeTitle}>{t('ai.title')}</h2>
               <p className={styles.welcomeText}>{t('ai.noContext')}</p>
               <div className={styles.suggestionChips}>
-                {['How much did I spend this month?', 'What is my biggest expense category?', 'Give me a savings tip', 'How are my wallets doing?'].map((s) => (
+                {[t('ai.chip1'), t('ai.chip2'), t('ai.chip3'), t('ai.chip4')].map((s) => (
                   <button key={s} className={styles.chip} onClick={() => handleSuggestionClick(s)} dir="auto">
                     {s}
                   </button>
@@ -141,11 +153,6 @@ function AIPageContent() {
                         {s}
                       </button>
                     ))}
-                  </div>
-                )}
-                {msg.confidence !== undefined && (
-                  <div className={styles.confidence}>
-                    {t('ai.confidence')}: {Math.round(msg.confidence * 100)}%
                   </div>
                 )}
               </div>
@@ -177,14 +184,21 @@ function AIPageContent() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            disabled={loading}
+            disabled={loading || quota?.remaining === 0}
+            maxLength={500}
           />
-          <button className={styles.sendBtn} onClick={handleSend} disabled={!input.trim() || loading}>
+          <button className={styles.sendBtn} onClick={handleSend} disabled={!input.trim() || loading || quota?.remaining === 0}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />
             </svg>
           </button>
+        </div>
+        <div className={styles.footnote}>
+          {quota?.remaining !== null && quota?.remaining !== undefined && (
+            <span>{fillText(t('ai.quotaLeft'), { n: quota.remaining })}</span>
+          )}
+          <span>{t('ai.disclaimer')}</span>
         </div>
       </div>
     </div>

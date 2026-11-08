@@ -407,3 +407,13 @@
     width: 100%;
   }
 }
+
+.footnote {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px 0;
+  font-size: 11px;
+  color: var(--text-light);
+  text-align: center;
+}

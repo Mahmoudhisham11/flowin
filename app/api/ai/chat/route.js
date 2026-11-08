@@ -1,107 +1,67 @@
-import { requireUser, requirePaidUser, errorResponse } from '@/lib/serverAuth'
+import { getAdminFirestore } from '@/lib/firebaseAdmin'
+import { requirePaidUser, errorResponse, HttpError } from '@/lib/serverAuth'
 import { rateLimit } from '@/lib/rateLimit'
+import { resolveTimezone, localDateStr } from '@/lib/timezone'
+import { getQuota, consumeQuota } from '@/lib/aiQuota'
+import { loadChatData } from '@/lib/chatData'
+import { formatChatContext } from '@/lib/chatContext'
+import { systemPrompt, parseModelAnswer } from '@/lib/chatPrompt'
 import { normalizeCurrency } from '@/lib/currency'
 
-const SYSTEM_PROMPT = `You are a professional financial advisor AI. You have access to the user's real financial data as context, including their transactions, wallets, budget, and tasks. The user's name is provided in the context - use it to personalize your responses and greet them by name.
+const MODEL = 'openrouter/free'
+const MAX_MESSAGE = 2000
 
-Rules:
-- Answer ONLY based on the provided financial context
-- Be concise, helpful, and accurate
-- Use a professional but friendly tone
-- Greet the user by their name at the start of your response when appropriate
-- If the question is outside the scope of the provided data, politely say you can only answer based on their financial data
-- Use numbers and percentages from the context when relevant
-- Suggest actionable advice when appropriate
-- You can analyze daily task completion rates and overdue tasks
-- Tasks are persistent (they don't reset daily) and are scheduled for specific dates
-- You can help users plan their tasks across the week and prioritize effectively
-
-Return ONLY valid JSON in this exact format:
-{
-  "answer": string (your full response, greet the user by name when appropriate),
-  "suggestions": string[] (3 follow-up questions the user might ask next),
-  "confidence": number (0-1 based on how confident you are in the answer)
+// Remaining messages for today (shown under the chat input).
+export async function GET(req) {
+  try {
+    const { uid, userData } = await requirePaidUser(req)
+    const tz = resolveTimezone(userData.timezone)
+    const quota = await getQuota(uid, userData, localDateStr(tz))
+    return Response.json({ success: true, quota })
+  } catch (err) {
+    return errorResponse(err)
+  }
 }
-
-No markdown, no code fences, no extra text.`
 
 export async function POST(req) {
   try {
-    const { uid } = await requirePaidUser(req)
-    rateLimit(`ai-chat:${uid}`, 20, 60_000)
+    const { uid, userData } = await requirePaidUser(req)
+    rateLimit(`ai-chat:${uid}`, 15, 60_000)
 
-    const { message, context, history } = await req.json()
-
-    if (!message || !context) {
-      return Response.json({ error: 'Message and context are required' }, { status: 400 })
-    }
+    const body = await req.json().catch(() => ({}))
+    const message = typeof body.message === 'string' ? body.message.trim().slice(0, MAX_MESSAGE) : ''
+    if (!message) throw new HttpError(400, 'Message is required')
+    const lang = body.lang === 'en' ? 'en' : 'ar'
 
     const apiKey = process.env.OPENROUTER_API_KEY
+    if (!apiKey) throw new HttpError(500, 'AI is not configured')
 
-    if (!apiKey) {
-      return Response.json({ error: 'OpenRouter API key not configured' }, { status: 500 })
-    }
+    const tz = resolveTimezone(body.timezone || userData.timezone)
+    const day = localDateStr(tz)
 
-    const cur = normalizeCurrency(context.currency)
-    const fmt = (v) => { try { return Number(v || 0).toLocaleString() } catch { return '0' } }
+    // Fail fast (without spending a message) when today's limit is already used up.
+    const before = await getQuota(uid, userData, day)
+    if (before.remaining === 0) throw new HttpError(429, 'DAILY_LIMIT')
 
-    const contextBlock = `USER: ${context.userName || 'User'}
-
-USER FINANCIAL DATA (${context.period || 'N/A'}):
-- Total Balance: ${cur} ${fmt(context.totalBalance)}
-- Total Spent: ${cur} ${fmt(context.totalSpent)}
-- Total Income: ${cur} ${fmt(context.totalIncome)}
-- Transactions in period: ${context.transactionCount || 0}
-
-Spending by Category:
-${Object.entries(context.categories || {})
-  .map(([cat, amt]) => `  - ${cat}: ${cur} ${fmt(amt)}`)
-  .join('\n') || '  (no data)'}
-
-Wallet Activity:
-${Object.entries(context.walletActivity || {})
-  .map(([name, amt]) => `  - ${name}: ${cur} ${fmt(amt)}`)
-  .join('\n') || '  (no data)'}
-
-Wallets:
-${(context.wallets || []).map((w) => `  - ${w.name} (${w.type || '?'}): ${cur} ${fmt(w.balance)}`).join('\n') || '  (no wallets)'}
-
-${context.latestInsight ? `Latest AI Insight:
-- Risk Level: ${context.latestInsight.riskLevel || 'N/A'}
-- Insight: ${context.latestInsight.insight || 'N/A'}
-- Recommendation: ${context.latestInsight.recommendation || 'N/A'}` : ''}
-
-${context.budget ? `MONTHLY BUDGET PLAN:
-- Monthly Income: ${cur} ${fmt(context.budget.monthlyIncome)}
-- Total Essential Expenses: ${cur} ${fmt(context.budget.totalEssentials)}
-- Potential Savings: ${cur} ${fmt((context.budget.monthlyIncome || 0) - (context.budget.totalEssentials || 0))}
-- Essential Categories:
-${(context.budget.essentialCategories || []).map((c) => `  - ${c.name}: ${cur} ${fmt(c.amount)}`).join('\n') || '  (none set)'}` : ''}
-
-DAILY TASKS (${context.dailyTasks?.total || 0} total, ${context.dailyTasks?.completed || 0} completed):
-Today (${context.dailyTasks?.todayTotal || 0} tasks, ${context.dailyTasks?.todayCompletionRate || 0}% complete):
-${(context.dailyTasks?.todayItems || []).length > 0 ? context.dailyTasks.todayItems.map((t) => `  - [${t.completed ? 'x' : ' '}] ${t.title} (${t.priority}${t.time ? ', ' + t.time : ''})`).join('\n') : '  (no tasks today)'}
-${context.dailyTasks?.urgent > 0 ? `  - WARNING: ${context.dailyTasks.urgent} urgent task(s) incomplete today!` : ''}
-${context.dailyTasks?.overdue > 0 ? `OVERDUE TASKS (${context.dailyTasks.overdue}):
-${(context.dailyTasks?.overdueItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}`).join('\n')}` : ''}
-${context.dailyTasks?.upcoming > 0 ? `UPCOMING TASKS (${context.dailyTasks.upcoming}):
-${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.priority}) - scheduled: ${t.date}${t.time ? ', ' + t.time : ''}`).join('\n')}` : ''}`
+    // Everything the model knows comes from the database, never from the browser.
+    const db = getAdminFirestore()
+    const data = await loadChatData(db, uid, userData, tz)
+    const firstName = String(userData.name || '').trim().split(/\s+/)[0]
+    const context = formatChatContext({ ...data, firstName, currency: normalizeCurrency(userData.currency) })
 
     const messages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'system', content: contextBlock },
+      { role: 'system', content: systemPrompt(lang) },
+      { role: 'system', content: context },
     ]
-
-    // Only user/assistant turns are accepted from the client (never 'system'), with bounded size.
-    if (Array.isArray(history)) {
-      history.slice(-20).forEach((msg) => {
-        if ((msg?.role === 'user' || msg?.role === 'assistant') && typeof msg.text === 'string') {
-          messages.push({ role: msg.role, content: msg.text.slice(0, 4000) })
+    // Only user/assistant turns from the client (never 'system'), bounded in number and size.
+    if (Array.isArray(body.history)) {
+      body.history.slice(-10).forEach((m) => {
+        if ((m?.role === 'user' || m?.role === 'assistant') && typeof m.text === 'string') {
+          messages.push({ role: m.role, content: m.text.slice(0, 1500) })
         }
       })
     }
-
-    messages.push({ role: 'user', content: String(message).slice(0, 4000) })
+    messages.push({ role: 'user', content: message })
 
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -110,42 +70,25 @@ ${(context.dailyTasks?.upcomingItems || []).map((t) => `  - [ ] ${t.title} (${t.
         Authorization: `Bearer ${apiKey}`,
         'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
       },
-      body: JSON.stringify({
-        model: 'openrouter/free',
-        messages,
-        temperature: 0.3,
-        max_tokens: 800,
-      }),
+      body: JSON.stringify({ model: MODEL, messages, temperature: 0.3, max_tokens: 900 }),
     })
 
     if (!res.ok) {
-      const errText = await res.text().catch(() => '')
-      return Response.json({ error: `OpenRouter API error: ${res.status}` }, { status: 502 })
+      console.error('[ai/chat] OpenRouter error:', res.status)
+      throw new HttpError(502, 'The AI service is busy. Please try again.')
     }
 
-    const data = await res.json()
-    const content = data.choices?.[0]?.message?.content || ''
+    const completion = await res.json()
+    const parsed = parseModelAnswer(completion.choices?.[0]?.message?.content, lang)
+    if (!parsed) throw new HttpError(502, 'The AI returned an empty answer. Please try again.')
 
-    if (!content) {
-      return Response.json({ error: 'AI returned empty response' }, { status: 502 })
-    }
-
-    const cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim()
-    const first = cleaned.indexOf('{')
-    const last = cleaned.lastIndexOf('}')
-
-    if (first === -1 || last === -1) {
-      return Response.json({
-        answer: content,
-        suggestions: ['How can I reduce my spending?', 'What are my biggest expenses?', 'Give me a savings tip'],
-        confidence: 0.5,
-      })
-    }
-
-    const parsed = JSON.parse(cleaned.slice(first, last + 1))
-    return Response.json(parsed)
+    // Only a delivered answer costs a message.
+    const quota = await consumeQuota(uid, userData, day)
+    return Response.json({ success: true, ...parsed, quota })
   } catch (err) {
+    if (err instanceof HttpError && err.message === 'DAILY_LIMIT') {
+      return Response.json({ success: false, code: 'DAILY_LIMIT', error: 'You reached today’s message limit.' }, { status: 429 })
+    }
     return errorResponse(err)
   }
 }
-
